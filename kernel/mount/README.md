@@ -3,7 +3,20 @@
 Tree: master at 50d05c7c76c9 (v7.3-rc3) plus the staged revert of
 put_mnt_ns() to `umount_tree(ns->root, 0)`; that revert is the
 `FIX_PUT_MNT_NS_DISCONNECT` constant.  Files: fs/namespace.c, fs/pnode.c,
-fs/mount.h, fs/pnode.h and the mount-crossing code of fs/namei.c.
+fs/mount.h, fs/pnode.h and the mount-crossing code of fs/namei.c.  The
+revert has since been merged as 2e2142a35d80 in vfs.fixes.
+
+Everything here models mainline, with one exception: four toggles model
+fixes these models found, queued on work.mount.fixes and not in mainline
+yet: `FIX_CLONE_UNBINDABLE` (F1), `FIX_SET_GROUP_UNBINDABLE` (F4),
+`FIX_BUSY_VICTIMS` (F5) and `FIX_SPLIT_COUNT` (F2).  The green
+configurations run with the first three on; with them off the models
+describe mainline as it is, and `small_clone_unbindable`,
+`locked_set_group_unbindable`, `locked_busy_victims` and
+`mntput_torn_sum` show the four bugs there.  Models of unmerged series
+live next to this directory: `kernel/mount-knullfs/` (the vacant-mount
+series) and `kernel/mount-ownership/` (the three answers to the ownership
+cycle compared against each other).
 
 Two families of models, as in `~/notes/work.tla.mount/PLAN.md`:
 
@@ -34,11 +47,11 @@ Two families of models, as in `~/notes/work.tla.mount/PLAN.md`:
 | `show-trace.py` | print a counterexample from a log compactly |
 | `MC_parentcand.tla` | a scripted layout: the victim's parent is a candidate itself (from the review of the F5 fix) |
 | `MC_dbg.tla`, `dbg_trace.cfg` | a debugging template: script a scenario as a prelude with `MaxOps = 0`; the `PreludeDone` invariant fails after the last step and TLC prints every state |
-| `MntPut.tla`, `MC_mntput.tla` | Family B: __legitimize_mnt(), mntput_no_expire() with its slow path, cleanup_mnt(), do_umount() (sync and MNT_DETACH), namespace_unlock(), mntget()/mntput() pairs of a task holding a reference, migration; per-CPU mnt_count summed CPU by CPU, TSO store buffers, RCU grace periods |
+| `MntPut.tla`, `MC_mntput.tla` | Family B: __legitimize_mnt(), mntput_no_expire() with its slow path, cleanup_mnt(), do_umount() (sync and MNT_DETACH), namespace_unlock(), mntget()/mntput() pairs of a task holding a reference, migration; per-CPU mnt_count summed CPU by CPU, or with `FIX_SPLIT_COUNT` per-CPU gets and puts summed in two passes; store buffers, in order (TSO) or with `WEAK_STORES` reordered between words and fenced by smp_wmb(); RCU grace periods |
 | `show-put-trace.py` | print a MntPut counterexample compactly |
 | `LockMount.tla`, `MC_lockmount.tla` | Family B: do_lock_mount() (where_to_mount() under mount_lock, the temporary mntget(), inode_lock(), namespace_lock(), the second where_to_mount() and the -EAGAIN retry, cant_mount()/is_mounted()), get_mountpoint() with lookup_mountpoint()/d_set_mounted() and the -EBUSY retry, the pinned_mountpoint on m_list, do_add_mount()/attach_recursive_mnt(), unlock_mount(); against vfs_rmdir() (is_local_mountpoint() of its own namespace, dont_mount(), detach_mounts(), d_delete() after inode_unlock()), d_invalidate() (__d_drop() then detach_mounts() rounds), umount2(MNT_DETACH), namespace_unlock()'s puts and cleanup_mnt()'s put of stuck children; two namespaces sharing the dentries |
 | `show-lock-trace.py` | print a LockMount counterexample compactly |
-| `MountWalk.tla`, `MC_mountwalk.tla` | Family B: the RCU path walk (path_init(), __follow_mount_rcu() with __lookup_mnt()'s possible miss while a writer runs and the rechecks after a hop and a miss, follow_dotdot_rcu()/choose_mountpoint_rcu() with its recheck, step_into()'s -ENOENT on a negative dentry with no recheck, handle_dots()'s scoped -EAGAIN, complete_walk()'s legitimization, -ECHILD restarts in REF mode with lookup_mnt()/choose_mountpoint()) against a mounter (d_set_mounted(), then the write section), a lazy umount (unhash, DCACHE_MOUNTED cleared, synchronize_rcu(), the put that frees) and a move (unhash, new parent and mountpoint, rehash), each section one store per step |
+| `MountWalk.tla`, `MC_mountwalk.tla`, `MC_mountwalk2.tla` | Family B: the RCU path walk (path_init(), __follow_mount_rcu() with __lookup_mnt()'s possible miss while a writer runs and the rechecks after a hop and a miss, follow_dotdot_rcu()/choose_mountpoint_rcu() with its recheck, step_into()'s -ENOENT on a negative dentry with no recheck, handle_dots()'s scoped -EAGAIN, complete_walk()'s legitimization, -ECHILD restarts in REF mode with lookup_mnt()/choose_mountpoint()) against a mounter (d_set_mounted(), then the write section), a lazy umount (unhash, DCACHE_MOUNTED cleared, synchronize_rcu(), the put that frees) and a move (unhash, new parent and mountpoint, rehash), each section one store per step |
 | `show-walk-trace.py` | print a MountWalk counterexample compactly |
 | `MntWriters.tla`, `MC_mntwriters.tla` | Family B: WRITE_HOLD, mnt_get_write_access() (per-CPU increment, smp_mb(), the spin on WRITE_HOLD, mnt_is_readonly() with s_readonly_remount) against mnt_make_readonly() and sb_prepare_remount_readonly() with the remount's SB_RDONLY and sb_end_ro_state_change(); TSO store buffers |
 | `MntNs.tla`, `MC_mntns.tla` | Family B: the lifetime of one mount namespace under __ns_ref, __ns_ref_active (with the cascade to the owning user namespace) and the mount namespace's passive count; the task in it exiting (deactivate_nsproxy()), /proc/<pid>/ns/mnt files (mntns_get(), path_from_stashed(), nsfs_init_inode()'s resurrection, nsfs_evict()), listns() (ns_tree_lookup_rcu() + ns_get_unless_inactive()), NS_MNT_GET_NEXT (get_sequential_mnt_ns()), statmount() by id (lookup_mnt_ns(), namespace_sem shared, mnt_ns_release()), put_mnt_ns()'s teardown and free_mnt_ns() with the RCU-delayed passive drop |
@@ -98,6 +111,7 @@ root, pwd and open files.
 
 | Invariant | Meaning |
 |-----------|---------|
+| `UnwindOK` | after an injected failure inside a mount, bind or move, every live mount is exactly what it was before the operation: the partial copies are gone, the invented group ids are released, the peer rings and slave lists are back, nothing is marked (`FAILS` configurations) |
 | `AlgebraOK` | every step's operational result equalled the declarative rule: `CopiesOK` after mount/bind/move (copies exactly at the receivers, the shape of the source, the receivers' propagation graph position by position), `UmountVictimsOK` after umount (the victims are the maximal non-revealing subset of the maximal non-shifting subset of tree plus cognates, survivors reparented to the first surviving ancestor, victims private, slaves of victims transferred to a surviving peer or up the master chain), the change-type table of sharedsubtree.rst 5e, where a recursive make-slave keeps a mount a slave only if a peer outside the tree survives or its master chain leaves the tree (`KeepsMaster`), the clone-namespace rules; with `CHECK_DOC` also sharedsubtree.rst 5f and 5g as written |
 | `Structure` | one hashed mount per (parent, mountpoint); children lists and the overmount field; mountpoints under the parent's root; no cycles; T_SHARED iff a group id; peer rings; slave lists, one master per peer group, contiguous segments; unbindable is private; no marks left; MNT_UMOUNT means out of every namespace; a connected child of an unmounted mount is unmounted; MNT_LOCKED only with a parent |
 | `IteratorsOK` | `propagation_next()` enumerates exactly `RecvSet` |
@@ -139,6 +153,10 @@ by one):
 | `FIX_DOOMED_FLAG` | __legitimize_mnt() ignores MNT_DOOMED (119e1ef80ecf, 250cf3693060) |
 | `MIGRATE` | on: the holder migrates between CPUs, so its mntget()/mntput() pair can straddle mnt_get_count()'s loop |
 | `LAZY` | umount2(MNT_DETACH) instead of a synchronous umount |
+| `FIX_SPLIT_COUNT` | on: the fix for F2, gets and puts in separate per-CPU counters and mnt_get_count() summing every CPU's puts before every CPU's gets, the way srcu_readers_active_idx_check() sums srcu_unlock_count before srcu_lock_count; off: the single mnt_count summed once |
+| `SPLIT_GETS_FIRST` | on: the mutation of the fix that reads the gets before the puts |
+| `WEAK_STORES` | on: a CPU's stores to different words become visible in any order unless an smp_wmb() sits between them (arm64, POWER); stores to one word keep their order; off: TSO, in order |
+| `FIX_PUT_WMB` | on: the smp_wmb() mnt_dec_count() issues before the increment of the puts, so that the put of a reference cannot overtake its get; only observable with `WEAK_STORES` |
 
 `LockMount.tla`:
 
@@ -206,6 +224,7 @@ TSO and are left to the herd7 litmus tests.
 
 | Constant | Off means |
 |----------|-----------|
+| `FAILS` (a count, not a fix) | how many allocation failures TLC may inject into propagate_mnt(): at any copy, before it is made (copy_tree(), ENOMEM) or after it is on the list (count_mounts(), ENOSPC); attach_recursive_mnt()'s out_cleanup_ids is transcribed (umount_tree(UMOUNT_SYNC) of every copy, cleanup_group_ids() of the source), do_loopback() and do_add_mount() unmount the copy or mount they made, a move keeps its source; `UnwindOK` then requires the tree after the failure to equal the tree before it, mount by mount |
 | `FIX_RECHECK_MISS` | no m_seq recheck after a miss of __lookup_mnt() (b37199e626b3) |
 | `FIX_RECHECK_HOP` | no m_seq recheck after crossing into a mount (20aac6c60981) |
 | `FIX_RECHECK_DOTDOT` | no m_seq recheck after choose_mountpoint_rcu() (aed434ada685) |
@@ -219,7 +238,7 @@ the -ENOENT of a negative dentry that is returned without a recheck,
 equal the sequential walk over the tree at that moment: 03fa86e9f79d's
 contract), `ScopedOK` (a scoped walk never returns a path outside its
 root), `Bounded` (restarts), `Ledger`, deadlock freedom; witnesses
-`NoMiss`, `NoEscape` (the no-recheck arm taken while a writer runs) and
+`NoMiss`, `NoEscape` (the no-recheck arm taken while a writer runs),
 `NoClimb`.
 
 What `MntPut.tla` checks: `Ledger` (the counters add up to the references),
@@ -261,6 +280,16 @@ and `logs/batch.out`, the verdicts land in `logs/summary.txt`.
 | `mntput_no_sync_flag` | `SyncClean` violated | the walker's __legitimize_mnt() returns -1, its mntput() is the last one and cleanup_mnt() runs from the walker after umount(2) returned (48a066e72d97) |
 | `mntput_no_doomed_flag` | `NoUAF` violated | the walker's mntput() touches the mount after the RCU callback freed it (250cf3693060) |
 | `mntput_no_rcu_delay`, `mntput_no_put_rcu` | `Freed` violated | the holder's fast-path decrement lands after the namespace's slow-path put found the count non-zero: nobody frees the mount (9ea0a46ca2c3) |
+
+### MntPut, the fix for F2 and weakly ordered stores (local runs, 2026-09-23)
+
+| Configuration | Result | What it shows |
+|---------------|--------|---------------|
+| `mntput_split_sum`, `mntput_split_sum_lazy`, `mntput_split_sum_busy` | pass | with gets and puts in separate per-CPU counters and mnt_get_count() summing every CPU's puts before every CPU's gets, the migrating holder of `mntput_torn_sum` no longer hides a reference: a put the first pass counted has its get visible to the second pass, so the difference never comes out low; the overcount a pair inside the window can cause is harmless, and nothing is freed early or leaked (`_busy`: two pairs and three migrations) |
+| `mntput_split_gets_first` | `SyncClean` violated | the mutation with the passes swapped: the holder's get and put sit in its store buffer, the gets pass reads the CPU before either is visible, the puts pass after both are, the sum is one short and the synchronous umount succeeds with the fd open; no migration needed |
+| `mntput_fixed_weak`, `mntput_fixed_weak_lazy`, `mntput_torn_sum_weak` | pass, pass, `SyncClean` violated | the unchanged protocol with `WEAK_STORES`: stores of one CPU to different words become visible in any order, the seqlock's smp_wmb()s and the release of spin_unlock() fence them and stores to one word keep their order (the single mnt_count is one word per CPU); every verdict of the TSO configurations stays |
+| `mntput_split_weak` | `SyncClean` violated | the split counters are two words: without a fence the increment of the puts becomes visible before the increment of the gets that preceded it in the same task, the first pass counts the put, the second pass misses the get, and the umount succeeds with the reference held |
+| `mntput_split_weak_wmb`, `mntput_split_weak_wmb_lazy` | pass | the smp_wmb() mnt_dec_count() issues before its increment (`FIX_PUT_WMB`) orders the get before the put for every observer: the fix as committed in work.mount.fixes |
 
 ### LockMount (local runs, 2026-09-21)
 
@@ -357,8 +386,11 @@ Every fix on, every safety invariant including `BusyMirrorOK`:
 | `chain_fixed` (MaxOps 3) | pass | 359,356 |
 | `small_smoke` (MaxOps 3, plus `ReachOK`) | pass | 98,492 |
 | `parentcand_fixed` (scripted, MaxOps 1) | pass | 53 |
-| `algebra_smoke` (MaxOps 3) | running | |
-| `small_fixed`, `algebra_fixed`, `algebra_*` mutations (MaxOps 4) | not feasible: the algebra layout sat at BFS depth 5 for 13 hours at ~6k states/min | |
+| `peers_fail`, `locked_fail`, `chain_fail`, `small_smoke_fail` (one injected allocation failure in propagate_mnt() per run, `UnwindOK` on) | pass | 63,437; 199,428; 370,306; 98,526 |
+| `locked_witness_fail` | `NoFail` fires | an injected failure is reached and the tree afterwards equals the tree before |
+| `algebra_smoke` (MaxOps 3, plus `ReachOK`) | pass | 418,049 (8h38m) |
+| `small_fixed` (MaxOps 4) | pass | 3,243,225 (14h47m) |
+| `algebra_fixed`, `algebra_put_ns_connected`, `algebra_*` mutations (MaxOps 4) | not feasible: after 24 hours the algebra layout is still at BFS depth 5 with as many states queued as visited (1.7M each for the two green runs), no violation seen; the mutations show their bugs on the other layouts, `algebra_doc` its documentation stops at 1.66M states | |
 
 Before the model's own expectations were corrected the green runs
 stopped three times, each time on the kernel's behaviour: the recursive

@@ -56,7 +56,8 @@ CONSTANTS
     MaxFds,         \* open files per process
     Prelude,        \* a sequence of scripted syscalls that builds the starting topology
     FIX_PUT_MNT_NS_DISCONNECT,
-    CHECK_DOC
+    CHECK_DOC,
+    FAILS           \* allocation failures TLC may inject into propagate_mnt() (0: none)
 
 InitUser == 1
 
@@ -70,9 +71,10 @@ VARIABLES
     ok,       \* every declarative check so far held
     hist,     \* what happened, for the witnesses and the traces
     reach,    \* per process: the positions its walks can reach (a cache)
-    step      \* the next step of the prelude, or past its end
+    step,     \* the next step of the prelude, or past its end
+    fails     \* failures left to inject
 
-vars == <<mt, nst, pr, ddead, covers, ops, ok, hist, reach, step>>
+vars == <<mt, nst, pr, ddead, covers, ops, ok, hist, reach, step, fails>>
 
 InPrelude == step <= Len(Prelude)
 
@@ -85,12 +87,12 @@ Kinds == {"none", "mount", "bind", "move", "umount", "chtype", "setgroup", "clon
           "expire", "walk"}
 HistRec == [kind: Kinds, tucked: BOOLEAN, locktransfer: BOOLEAN, reparented: BOOLEAN,
             slaveofslave: BOOLEAN, skippedmaster: BOOLEAN, lockedkept: BOOLEAN,
-            connected: BOOLEAN, syncbusy: BOOLEAN, busymismatch: BOOLEAN, putns: BOOLEAN, expired: BOOLEAN,
+            connected: BOOLEAN, syncbusy: BOOLEAN, busymismatch: BOOLEAN, failed: BOOLEAN, unwind: BOOLEAN, putns: BOOLEAN, expired: BOOLEAN,
             trimmed: BOOLEAN]
 
 HistNone == [kind |-> "none", tucked |-> FALSE, locktransfer |-> FALSE, reparented |-> FALSE,
              slaveofslave |-> FALSE, skippedmaster |-> FALSE, lockedkept |-> FALSE,
-             connected |-> FALSE, syncbusy |-> FALSE, busymismatch |-> FALSE, putns |-> FALSE, expired |-> FALSE,
+             connected |-> FALSE, syncbusy |-> FALSE, busymismatch |-> FALSE, failed |-> FALSE, unwind |-> FALSE, putns |-> FALSE, expired |-> FALSE,
              trimmed |-> FALSE]
 
 NsAnon == [n \in NsIds \cup {NoNs} |-> IF n = NoNs THEN FALSE ELSE nst[n].anon]
@@ -220,6 +222,17 @@ PropagationWouldOvermount(t, from, to, d) ==
 \* namespace_unlock() and what follows it, then put_mnt_ns() for every
 \* namespace without users; the covers ghost follows the locked mounts
 \* uncover: positions whose lock the kernel lifted itself (propagate_mount_unlock())
+\* the same live mounts with the same records
+SameLive(a, b) == Live(a) = Live(b) /\ \A x \in Live(a) : a[x] = b[x]
+
+\* the failures TLC may inject into an attach at (P, d): none, or the k-th
+\* copy for a receiver, by copy_tree() or by count_mounts()
+FailChoices(P, d) ==
+    {[k |-> 0, kind |-> "ENOMEM"]} \cup
+    (IF fails > 0
+     THEN {[k |-> k, kind |-> kd] : k \in 1..Cardinality(ExpectedReceivers(mt, NsAnon, P, d)), kd \in FailKinds}
+     ELSE {})
+
 FinishUncover(t, ns1, pr1, dd, hrec, uncover) ==
     LET refs == [m \in MntIds |->
                     Cardinality({p \in Procs : pr1[p].root.mnt = m})
@@ -252,8 +265,11 @@ FinishUncover(t, ns1, pr1, dd, hrec, uncover) ==
                        \cup {c \in newc : c \notin uncover /\ ~\E pos \in Reach1(p) : Hides(c, pos)}]
        /\ ops' = IF InPrelude THEN ops ELSE ops + 1
        /\ step' = step + 1
-       /\ hist' = [hrec EXCEPT !.putns = hrec.putns \/ n0 # NoNs]
+       /\ hist' = [hrec EXCEPT !.putns = hrec.putns \/ n0 # NoNs,
+                               \* a failed operation left a trace: not the tree it found
+                               !.unwind = hrec.failed /\ ~SameLive(mt, t2)]
        /\ reach' = [p \in Procs |-> Reach1(p)]
+       /\ fails' = IF hrec.failed THEN fails - 1 ELSE fails
 
 Finish(t, ns1, pr1, dd, hrec) == FinishUncover(t, ns1, pr1, dd, hrec, {})
 
@@ -288,13 +304,15 @@ NewMount(p, R, pos, sb, auto) ==
        IN /\ mt[P].ns = pr[p].ns                                   \* check_mnt(parent)
           /\ ~(mt[P].sb = sb /\ mt[P].root = d)                     \* -EBUSY
           /\ RoomFor(1 + Cardinality(ExpectedReceivers(mt, NsAnon, P, d)))
-          /\ LET id == NewId(mt)
+          /\ \E f \in FailChoices(P, d) :
+             LET id == NewId(mt)
                  t0 == [mt EXCEPT ![id] = [Fresh(id, sb, SbRoot[sb]) EXCEPT !.shrink = auto, !.onexp = auto]]
-                 r == AttachRecursive(t0, NsUser, NsAnon, ProcUser[p], id, P, d)
-             IN /\ r.err \in {"", "NULLDEREF"}
-                /\ ok' = (ok /\ r.err = "" /\ CopiesOK(t0, r.mt, NsAnon, P, d, id))
-                /\ Finish(IF r.err = "" THEN r.mt ELSE mt, nst, pr, ddead,
-                    [HistNone EXCEPT !.kind = "mount",
+                 r == AttachRecursive(t0, NsUser, NsAnon, ProcUser[p], id, P, d, f.k, f.kind)
+             IN /\ r.err \in {"", "NULLDEREF"} \cup FailKinds
+                /\ ok' = (ok /\ (r.err \in FailKinds \/ (r.err = "" /\ CopiesOK(t0, r.mt, NsAnon, P, d, id))))
+                \* do_add_mount() failed: the new mount is put
+                /\ Finish(IF r.err = "" THEN r.mt ELSE UmountTree(r.mt, id, UmountHow(TRUE, FALSE, FALSE)).mt, nst, pr, ddead,
+                    [HistNone EXCEPT !.kind = "mount", !.failed = r.err \in FailKinds,
                         !.tucked = LookupMnt(mt, P, d) # NoMnt,
                         !.slaveofslave = \E x \in Live(r.mt) \ Live(mt) :
                                             r.mt[x].master # NoMnt /\ r.mt[r.mt[x].master].master # NoMnt
@@ -316,15 +334,17 @@ Bind(p, R, src, dst, rec) ==
           /\ rec \/ ~HasLockedChildren(mt, src.mnt, src.dentry)
           /\ RoomFor(Cardinality(Subtree(mt, src.mnt)) *
                      (1 + Cardinality(ExpectedReceivers(mt, NsAnon, P, d))))
-          /\ LET flag == CL_NONE
+          /\ \E f \in FailChoices(P, d) :
+             LET flag == CL_NONE
                  c == IF rec THEN CopyTree(mt, src.mnt, src.dentry, flag)
                       ELSE LET r == CloneMnt(mt, src.mnt, src.dentry, flag) IN [mt |-> r.mt, id |-> r.id, err |-> ""]
              IN /\ c.err = ""
-                /\ LET r == AttachRecursive(c.mt, NsUser, NsAnon, ProcUser[p], c.id, P, d)
-                   IN /\ r.err \in {"", "NULLDEREF"}
-                      /\ ok' = (ok /\ r.err = "" /\ CopiesOK(c.mt, r.mt, NsAnon, P, d, c.id))
-                      /\ Finish(IF r.err = "" THEN r.mt ELSE mt, nst, pr, ddead,
-                                [HistNone EXCEPT !.kind = "bind",
+                /\ LET r == AttachRecursive(c.mt, NsUser, NsAnon, ProcUser[p], c.id, P, d, f.k, f.kind)
+                   IN /\ r.err \in {"", "NULLDEREF"} \cup FailKinds
+                      /\ ok' = (ok /\ (r.err \in FailKinds \/ (r.err = "" /\ CopiesOK(c.mt, r.mt, NsAnon, P, d, c.id))))
+                      \* graft_tree() failed: do_loopback() unmounts the copy it made
+                      /\ Finish(IF r.err = "" THEN r.mt ELSE UmountTree(r.mt, c.id, UmountHow(TRUE, FALSE, FALSE)).mt, nst, pr, ddead,
+                                [HistNone EXCEPT !.kind = "bind", !.failed = r.err \in FailKinds,
                                     !.tucked = LookupMnt(mt, P, d) # NoMnt,
                                     !.slaveofslave = \E x \in Live(r.mt) \ Live(c.mt) :
                                                         r.mt[x].master # NoMnt /\ r.mt[r.mt[x].master].master # NoMnt
@@ -363,11 +383,13 @@ Move(p, R, src, dst, beneath) ==
           /\ ~(mt[P].shared /\ TreeContainsUnbindable(mt, old))
           /\ ~MountIsAncestor(mt, old, P)
           /\ RoomFor(Cardinality(Subtree(mt, old)) * Cardinality(ExpectedReceivers(mt, NsAnon, P, d)))
-          /\ LET r == AttachRecursive(mt, NsUser, NsAnon, ProcUser[p], old, P, d)
-             IN /\ r.err \in {"", "NULLDEREF"}
-                /\ ok' = (ok /\ r.err = "" /\ CopiesOK(mt, r.mt, NsAnon, P, d, old))
-                /\ Finish(IF r.err = "" THEN r.mt ELSE mt, nst, pr, ddead,
-                          [HistNone EXCEPT !.kind = "move",
+          /\ \E f \in FailChoices(P, d) :
+             LET r == AttachRecursive(mt, NsUser, NsAnon, ProcUser[p], old, P, d, f.k, f.kind)
+             IN /\ r.err \in {"", "NULLDEREF"} \cup FailKinds
+                /\ ok' = (ok /\ (r.err \in FailKinds \/ (r.err = "" /\ CopiesOK(mt, r.mt, NsAnon, P, d, old))))
+                \* the source stays where it was; the copies are gone
+                /\ Finish(r.mt, nst, pr, ddead,
+                          [HistNone EXCEPT !.kind = "move", !.failed = r.err \in FailKinds,
                               !.tucked = beneath \/ LookupMnt(mt, P, d) # NoMnt,
                               !.locktransfer = beneath /\ mt[X].locked])
 
@@ -825,6 +847,7 @@ Init ==
     /\ hist = HistNone
     /\ reach = [p \in Procs |-> ReachNow(p)]
     /\ step = 1
+    /\ fails = FAILS
 
 AllPos == [mnt: MntIds, dentry: Dentries]
 Types == {"shared", "slave", "private", "unbindable"}
@@ -930,6 +953,9 @@ CoverOK ==
 SyncUmountNotBusy == ~hist.syncbusy
 \* the proposed propagate_mount_busy() agrees with the exact rule
 BusyMirrorOK == ~hist.busymismatch
+\* a failed mount, bind or move leaves the tree as it found it
+UnwindOK == ~hist.unwind
+NoFail == ~hist.failed
 
 (* ---- witnesses: the interesting states are reachable ------------------- *)
 

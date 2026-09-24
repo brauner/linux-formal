@@ -250,13 +250,18 @@ PeerLoop(st, nsanon, n, m, d, source) ==
              IF ~NeedSecondary(st.mt, nsanon, n, d) THEN st
              ELSE LET copy == IF st.type.slave THEN FindMaster(st.mt, n, st.copy, source) ELSE st.copy
                   IN IF copy = NoMnt THEN [st EXCEPT !.err = "NULLDEREF"]
+                     \* an injected allocation failure in copy_tree(): nothing made
+                     ELSE IF st.failat = 1 /\ st.failkind = "ENOMEM" THEN [st EXCEPT !.err = "ENOMEM", !.failat = 0]
                      ELSE LET r == CopyTree(st.mt, copy, st.mt[copy].root, st.type)
                           IN IF r.err # "" THEN [st EXCEPT !.err = r.err]
                              ELSE LET mt1 == SetMountpoint(r.mt, n, d, r.id)
                                       mt2 == IF mt1[n].master # NoMnt
                                              THEN SetMarked(mt1, mt1[n].master, TRUE) ELSE mt1
-                                  IN [st EXCEPT !.mt = mt2, !.list = <<r.id>> \o st.list, !.copy = r.id,
-                                                !.type = CL(FALSE, FALSE, TRUE, FALSE, FALSE), !.err = ""]
+                                      st2 == [st EXCEPT !.mt = mt2, !.list = <<r.id>> \o st.list, !.copy = r.id,
+                                                !.type = CL(FALSE, FALSE, TRUE, FALSE, FALSE), !.err = "",
+                                                !.failat = IF st.failat > 0 THEN st.failat - 1 ELSE 0]
+                                  \* an injected count_mounts() failure: the copy is on the list already
+                                  IN IF st.failat = 1 /\ st.failkind = "ENOSPC" THEN [st2 EXCEPT !.err = "ENOSPC"] ELSE st2
              next == NextPeer(st1.mt, n)
          IN IF next = m THEN st1 ELSE PeerLoop(st1, nsanon, next, m, d, source)
 
@@ -278,10 +283,13 @@ GroupLoop(st, nsanon, m, dest, d) ==
 
 \* propagate_mnt(dest, dest_mp, source): [mt, list, err]; list is the
 \* tree_list, most recent copy first
-PropagateMnt(mt, nsanon, dest, d, source) ==
+\* failat > 0 makes the failat-th copy fail with failkind ("ENOMEM": copy_tree(),
+\* "ENOSPC": count_mounts() after the copy is on the list)
+PropagateMnt(mt, nsanon, dest, d, source, failat, failkind) ==
     LET mt0 == IF mt[dest].master # NoMnt THEN SetMarked(mt, mt[dest].master, TRUE) ELSE mt
         st == GroupLoop([mt |-> mt0, list |-> <<>>, copy |-> source, source |-> source,
-                         type |-> CL_NONE, err |-> ""], nsanon, dest, dest, d)
+                         type |-> CL_NONE, err |-> "", failat |-> failat, failkind |-> failkind],
+                        nsanon, dest, dest, d)
         \* the marks come off even on failure (the caller destroys the copies)
         mt1 == [x \in MntIds |-> IF x \in (UNION {{st.mt[st.mt[n].parent].master} : n \in ToSet(st.list)}
                                             \cup {st.mt[dest].master}) /\ x # NoMnt
@@ -306,33 +314,6 @@ TuckLoop(mt, list, userns, nsuser) ==
                                      ELSE mt2
                          IN ChangeMountpoint(mt2a, r, mt2a[r].root, q)
          IN TuckLoop(mt3, Tail(list), userns, nsuser)
-
-\* attach_recursive_mnt(source, {parent P, mountpoint d}); userns is the
-\* caller's user namespace, nsuser/nsanon the namespace table's fields.
-\* Returns [mt, err, emptied]: emptied is the anonymous namespace the source
-\* came from, or NoNs.
-AttachRecursive(mt, nsuser, nsanon, userns, source, P, d) ==
-    LET moving == HasParent(mt, source)
-        sharedDest == mt[P].shared
-        mt1 == IF sharedDest THEN InventGroupIds(mt, source, TRUE) ELSE mt
-        pm == IF sharedDest THEN PropagateMnt(mt1, nsanon, P, d, source)
-              ELSE [mt |-> mt1, list |-> <<>>, err |-> ""]
-    IN IF pm.err # "" THEN [mt |-> mt, err |-> pm.err, emptied |-> NoNs]
-       ELSE LET mt2 == pm.mt
-                mt3 == IF sharedDest
-                       THEN [x \in MntIds |-> IF x \in Subtree(mt2, source)
-                                              THEN [mt2[x] EXCEPT !.shared = TRUE, !.unbind = FALSE]
-                                              ELSE mt2[x]]
-                       ELSE mt2
-                emptied == IF ~moving /\ mt3[source].ns # NoNs THEN mt3[source].ns ELSE NoNs
-                mt4 == IF moving THEN SetOnexp(UmountMnt(mt3, source), source, FALSE)
-                       ELSE IF emptied # NoNs
-                       THEN [x \in MntIds |-> IF x \in Subtree(mt3, source)
-                                              THEN [mt3[x] EXCEPT !.attached = FALSE] ELSE mt3[x]]
-                       ELSE mt3
-                mt5 == SetMountpoint(mt4, P, d, source)
-                mt6 == TuckLoop(mt5, <<source>> \o pm.list, userns, nsuser)
-            IN [mt |-> mt6, err |-> "", emptied |-> emptied]
 
 (* ---- change_mnt_propagation(), bulk_make_private() --------------------- *)
 
@@ -762,5 +743,49 @@ UmountVictimsOK(mtb, mta, T) ==
     /\ \A s \in Live(mtb) \ T :
          (mtb[s].master \notin T) => mta[s].master = mtb[s].master
     /\ \A s \in Live(mtb) \ T : mta[s].gid = mtb[s].gid /\ mta[s].shared = mtb[s].shared
+
+(* ---- the failure path of attach_recursive_mnt() -------------------------- *)
+
+FailKinds == {"ENOMEM", "ENOSPC"}
+\* out_cleanup_ids: umount_tree(copy, UMOUNT_SYNC) for every copy on the list,
+\* newest first as the hlist has them, then cleanup_group_ids(source): the
+\* group ids invented for the source tree go back (it was not made shared)
+RECURSIVE UmountCopies(_, _)
+UmountCopies(mt, list) ==
+    IF list = <<>> THEN mt
+    ELSE UmountCopies(UmountTree(mt, Head(list), UmountHow(TRUE, FALSE, FALSE)).mt, Tail(list))
+CleanupGroupIds(mt, source) ==
+    [x \in MntIds |-> IF x \in Subtree(mt, source) /\ mt[x].gid # 0 /\ ~mt[x].shared
+                      THEN [mt[x] EXCEPT !.gid = 0] ELSE mt[x]]
+Unwind(mt, list, source) == CleanupGroupIds(UmountCopies(mt, list), source)
+
+\* attach_recursive_mnt(source, {parent P, mountpoint d}); userns is the
+\* caller's user namespace, nsuser/nsanon the namespace table's fields.
+\* Returns [mt, err, emptied]: emptied is the anonymous namespace the source
+\* came from, or NoNs.
+AttachRecursive(mt, nsuser, nsanon, userns, source, P, d, failat, failkind) ==
+    LET moving == HasParent(mt, source)
+        sharedDest == mt[P].shared
+        mt1 == IF sharedDest THEN InventGroupIds(mt, source, TRUE) ELSE mt
+        pm == IF sharedDest THEN PropagateMnt(mt1, nsanon, P, d, source, failat, failkind)
+              ELSE [mt |-> mt1, list |-> <<>>, err |-> ""]
+    IN IF pm.err \in FailKinds THEN [mt |-> Unwind(pm.mt, pm.list, source), err |-> pm.err, emptied |-> NoNs]
+       ELSE IF pm.err # "" THEN [mt |-> mt, err |-> pm.err, emptied |-> NoNs]
+       ELSE LET mt2 == pm.mt
+                mt3 == IF sharedDest
+                       THEN [x \in MntIds |-> IF x \in Subtree(mt2, source)
+                                              THEN [mt2[x] EXCEPT !.shared = TRUE, !.unbind = FALSE]
+                                              ELSE mt2[x]]
+                       ELSE mt2
+                emptied == IF ~moving /\ mt3[source].ns # NoNs THEN mt3[source].ns ELSE NoNs
+                mt4 == IF moving THEN SetOnexp(UmountMnt(mt3, source), source, FALSE)
+                       ELSE IF emptied # NoNs
+                       THEN [x \in MntIds |-> IF x \in Subtree(mt3, source)
+                                              THEN [mt3[x] EXCEPT !.attached = FALSE] ELSE mt3[x]]
+                       ELSE mt3
+                mt5 == SetMountpoint(mt4, P, d, source)
+                mt6 == TuckLoop(mt5, <<source>> \o pm.list, userns, nsuser)
+            IN [mt |-> mt6, err |-> "", emptied |-> emptied]
+
 
 =============================================================================

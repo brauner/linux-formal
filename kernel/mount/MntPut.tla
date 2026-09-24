@@ -23,6 +23,23 @@
 (* grace period) flush the buffer.  mnt_count is one counter per CPU,      *)
 (* summed CPU by CPU by mnt_get_count() (9ea0a46ca2c3).                    *)
 (*                                                                         *)
+(* FIX_SPLIT_COUNT models the fix for the torn sum: gets and puts live in  *)
+(* separate per-CPU counters and mnt_get_count() reads every CPU's puts    *)
+(* first, then every CPU's gets, the way srcu_readers_active_idx_check()   *)
+(* sums srcu_unlock_count before srcu_lock_count.  A put a task stores is  *)
+(* behind its get in that task's store buffer and behind it after a       *)
+(* migration, so a put the first pass counted has its get visible to the   *)
+(* second pass.  The smp_mb() between the passes orders two loads, which   *)
+(* TSO does anyway, so it has no step here.  SPLIT_GETS_FIRST is the       *)
+(* mutation that reads the passes the other way round.                     *)
+(*                                                                         *)
+(* WEAK_STORES drops the FIFO order of the store buffers: a CPU's stores   *)
+(* become visible in any order unless an smp_wmb() sits between them, as  *)
+(* on arm64 or POWER.  The seqlock's smp_wmb()s and the release of         *)
+(* spin_unlock() are modelled as such fences; FIX_PUT_WMB is the           *)
+(* smp_wmb() mnt_dec_count() issues before its increment so that the put   *)
+(* of a reference never overtakes its get.                                 *)
+(*                                                                         *)
 (* Constants switch the pieces of the protocol off one by one: the three   *)
 (* smp_mb() (__legitimize_mnt(), mntput_no_expire_slowpath(), do_umount()  *)
 (* -- 65781e19dcfc), the synchronize_rcu_expedited() before the puts in    *)
@@ -48,7 +65,11 @@ CONSTANTS
     FIX_RCU_DELAY,  \* synchronize_rcu_expedited() in namespace_unlock()
     FIX_PUT_RCU,    \* rcu_read_lock() around the mnt_ns test in mntput_no_expire()
     FIX_SYNC_FLAG,  \* __legitimize_mnt() fails on MNT_SYNC_UMOUNT
-    FIX_DOOMED_FLAG \* __legitimize_mnt() fails on MNT_DOOMED
+    FIX_DOOMED_FLAG, \* __legitimize_mnt() fails on MNT_DOOMED
+    FIX_SPLIT_COUNT, \* gets and puts in separate counters, puts summed first
+    SPLIT_GETS_FIRST, \* mutation: the split sum reads the gets first
+    WEAK_STORES,    \* stores of one CPU may become visible out of order
+    FIX_PUT_WMB     \* smp_wmb() before the increment of the puts
 
 U == "U"
 Tasks == {TaskList[i] : i \in 1..Len(TaskList)}
@@ -60,6 +81,8 @@ ASSUME U \in Tasks /\ Walkers \subseteq Tasks /\ Holders \subseteq Tasks
 VARIABLES
     seqv,     \* mount_lock's seqcount as the other CPUs see it
     cntv,     \* [CPUs -> Int]: mnt_pcp->mnt_count as the other CPUs see it
+              \* (with FIX_SPLIT_COUNT: mnt_gets - mnt_puts, one word each)
+    putv,     \* [CPUs -> Nat]: mnt_pcp->mnt_puts as the other CPUs see it
     lockv,    \* mount_lock's spinlock as the other CPUs see it: holder or NoTask
     m,        \* the mount: hashed, ns (mnt_ns != NULL), umount, sync, doomed, freed
     buf,      \* [Tasks -> Seq(store)]: the store buffer of the task's CPU
@@ -80,12 +103,15 @@ VARIABLES
     cleaner,  \* the task that ran cleanup_mnt()
     uresult   \* "", "ok" or "busy"
 
-vars == <<seqv, cntv, lockv, m, buf, cpu, rcu, gp, gpfree, pc, ret, sq, acc, ci,
+vars == <<seqv, cntv, putv, lockv, m, buf, cpu, rcu, gp, gpfree, pc, ret, sq, acc, ci,
           refs, nsref, nsput, gets, migs, cleaner, uresult>>
 
 (* ---- the store buffers ------------------------------------------------- *)
 
-\* a store: seq := v, cnt[c] += d, hashed := v, ns := v, lock := v
+\* a store: seq := v, cnt[c] += d, hashed := v, ns := v, lock := v;
+\* a wmb entry is smp_wmb(): the stores behind it wait for the ones before
+StWmb       == [f |-> "wmb"]
+Wmb(on)     == IF on THEN <<StWmb>> ELSE <<>>
 StSeq(v)    == [f |-> "seq", v |-> v]
 StCnt(c, d) == [f |-> "cnt", c |-> c, d |-> d]
 StHash(v)   == [f |-> "hashed", v |-> v]
@@ -93,13 +119,15 @@ StNs(v)     == [f |-> "ns", v |-> v]
 StLock(v)   == [f |-> "lock", v |-> v]
 
 \* the visible state as a record, so that stores can be applied in order
-Vis == [seqv |-> seqv, cntv |-> cntv, lockv |-> lockv, m |-> m]
+Vis == [seqv |-> seqv, cntv |-> cntv, putv |-> putv, lockv |-> lockv, m |-> m]
 Apply(s, e) ==
     CASE e.f = "seq"    -> [s EXCEPT !.seqv = e.v]
-      [] e.f = "cnt"    -> [s EXCEPT !.cntv[e.c] = @ + e.d]
+      [] e.f = "cnt"    -> [s EXCEPT !.cntv[e.c] = @ + e.d,
+                                     !.putv[e.c] = @ + (IF e.d < 0 THEN 1 ELSE 0)]
       [] e.f = "hashed" -> [s EXCEPT !.m.hashed = e.v]
       [] e.f = "ns"     -> [s EXCEPT !.m.ns = e.v]
       [] e.f = "lock"   -> [s EXCEPT !.lockv = e.v]
+      [] e.f = "wmb"    -> s
 RECURSIVE ApplyAll(_, _)
 ApplyAll(s, es) == IF es = <<>> THEN s ELSE ApplyAll(Apply(s, Head(es)), Tail(es))
 
@@ -110,21 +138,29 @@ Buffered(t, c) == SumD([i \in 1..Len(buf[t]) |->
                         IF buf[t][i].f = "cnt" /\ buf[t][i].c = c THEN buf[t][i].d ELSE 0])
 \* what a load of cnt[c] by t returns
 SeenCnt(t, c) == cntv[c] + Buffered(t, c)
+\* the split counters: what a load of puts[c] or gets[c] by t returns
+BufferedPuts(t, c) == SumD([i \in 1..Len(buf[t]) |->
+                            IF buf[t][i].f = "cnt" /\ buf[t][i].c = c /\ buf[t][i].d < 0 THEN 1 ELSE 0])
+BufferedGets(t, c) == SumD([i \in 1..Len(buf[t]) |->
+                            IF buf[t][i].f = "cnt" /\ buf[t][i].c = c /\ buf[t][i].d > 0 THEN 1 ELSE 0])
+SeenPuts(t, c) == putv[c] + BufferedPuts(t, c)
+SeenGets(t, c) == cntv[c] + putv[c] + BufferedGets(t, c)
 \* the count as it will be once every buffer has drained
 Total == SumD([c \in 1..NCPU |-> cntv[c]])
          + SumD([i \in 1..Len(TaskList) |->
                  SumD([c \in 1..NCPU |-> Buffered(TaskList[i], c)])])
 
 Push(t, e) == buf' = [buf EXCEPT ![t] = Append(@, e)]
+PushAll(t, es) == buf' = [buf EXCEPT ![t] = @ \o es]
 Empty(t) == buf[t] = <<>>
 
 \* everything t has stored becomes visible: after a full barrier, an
 \* atomic RMW, a migration, or the end of a grace period that waited for t
 Drained(t, extra) ==
     LET r == ApplyAll(Vis, buf[t] \o extra)
-    IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ lockv' = r.lockv /\ m' = r.m
+    IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ putv' = r.putv /\ lockv' = r.lockv /\ m' = r.m
        /\ buf' = [buf EXCEPT ![t] = <<>>]
-Unchanged_vis == UNCHANGED <<seqv, cntv, lockv, m>>
+Unchanged_vis == UNCHANGED <<seqv, cntv, putv, lockv, m>>
 
 \* a grace period is a full memory barrier on every CPU: everything any
 \* task has stored before it starts is visible when it ends
@@ -132,7 +168,7 @@ RECURSIVE ApplyTasks(_, _)
 ApplyTasks(s, i) == IF i > Len(TaskList) THEN s ELSE ApplyTasks(ApplyAll(s, buf[TaskList[i]]), i + 1)
 DrainedAll ==
     LET r == ApplyTasks(Vis, 1)
-    IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ lockv' = r.lockv /\ m' = r.m
+    IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ putv' = r.putv /\ lockv' = r.lockv /\ m' = r.m
        /\ buf' = [t \in Tasks |-> <<>>]
 
 (* ---- RCU --------------------------------------------------------------- *)
@@ -153,13 +189,13 @@ Readers == {t \in Tasks : rcu[t]}
 Lock(t) ==
     /\ lockv = NoTask /\ Empty(t)
     /\ lockv' = t
-    /\ Push(t, StSeq(seqv + 1))
-    /\ UNCHANGED <<seqv, cntv, m>>
+    /\ PushAll(t, <<StSeq(seqv + 1), StWmb>>)
+    /\ UNCHANGED <<seqv, cntv, putv, m>>
 \* the seqcount as t sees it: its own increment may still sit in its buffer
 SeenSeq(t) == LET ss == SelectSeq(buf[t], LAMBDA e : e.f = "seq")
               IN IF ss = <<>> THEN seqv ELSE ss[Len(ss)].v
 \* unlock_mount_hash() = write_sequnlock(): two plain stores
-UnlockStores(t) == <<StSeq(SeenSeq(t) + 1), StLock(NoTask)>>
+UnlockStores(t) == <<StWmb, StSeq(SeenSeq(t) + 1), StWmb, StLock(NoTask)>>
 
 (* ---- the labels -------------------------------------------------------- *)
 
@@ -176,6 +212,7 @@ Init ==
     /\ seqv = 0
     \* the namespace's and U's references on CPU 1, the holders' on CPU 2
     /\ cntv = [c \in CPUs |-> IF c = 1 THEN 2 ELSE IF c = 2 THEN Cardinality(Holders) ELSE 0]
+    /\ putv = [c \in CPUs |-> 0]
     /\ lockv = NoTask
     /\ m = [hashed |-> TRUE, ns |-> TRUE, umount |-> FALSE, sync |-> FALSE,
             doomed |-> FALSE, freed |-> FALSE]
@@ -199,12 +236,27 @@ Init ==
 
 (* ---- the memory system ------------------------------------------------- *)
 
-\* one store leaves a buffer
+\* one store leaves a buffer: the oldest one, or with WEAK_STORES any one
+\* that no wmb entry and no older store to the same word precede (stores
+\* to one location stay in program order on every architecture); a wmb
+\* entry itself retires once it is the oldest, i.e. once every store
+\* before it is visible.  With the split counters the gets and the puts
+\* of a CPU are two words, with the single counter they are one.
+Remove(s, i) == [j \in 1..(Len(s) - 1) |-> IF j < i THEN s[j] ELSE s[j + 1]]
+Loc(e) == IF e.f = "cnt"
+          THEN (IF FIX_SPLIT_COUNT THEN <<"cnt", e.c, e.d > 0>> ELSE <<"cnt", e.c>>)
+          ELSE <<e.f>>
+Flushable(t) == IF WEAK_STORES
+                THEN {i \in 1..Len(buf[t]) :
+                        /\ \A j \in 1..(i - 1) : buf[t][j].f # "wmb" /\ Loc(buf[t][j]) # Loc(buf[t][i])
+                        /\ (buf[t][i].f = "wmb" => i = 1)}
+                ELSE {1}
 Flush(t) ==
     /\ ~Empty(t)
-    /\ LET r == Apply(Vis, Head(buf[t]))
-       IN seqv' = r.seqv /\ cntv' = r.cntv /\ lockv' = r.lockv /\ m' = r.m
-    /\ buf' = [buf EXCEPT ![t] = Tail(@)]
+    /\ \E i \in Flushable(t) :
+        /\ LET r == Apply(Vis, buf[t][i])
+           IN seqv' = r.seqv /\ cntv' = r.cntv /\ putv' = r.putv /\ lockv' = r.lockv /\ m' = r.m
+        /\ buf' = [buf EXCEPT ![t] = Remove(@, i)]
     /\ UNCHANGED <<cpu, rcu, gp, gpfree, pc, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner, uresult>>
 
 \* delayed_free_vfsmnt(): the RCU callback runs after its grace period
@@ -212,7 +264,7 @@ RcuFree ==
     /\ gpfree.on /\ gpfree.wait = {}
     /\ gpfree' = [on |-> FALSE, wait |-> {}]
     /\ m' = [m EXCEPT !.freed = TRUE]
-    /\ UNCHANGED <<seqv, cntv, lockv, buf, cpu, rcu, gp, pc, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner, uresult>>
+    /\ UNCHANGED <<seqv, cntv, putv, lockv, buf, cpu, rcu, gp, pc, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner, uresult>>
 
 (* ---- mntput() ---------------------------------------------------------- *)
 (* entered at "p_enter" with ret[t] set; the ledger entry it drops is the   *)
@@ -233,8 +285,8 @@ PutEnter(t) ==
 \* the fast path: mnt_add_count(mnt, -1) with nothing held but RCU
 PutFast(t) ==
     /\ pc[t] = "p_fast"
-    /\ IF Waited(t) THEN Drained(t, <<StCnt(cpu[t], -1)>>)
-       ELSE Push(t, StCnt(cpu[t], -1)) /\ Unchanged_vis
+    /\ IF Waited(t) THEN Drained(t, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[t], -1)>>)
+       ELSE PushAll(t, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[t], -1)>>) /\ Unchanged_vis
     /\ DropRef(t)
     /\ RcuOut(t)
     /\ pc' = [pc EXCEPT ![t] = ret[t]]
@@ -259,7 +311,7 @@ PutMb(t) ==
 \* mnt_add_count(mnt, -1), then mnt_get_count() starts
 PutDec(t) ==
     /\ pc[t] = "p_dec"
-    /\ Push(t, StCnt(cpu[t], -1))
+    /\ PushAll(t, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[t], -1)>>)
     /\ DropRef(t)
     /\ acc' = [acc EXCEPT ![t] = 0]
     /\ ci' = [ci EXCEPT ![t] = 1]
@@ -267,10 +319,18 @@ PutDec(t) ==
     /\ Unchanged_vis
     /\ UNCHANGED <<cpu, rcu, gp, gpfree, ret, sq, nsput, gets, migs, cleaner, uresult>>
 
-\* mnt_get_count(): one CPU per step
+\* mnt_get_count(): one CPU per step; with FIX_SPLIT_COUNT two passes, the
+\* puts of every CPU first and the gets second (SPLIT_GETS_FIRST: the
+\* other way round)
+Reads == IF FIX_SPLIT_COUNT THEN 2 * NCPU ELSE NCPU
+ReadCnt(t, i) ==
+    IF ~FIX_SPLIT_COUNT THEN SeenCnt(t, i)
+    ELSE LET c == IF i <= NCPU THEN i ELSE i - NCPU
+             putsPass == (i <= NCPU) # SPLIT_GETS_FIRST
+         IN IF putsPass THEN -SeenPuts(t, c) ELSE SeenGets(t, c)
 SumStep(t, next) ==
-    /\ IF ci[t] <= NCPU
-       THEN /\ acc' = [acc EXCEPT ![t] = @ + SeenCnt(t, ci[t])]
+    /\ IF ci[t] <= Reads
+       THEN /\ acc' = [acc EXCEPT ![t] = @ + ReadCnt(t, ci[t])]
             /\ ci' = [ci EXCEPT ![t] = @ + 1]
             /\ UNCHANGED pc
        ELSE /\ pc' = [pc EXCEPT ![t] = next]
@@ -288,7 +348,7 @@ PutCheck(t) ==
        THEN /\ Drained(t, UnlockStores(t))
             /\ pc' = [pc EXCEPT ![t] = ret[t]]
        ELSE LET r == ApplyAll(Vis, buf[t] \o UnlockStores(t))
-            IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ lockv' = r.lockv
+            IN /\ seqv' = r.seqv /\ cntv' = r.cntv /\ putv' = r.putv /\ lockv' = r.lockv
                /\ m' = [r.m EXCEPT !.doomed = TRUE]
                /\ buf' = [buf EXCEPT ![t] = <<>>]
                /\ pc' = [pc EXCEPT ![t] = "p_cleanup"]
@@ -378,7 +438,7 @@ WLock(t) ==
 WFlags(t) ==
     /\ pc[t] = "w_flags"
     /\ IF (FIX_SYNC_FLAG /\ m.sync) \/ (FIX_DOOMED_FLAG /\ m.doomed)
-       THEN /\ Drained(t, <<StCnt(cpu[t], -1)>> \o UnlockStores(t))
+       THEN /\ Drained(t, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[t], -1)>> \o UnlockStores(t))
             /\ refs' = [refs EXCEPT ![t] = @ - 1]
             /\ pc' = [pc EXCEPT ![t] = "lost"]
             /\ UNCHANGED ret
@@ -478,7 +538,7 @@ UTree ==
     /\ buf' = [buf EXCEPT ![U] = @ \o <<StHash(FALSE), StNs(FALSE)>>]
     /\ uresult' = "ok"
     /\ pc' = [pc EXCEPT ![U] = "u_unlock"]
-    /\ UNCHANGED <<seqv, cntv, lockv, cpu, rcu, gp, gpfree, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner>>
+    /\ UNCHANGED <<seqv, cntv, putv, lockv, cpu, rcu, gp, gpfree, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner>>
 
 \* unlock_mount_hash()
 UUnlock ==
@@ -549,9 +609,10 @@ IsStore(e) == \/ (e.f = "seq" /\ e.v \in Nat)
               \/ (e.f = "cnt" /\ e.c \in CPUs /\ e.d \in {-1, 1})
               \/ (e.f \in {"hashed", "ns"} /\ e.v \in BOOLEAN)
               \/ (e.f = "lock" /\ e.v = NoTask)
+              \/ (e.f = "wmb")
 Labels == Touching \cup Done \cup {"w_start", "w_lookup", "h_idle", "u_nsunlock", "u_gpwait", "u_ret"}
 TypeOK ==
-    /\ seqv \in Nat /\ cntv \in [CPUs -> Int] /\ lockv \in Tasks \cup {NoTask}
+    /\ seqv \in Nat /\ cntv \in [CPUs -> Int] /\ putv \in [CPUs -> Nat] /\ lockv \in Tasks \cup {NoTask}
     /\ m \in [hashed: BOOLEAN, ns: BOOLEAN, umount: BOOLEAN, sync: BOOLEAN, doomed: BOOLEAN, freed: BOOLEAN]
     /\ \A t \in Tasks : \A i \in 1..Len(buf[t]) : IsStore(buf[t][i])
     /\ cpu \in [Tasks -> CPUs] /\ rcu \in [Tasks -> BOOLEAN]
