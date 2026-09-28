@@ -34,6 +34,7 @@ def mounts(body):
         rec = mm.group(1)
         f = dict(re.findall(r'(\w+) \|-> ([^,\]]+(?:\{[^}]*\})?)', rec))
         flags = ''.join(k[0].upper() for k in ('hashed', 'doomed', 'vacant', 'oldroot', 'freed', 'rcufree', 'mpgone') if f.get(k) == 'TRUE')
+        flags += 'K' if f.get('mark') == 'TRUE' else ''
         out.append(f"{i}:{f.get('count', '?')}{flags}/{f.get('inst', '?').strip('\"')}p{f.get('parent', '?')}"
                    + (f"s{f['stuck']}" if f.get('stuck', '{}') != '{}' else ''))
     return ' '.join(out)
@@ -48,4 +49,5 @@ for i in range(1, len(states), 2):
     warn = re.search(r'warn \|-> (\{[^}]*\})', hist)
     print(f"{num:>3} {act:<11} {mounts(body)} | U={var(body, 'upc')}{var(body, 'uhead')} ext={var(body, 'ext')} "
           f"W={var(body, 'wpc')}/{var(body, 'wres')} D={var(body, 'dpc')}{var(body, 'dhead')} tw={var(body, 'tw')} "
-          f"pins={var(body, 'pins')} sb={var(body, 'sbact')} vac={h.get('vacates')} warn={warn.group(1) if warn else '?'}")
+          f"pins={var(body, 'pins')} owed={var(body, 'vq')} sb={var(body, 'sbact')} watched={var(body, 'watched')} "
+          f"vac={h.get('vacates')} warn={warn.group(1) if warn else '?'}")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the TLC configurations of the models of work.mount.knullfs: the
+"""Generate the TLC configurations of the models of work.mount.knullfs.4: the
 RCU walk against vacate_mount() (MountWalk) and the vacant-mount protocol
 (MntVacant)."""
 import pathlib
@@ -53,11 +53,14 @@ for name, (layout, change, victim, mounts, flip, weak, invs, expect) in MW_CONFI
     (here / f"{name}.cfg").write_text("\n".join(lines) + "\n")
 
 
-# ---- MntVacant: the vacant-mount protocol of work.mount.knullfs -----------
-VAC_FIXES = ["FIX_OWN_REF", "FIX_STUCK_VACANT_ONLY", "FIX_TREE_ORDER", "FIX_DETACH_PUTS_VACANT",
-             "FIX_HANDOFF_LOCKED", "FIX_STUCK_BEFORE_HANDOFF"]
-VAC_SAFETY = ["TypeOK", "NoNegative", "NoWarn", "ExactlyOnce", "NoDangling", "HashedHasRef",
-              "DoomedIsLast", "VacantOK", "NoReveal", "NoHang", "Reaped"]
+# ---- MntVacant: the vacant-mount protocol of work.mount.knullfs.4 ---------
+VAC_FIXES = ["FIX_OWN_REF", "FIX_PUT_VACANT_ONLY", "FIX_TREE_ORDER", "FIX_DETACH_PUTS_VACANT", "FIX_DISOWNED",
+             "FIX_HANDOFF_LOCKED", "FIX_LAST_UNDER_LOCK", "FIX_CONN_SB", "FIX_MARK_GATE"]
+VAC_SAFETY = ["TypeOK", "NoNegative", "NoWarn", "ExactlyOnce", "NoDangling", "HashedHasRef", "DoomedIsLast",
+              "OwnRefOnRing", "VacantCount", "VacantOK", "KnullfsOK", "NoVacantOnRing", "NoReveal", "NoHang",
+              "NoNegativeWatch", "NoTeardownHang", "WatchedBalanced", "Reaped"]
+VAC_OTHER = (("VACATE_MODE", '"vacate"'), ("DETACH_PUTS_ALL", "FALSE"), ("RELEASE_PUTS", "FALSE"),
+             ("Marks", "FALSE"), ("U_INLINE", "FALSE"))
 # name: (pins, holders, walk budget, detach targets, holder order, fixes off, other constants, invariants, expectation)
 VAC_CONFIGS = {
     # the series: P held by a file, M held by a file, M's filesystem pins P and G's pins M,
@@ -68,7 +71,9 @@ VAC_CONFIGS = {
     "mntvacant_fixed_noholder": (True,  [],           0, [2, 3], "any", [], {}, VAC_SAFETY, "pass"),
     # two walkers at once, from the file on P into M
     "mntvacant_fixed_2walkers": (True,  ["H1"],       1, [2],    "any", [], {"Walkers": '{"W1", "W2"}'}, VAC_SAFETY, "pass"),
-    # the earlier design: two references at vacate_mount(), the release visit ends in mntput()
+    # the task-work shape of mntput_unmounted_work(): each final put's cleanup before the next put
+    "mntvacant_fixed_inline":   (True,  ["H1", "H2"], 1, [2, 3], "any", [], {"U_INLINE": "TRUE"}, VAC_SAFETY, "pass"),
+    # the earlier design: two references at vacate_mount(), the release ends in mntput()
     "mntvacant_count_two":      (True,  ["H1", "H2"], 1, [2, 3], "any", [], {"RELEASE_PUTS": "TRUE"}, VAC_SAFETY, "pass"),
     # upstream: the parent owns its attached unmounted children; with the
     # pins nothing is ever freed (Michael Vogt's cycle), without them it is fine
@@ -78,15 +83,23 @@ VAC_CONFIGS = {
     # dooms it in place (freed while hashed) or disconnects it (the reveal)
     "mntvacant_doom":           (False, ["H1"], 1, [], "any", [], {"VACATE_MODE": '"doom"'}, VAC_SAFETY, "violation: NoWarn (doomed_attached), HashedHasRef, NoHang or NoDangling"),
     "mntvacant_unhash":         (False, ["H1"], 1, [], "any", [], {"VACATE_MODE": '"unhash"'}, ["NoReveal"], "violation: NoReveal, a walk through the held parent lands in what the mount covered"),
-    # the parent's final put owning every unhashed child while they hold their own reference
-    "mntvacant_stuck_all":      (False, ["H1", "H2"], 1, [2, 3], "any", ["FIX_STUCK_VACANT_ONLY"], {}, VAC_SAFETY, "violation: NoNegative or NoWarn, a child is put twice"),
+    # the parent's final put putting every unhashed child while they hold their own reference
+    "mntvacant_put_all":        (False, ["H1", "H2"], 1, [2, 3], "any", ["FIX_PUT_VACANT_ONLY"], {}, VAC_SAFETY, "violation: OwnRefOnRing, a child still holding its own reference is put by its parent's final put and vacated on the unmounted list; NoNegative later"),
     # __detach_mounts(): a vacant mount it unhashes must be put, and only a vacant one
-    "mntvacant_detach_no_put":  (True,  ["H1"], 1, [2, 3], "any", ["FIX_DETACH_PUTS_VACANT"], {}, VAC_SAFETY, "violation: Reaped, the unhashed vacant mount is never put"),
-    "mntvacant_detach_put_all": (True,  ["H1"], 1, [2, 3], "any", [], {"DETACH_PUTS_ALL": "TRUE"}, VAC_SAFETY, "violation: NoNegative or NoWarn, a mount holding its own reference is put twice"),
-    # the handoff decided after dropping mount_lock (the first lock-handoff draft)
+    "mntvacant_detach_no_put":  (True,  ["H1"], 1, [2, 3], "any", ["FIX_DETACH_PUTS_VACANT"], {}, VAC_SAFETY, "violation: VacantCount, the parent's reference stays on a vacant mount nobody will put; Reaped later"),
+    "mntvacant_detach_put_all": (True,  ["H1"], 1, [2, 3], "any", [], {"DETACH_PUTS_ALL": "TRUE"}, VAC_SAFETY, "violation: OwnRefOnRing, a mount still holding its own reference is put by __detach_mounts(); NoNegative later"),
+    # a vacant mount riding the unmounted list instead of `disowned`: the
+    # list's first mount carries the task work in the mnt_rcu its pending
+    # release uses
+    "mntvacant_ring_carrier":   (True,  ["H1"], 1, [2, 3], "any", ["FIX_DISOWNED"], {}, VAC_SAFETY, "violation: NoVacantOnRing"),
+    "mntvacant_ring_carrier_lost": (True, ["H1"], 1, [2, 3], "any", ["FIX_DISOWNED"], {}, ["ExactlyOnce", "Reaped"], "violation: Reaped, the release the carrier clobbered never runs and the filesystem it would have released keeps its pin"),
+    # the handoff decided after dropping mount_lock (the first draft)
     "mntvacant_handoff_unlocked": (True, ["H1", "H2"], 1, [2, 3], "any", ["FIX_HANDOFF_LOCKED"], {}, VAC_SAFETY, "violation: ExactlyOnce or NoWarn, both sides free or one uses the mount after the other freed it"),
-    # the release visit handing off before it puts the stuck children
-    "mntvacant_handoff_first":  (True,  ["H1", "H2"], 1, [2, 3], "any", ["FIX_STUCK_BEFORE_HANDOFF"], {}, VAC_SAFETY, "violation: NoWarn (free_stuck) or Reaped"),
+    # the verdict of mntput_slow() from the flags re-read after unlock_mount_hash()
+    # (the shape before the fixup): the parent's final put can cut and doom the
+    # mount it just vacated in that window, and the vacating put frees it with
+    # the release never queued
+    "mntvacant_last_unlocked":  (True,  ["H1", "H2"], 1, [2, 3], "any", ["FIX_LAST_UNDER_LOCK"], {}, VAC_SAFETY, "violation: NoWarn (release_pending_at_free) or Reaped, the filesystem the mount carried is never released"),
     # the put order: parents first leaves a subtree nobody holds without vacant mounts
     "mntvacant_tree_order":     (False, [], 0, [], "any", [], {}, VAC_SAFETY + ["NoVacate"], "pass"),
     "mntvacant_lifo":           (False, [], 0, [], "any", ["FIX_TREE_ORDER"], {}, VAC_SAFETY + ["NoNeedlessVacate"], "violation: NoNeedlessVacate, children are put before their parent"),
@@ -96,6 +109,11 @@ VAC_CONFIGS = {
     "mntvacant_holder_early":   (False, ["H1"], 0, [], "early", [], {}, VAC_SAFETY + ["NoVacate"], "pass"),
     "mntvacant_holder_early_walk": (False, ["H1"], 1, [], "early", [], {}, ["NoVacate"], "violation: NoVacate, a walker that legitimized the dead parent keeps it alive while its child is put"),
     "mntvacant_holder_late":    (False, ["H1"], 1, [], "late", [], {}, VAC_SAFETY + ["NoVacate"], "violation: NoVacate"),
+    # fsnotify: marks placed before a vacate are accounted on the superblock
+    # the connector recorded and cleared by the release; knullfs takes none
+    "mntvacant_marks":          (True,  ["H1", "H2"], 1, [2, 3], "any", [], {"Marks": "TRUE"}, VAC_SAFETY, "pass"),
+    "mntvacant_marks_no_conn_sb": (True, ["H1", "H2"], 1, [2, 3], "any", ["FIX_CONN_SB"], {"Marks": "TRUE"}, VAC_SAFETY, "violation: NoNegativeWatch or NoTeardownHang, the mark of a vacated mount is taken back from knullfs and its old superblock waits in fsnotify_sb_delete() for good"),
+    "mntvacant_marks_no_gate":  (True,  ["H1", "H2"], 1, [2, 3], "any", ["FIX_MARK_GATE"], {"Marks": "TRUE"}, VAC_SAFETY, "violation: NoWarn (free_marks) or WatchedBalanced, a mark placed on a vacant mount after its release is never cleared"),
     # witnesses: the interleavings the green runs cover do occur
     "mntvacant_witness_vacate":       (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoVacate"], "violation"),
     "mntvacant_witness_walker_vacate": (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoWalkerVacate"], "violation"),
@@ -103,16 +121,18 @@ VAC_CONFIGS = {
     "mntvacant_witness_put_first":    (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoPutFirst"], "violation"),
     "mntvacant_witness_release_first": (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoReleaseFirst"], "violation"),
     "mntvacant_witness_detach_put":   (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoDetachPut"], "violation"),
+    "mntvacant_witness_null_seen":    (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoNullSeen"], "violation: a walk through the held parent lands on the knullfs directory that stands in for the vacated mount"),
+    "mntvacant_witness_mark_refused": (True, ["H1", "H2"], 1, [2, 3], "any", [], {"Marks": "TRUE"}, ["NoMarkRefused"], "violation: fanotify refuses a mount mark on the stand-in"),
     # an RCU walker inside a mount while the filesystem it carried is torn
-    # down: the series through vacate_mount()'s release visit, upstream
-    # through the stuck children of the parent's final put; neither waits
-    # for a grace period, the RCU-pathwalk contract covers both
+    # down: the series through vacate_mount()'s release, upstream through
+    # the stuck children of the parent's final put; neither waits for a
+    # grace period, the RCU-pathwalk contract covers both
     "mntvacant_witness_rcu_teardown": (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoRcuTeardown"], "violation"),
     "mntvacant_witness_rcu_teardown_upstream": (False, ["H1"], 1, [2, 3], "any", ["FIX_OWN_REF"], {}, ["NoRcuTeardown"], "violation"),
 }
 for name, (pins, holders, budget, targets, order, off, other, invs, expect) in VAC_CONFIGS.items():
     lines = [f"\\* generated by gen-cfgs.py: MntVacant, expected: {expect}", "SPECIFICATION Spec", "CONSTANTS",
-             "  MntIds = {1, 2, 3}", "  Parent <- ParentDef", '  SbIds = {"p", "m", "g"}', "  Sb <- SbDef",
+             "  MntIds = {1, 2, 3}", "  Parent <- ParentDef", '  SbIds = {"p", "m", "g"}', "  Sb <- SbDef", '  NullSb = "n"',
              f"  Pin <- {'PinDef' if pins else 'NoPinDef'}",
              "  Holders = {" + ", ".join(f'"{h}"' for h in holders) + "}", "  HolderMnt <- HolderMntDef",
              "  Walkers = " + other.get("Walkers", '{"W1"}'), f"  WalkBudget = {budget}",
@@ -120,7 +140,7 @@ for name, (pins, holders, budget, targets, order, off, other, invs, expect) in V
              f'  HOLDER_ORDER = "{order}"']
     for f in VAC_FIXES:
         lines.append(f"  {f} = {'FALSE' if f in off else 'TRUE'}")
-    for c, default in (("VACATE_MODE", '"vacate"'), ("DETACH_PUTS_ALL", "FALSE"), ("RELEASE_PUTS", "FALSE")):
+    for c, default in VAC_OTHER:
         lines.append(f"  {c} = {other.get(c, default)}")
     lines.append("INVARIANTS")
     lines += [f"  {i}" for i in invs]
