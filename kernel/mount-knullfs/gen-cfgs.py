@@ -121,8 +121,8 @@ VAC_CONFIGS = {
     "mntvacant_witness_put_first":    (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoPutFirst"], "violation"),
     "mntvacant_witness_release_first": (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoReleaseFirst"], "violation"),
     "mntvacant_witness_detach_put":   (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoDetachPut"], "violation"),
-    "mntvacant_witness_null_seen":    (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoNullSeen"], "violation: a walk through the held parent lands on the knullfs directory that stands in for the vacated mount"),
-    "mntvacant_witness_mark_refused": (True, ["H1", "H2"], 1, [2, 3], "any", [], {"Marks": "TRUE"}, ["NoMarkRefused"], "violation: fanotify refuses a mount mark on the stand-in"),
+    "mntvacant_witness_null_seen":    (True, ["H1", "H2"], 1, [2, 3], "any", [], {}, ["NoNullSeen"], "violation: NoNullSeen, a walk through the held parent lands on the knullfs directory that stands in for the vacated mount"),
+    "mntvacant_witness_mark_refused": (True, ["H1", "H2"], 1, [2, 3], "any", [], {"Marks": "TRUE"}, ["NoMarkRefused"], "violation: NoMarkRefused, fanotify refuses a mount mark on the stand-in"),
     # an RCU walker inside a mount while the filesystem it carried is torn
     # down: the series through vacate_mount()'s release, upstream through
     # the stuck children of the parent's final put; neither waits for a
