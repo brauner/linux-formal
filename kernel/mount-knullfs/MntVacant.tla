@@ -35,6 +35,17 @@
 (*     superblock recorded in its connector (the fsnotify prep patch) and  *)
 (*     cleared by the release before that superblock is torn down.         *)
 (*                                                                         *)
+(* NOREF is work.mount.knullfs.7: a vacant mount has no reference of its   *)
+(* own.  __legitimize_mnt() marks a stand-in before it bumps the count     *)
+(* (and under mount_lock on its retry path); the parent's final put, and   *)
+(* __detach_mounts(), disown a stand-in under mount_lock: off knullfs'     *)
+(* instance list, and unless it is marked and its count says a walk still  *)
+(* holds it, doomed, to be freed once the release is done, by the parent's *)
+(* cleanup_mnt() through mnt_stuck_children or right away in              *)
+(* __detach_mounts().  A walk's last put on a hashed stand-in leaves it    *)
+(* at zero where it is; on a disowned one it dooms it and hands off to the *)
+(* release as before.                                                      *)
+(*                                                                         *)
 (* Layout: P, the root of a lazily unmounted subtree, disconnected from    *)
 (* its mounted parent; M attached to P; G attached to M, all MNT_UMOUNT    *)
 (* with mnt_ns NULL (UMOUNT_CONNECTED, or M and G locked).  The initial    *)
@@ -99,13 +110,20 @@ CONSTANTS
     FIX_CONN_SB,              \* a mark is accounted on the superblock recorded in its connector
                               \* (off: on the superblock the object points at when the mark goes)
     FIX_MARK_GATE,            \* fanotify refuses mount marks on a knullfs mount (off: it takes them)
-    RELEASE_PUTS              \* the earlier design: vacate takes two references, the release ends in mntput()
+    RELEASE_PUTS,             \* the earlier design: vacate takes two references, the release ends in mntput()
+    NOREF,                    \* work.mount.knullfs.7: no reference for the parent, the mark decides (see the header)
+    NOREF_MARK,               \* __legitimize_mnt() marks the stand-in it takes a reference to (off: mutation)
+    NOREF_TRUST_MARK,         \* the parent frees an unmarked stand-in without summing its count (off: it always sums)
+    NOREF_SUM,                \* the parent sums the count of a marked stand-in (off: it never frees a marked one)
+    NOREF_HASHED_DOOMS,       \* mutation: a walk's last put dooms a stand-in that is still hashed
+    NOREF_DETACH_FREES        \* __detach_mounts() frees a dead stand-in it cut loose (off: mutation, it leaks)
 
 NoMnt == 0
 ASSUME VACATE_MODE \in {"vacate", "doom", "unhash"}
 ASSUME HOLDER_ORDER \in {"any", "early", "late"}
 ASSUME \A h \in Holders : HolderMnt[h] \in MntIds
 ASSUME NullSb \notin SbIds
+ASSUME NOREF => FIX_OWN_REF /\ VACATE_MODE = "vacate" /\ ~RELEASE_PUTS
 
 \* the tasks that put: U, D, K (a pin drop), C (cleanup task work), the holders, the walkers
 Tasks == {"U", "D", "K", "C"} \cup Holders \cup Walkers
@@ -113,7 +131,8 @@ WatchSbs == SbIds \cup {NullSb}
 
 VARIABLES
     mt,        \* [MntIds -> record]: hashed, parent, count, doomed, vacant, oldroot (release pending),
-               \*   inst ("fs", "null", "none": which instance list), stuck (upstream's owned children),
+               \*   inst ("fs", "null", "none": which instance list), stuck (upstream's owned children;
+               \*   with NOREF the dead stand-ins the cleanup frees), held (NOREF: a walk marked it),
                \*   freed, rcufree, mpgone, mark, conn (the superblock the mark is accounted on)
     sbact,     \* [SbIds -> BOOLEAN]: the superblock is active
     watched,   \* [WatchSbs -> Int]: fsnotify's watched objects per superblock
@@ -198,6 +217,16 @@ Free(s, m) ==
 
 (* ---- the slow path of mntput() ------------------------------------------ *)
 
+\* NOREF: disown_vacant_mount() under mount_lock, once the parent's final
+\* put or __detach_mounts() unhashed the stand-in: off knullfs' instance
+\* list; a walk may still hold it only if it marked it, and the count
+\* says whether it does; else it is doomed, and whoever comes second, this
+\* or the release, frees it
+Disown(t) ==
+    LET dead == (NOREF_TRUST_MARK /\ ~t.held) \/ (NOREF_SUM /\ t.count = 0)
+    IN [t EXCEPT !.inst = "none", !.doomed = dead]
+Dead(t) == Disown(t).doomed /\ ~t.oldroot
+
 \* the last put of a vacant mount inside mntput_final_locked(): it must
 \* have been unhashed already (VFS_WARN_ON_ONCE(connected)), MNT_DOOMED,
 \* off knullfs' instance list; then `mnt_old_root ? NULL : mnt`, and
@@ -215,6 +244,20 @@ VacantPut(s, m, who) ==
        ELSE IF t.oldroot THEN [s1 EXCEPT !.hist.putfirst = @ + 1]
        ELSE Free(s1, m)
 
+\* NOREF: the last put of a walk's reference on a stand-in.  Still hashed,
+\* it stays at zero until the parent lets go of it (the mutation dooms it
+\* in place); disowned by then, it is doomed here, and it and the release
+\* hand the free to whoever comes second
+VacantPutNoref(s, m, who) ==
+    LET t == s.mt[m]
+        w == IF t.inst # "none" THEN {"instance"} ELSE {}
+        s1 == [s EXCEPT !.mt[m].doomed = TRUE, !.hist.warn = @ \cup w, !.hist.doomby = @ \cup {who}]
+    IN IF t.hashed
+       THEN IF NOREF_HASHED_DOOMS THEN [s EXCEPT !.mt[m].doomed = TRUE, !.mt[m].inst = "none"]
+            ELSE [s EXCEPT !.hist.hashedzero = @ + 1]
+       ELSE IF t.oldroot THEN [s1 EXCEPT !.hist.putfirst = @ + 1]
+       ELSE Free(s1, m)
+
 \* the rest of mntput_final_locked() once the count reached zero and the
 \* mount is neither doomed nor vacant: unhash the children and owe the
 \* puts of the vacant ones (with the mutation of every one; upstream
@@ -229,20 +272,25 @@ LastPut(s, m, who, task) ==
         kids == Kids(s.mt, m)
         vac == FIX_OWN_REF /\ connected /\ VACATE_MODE = "vacate"
         unh == FIX_OWN_REF /\ connected /\ VACATE_MODE = "unhash"
-        owed == IF ~FIX_OWN_REF THEN {}
+        owed == IF ~FIX_OWN_REF \/ NOREF THEN {}
                 ELSE IF FIX_PUT_VACANT_ONLY THEN {c \in kids : s.mt[c].vacant} ELSE kids
-        stuck == IF FIX_OWN_REF THEN {} ELSE kids
+        \* upstream: every unhashed child, owned; NOREF: the dead stand-ins the cleanup frees
+        stuck == IF ~FIX_OWN_REF THEN kids
+                 ELSE IF NOREF THEN {c \in kids : s.mt[c].vacant /\ Dead(s.mt[c])} ELSE {}
         self == IF vac
-                THEN [t EXCEPT !.vacant = TRUE, !.oldroot = TRUE, !.inst = "null",
-                               !.count = IF RELEASE_PUTS THEN 2 ELSE 1]
+                THEN [t EXCEPT !.vacant = TRUE, !.oldroot = TRUE, !.inst = "null", !.held = FALSE,
+                               !.stuck = stuck,
+                               !.count = IF NOREF THEN 0 ELSE IF RELEASE_PUTS THEN 2 ELSE 1]
                 ELSE [t EXCEPT !.doomed = TRUE, !.inst = "none", !.stuck = stuck,
                                !.hashed = IF unh THEN FALSE ELSE t.hashed,
                                !.parent = IF unh THEN NoMnt ELSE t.parent]
+        Kid(x) == LET k == [s.mt[x] EXCEPT !.hashed = FALSE, !.parent = NoMnt]
+                  IN IF NOREF /\ k.vacant THEN Disown(k) ELSE k
         mt1 == [x \in MntIds |-> IF x = m THEN self
-                                 ELSE IF x \in kids THEN [s.mt[x] EXCEPT !.hashed = FALSE, !.parent = NoMnt]
+                                 ELSE IF x \in kids THEN Kid(x)
                                  ELSE s.mt[x]]
         item == [m |-> m, kind |-> IF vac THEN "release" ELSE "cleanup",
-                 step |-> IF FIX_OWN_REF THEN "sb" ELSE "stuck", owner |-> task]
+                 step |-> IF ~FIX_OWN_REF \/ stuck # {} THEN "stuck" ELSE "sb", owner |-> task]
         later == vac /\ ~FIX_LAST_UNDER_LOCK
         \* a vacate the put order alone caused: the parent lives on the
         \* reference U has not dropped yet and on nothing else
@@ -265,11 +313,12 @@ Put(s, m, who, task) ==
     LET t == s.mt[m]
         c == t.count - 1
         s0 == [s EXCEPT !.mt[m].count = c, !.seq = @ + 1]
-    IN IF c < 0 THEN [s0 EXCEPT !.hist.negative = TRUE]
-       ELSE IF c > 0 THEN s0
-       ELSE IF t.doomed THEN Warn(s0, "put_doomed")
-       ELSE IF t.vacant THEN VacantPut(s0, m, who)
-       ELSE LastPut(s0, m, who, task)
+        s0b == IF t.vacant /\ who \notin {"W", "H"} THEN [s0 EXCEPT !.hist.ownerputs = @ + 1] ELSE s0
+    IN IF c < 0 THEN [s0b EXCEPT !.hist.negative = TRUE]
+       ELSE IF c > 0 THEN s0b
+       ELSE IF t.doomed THEN Warn(s0b, "put_doomed")
+       ELSE IF t.vacant THEN (IF NOREF THEN VacantPutNoref(s0b, m, who) ELSE VacantPut(s0b, m, who))
+       ELSE LastPut(s0b, m, who, task)
 
 \* the puts a task owes right after its final put: mntput_list() of the
 \* vacant children, or the disowned mount of __detach_mounts()
@@ -308,13 +357,15 @@ Advance(s, it) ==
 \* next put, and the puts it owes come first
 Runnable(it) == ~U_INLINE \/ it.owner # "U" \/ Quiet("U")
 
-\* upstream: hlist_del(&m->mnt_umount); mntput(&m->mnt) for one stuck child
+\* upstream: hlist_del(&m->mnt_umount); mntput(&m->mnt) for one stuck child;
+\* NOREF: free_vacant_mount() of one dead stand-in the final put disowned
 TwStuck(it) ==
     /\ it.step = "stuck" /\ Runnable(it)
     /\ IF mt[it.m].stuck = {}
        THEN Apply(Advance(St, it))
        ELSE \E c \in mt[it.m].stuck :
-                Apply(Put([St EXCEPT !.mt[it.m].stuck = @ \ {c}], c, "C", "C"))
+                IF NOREF THEN Apply(Free([St EXCEPT !.mt[it.m].stuck = @ \ {c}, !.hist.deadfrees = @ + 1], c))
+                ELSE Apply(Put([St EXCEPT !.mt[it.m].stuck = @ \ {c}], c, "C", "C"))
 
 \* fsnotify_vfsmount_delete(), dput(root), deactivate_super(sb): the mark
 \* goes and its accounting is taken back from the superblock the connector
@@ -452,7 +503,8 @@ WLegit1(w) ==
     /\ wpc[w] = "legit1"
     /\ IF seq # wseq[w]
        THEN Apply(RcuOut([St EXCEPT !.wpc[w] = "ref"], w))
-       ELSE Apply([St EXCEPT !.mt[wtgt[w]].count = @ + 1, !.wpc[w] = "legit2"])
+       ELSE Apply([St EXCEPT !.mt[wtgt[w]].count = @ + 1, !.wpc[w] = "legit2",
+                             !.mt[wtgt[w]].held = @ \/ (NOREF_MARK /\ mt[wtgt[w]].vacant)])
 
 \* smp_mb(); read_seqretry(m_seq) again: legitimized, or on to lock_mount_hash()
 WLegit2(w) ==
@@ -468,7 +520,8 @@ WLock(w) ==
     /\ LET t == wtgt[w]
        IN IF mt[t].doomed
           THEN Apply(RcuOut([St EXCEPT !.mt[t].count = @ - 1, !.seq = @ + 1, !.wpc[w] = "ref"], w))
-          ELSE Apply(RcuOut([St EXCEPT !.seq = @ + 1, !.wpc[w] = "put"], w))
+          ELSE Apply(RcuOut([St EXCEPT !.seq = @ + 1, !.wpc[w] = "put",
+                                       !.mt[t].held = @ \/ (NOREF_MARK /\ mt[t].vacant)], w))
 
 \* the mntput() after __legitimize_mnt() returned -1; the walk then restarts in REF mode
 WPut(w) ==
@@ -495,6 +548,7 @@ WRef(w) ==
           ELSE IF ~found THEN Apply([St EXCEPT !.wpc[w] = "idle", !.wres[w] = "beneath"])
           ELSE IF mt[t].doomed THEN Apply([St EXCEPT !.wpc[w] = "idle", !.wres[w] = "hang"])
           ELSE Apply([St EXCEPT !.mt[t].count = @ + 1, !.seq = @ + 1, !.wpc[w] = "use",
+                                !.mt[t].held = @ \/ (NOREF_MARK /\ mt[t].vacant),
                                 !.wroot[w] = IF mt[t].vacant THEN "null" ELSE "fs"])
 
 Walk(w) == WStart(w) \/ WLookup(w) \/ WLegit1(w) \/ WLegit2(w) \/ WLock(w) \/ WPut(w) \/ WUse(w) \/ WRef(w)
@@ -515,6 +569,7 @@ DDetach ==
         /\ ~mt[t].mpgone /\ sbact[Sb[Parent[t]]]
         /\ LET attached == mt[t].hashed /\ mt[t].parent = Parent[t]
                listed == attached /\ (IF ~FIX_OWN_REF THEN TRUE
+                                      ELSE IF NOREF THEN FALSE
                                       ELSE IF mt[t].vacant THEN FIX_DETACH_PUTS_VACANT
                                       ELSE DETACH_PUTS_ALL)
                direct == FIX_OWN_REF /\ FIX_DISOWNED
@@ -526,7 +581,14 @@ DDetach ==
                s2 == IF ~listed THEN s1
                      ELSE IF direct THEN [s1 EXCEPT !.vq["D"] = <<t>>]
                      ELSE [s1 EXCEPT !.dpc = "gp", !.dgp = rcu, !.dhead = <<t>>]
-           IN Apply(IF attached THEN [s2 EXCEPT !.mt[t].hashed = FALSE, !.mt[t].parent = NoMnt] ELSE s2)
+               \* NOREF: the stand-in is disowned under mount_lock and, dead
+               \* with its release done, freed before namespace_sem is dropped
+               cut == [s1.mt[t] EXCEPT !.hashed = FALSE, !.parent = NoMnt]
+               s3 == [s1 EXCEPT !.mt[t] = IF mt[t].vacant THEN Disown(cut) ELSE cut]
+               s4 == IF mt[t].vacant /\ Dead(mt[t]) /\ NOREF_DETACH_FREES
+                     THEN Free([s3 EXCEPT !.hist.deadfrees = @ + 1], t) ELSE s3
+           IN IF NOREF /\ attached THEN Apply(s4)
+              ELSE Apply(IF attached THEN [s2 EXCEPT !.mt[t].hashed = FALSE, !.mt[t].parent = NoMnt] ELSE s2)
 DGp == dpc = "gp" /\ dgp = {} /\ Apply([St EXCEPT !.dpc = "put"])
 DPut ==
     /\ dpc = "put"
@@ -549,7 +611,7 @@ Init ==
               [hashed |-> Parent[m] # NoMnt, parent |-> Parent[m],
                count |-> 1 + Ext0(m) + Pinned0(m),
                doomed |-> FALSE, vacant |-> FALSE, oldroot |-> FALSE, inst |-> "fs",
-               stuck |-> {}, freed |-> FALSE, rcufree |-> FALSE, mpgone |-> FALSE,
+               stuck |-> {}, held |-> FALSE, freed |-> FALSE, rcufree |-> FALSE, mpgone |-> FALSE,
                mark |-> FALSE, conn |-> ""]]
     /\ sbact = [s \in SbIds |-> TRUE]
     /\ watched = [s \in WatchSbs |-> 0]
@@ -570,7 +632,7 @@ Init ==
                frees |-> [m \in MntIds |-> 0], releases |-> [m \in MntIds |-> 0],
                vacby |-> {}, doomby |-> {}, putfirst |-> 0, relfirst |-> 0, detachputs |-> 0,
                rcuteardown |-> FALSE, hung |-> FALSE, lost |-> FALSE, markrefused |-> FALSE,
-               nullmarks |-> 0, nullseen |-> FALSE]
+               nullmarks |-> 0, nullseen |-> FALSE, ownerputs |-> 0, hashedzero |-> 0, deadfrees |-> 0]
 
 Next ==
     \/ Unlocker
@@ -590,6 +652,7 @@ TypeOK ==
     /\ \A m \in MntIds : mt[m].count \in Int /\ mt[m].inst \in {"fs", "null", "none"}
                          /\ mt[m].stuck \subseteq MntIds /\ mt[m].parent \in MntIds \cup {NoMnt}
                          /\ mt[m].mark \in BOOLEAN /\ mt[m].conn \in WatchSbs \cup {""}
+                         /\ mt[m].held \in BOOLEAN
     /\ \A s \in WatchSbs : watched[s] \in Int
     /\ upc \in {"gp", "wait", "put", "done"} /\ dpc \in {"idle", "gp", "put"}
     /\ \A w \in Walkers : wpc[w] \in {"idle", "lookup", "legit1", "legit2", "lock", "put", "use", "ref"}
@@ -628,7 +691,8 @@ NoDangling ==
 
 \* a hashed mount is referenced (its own reference, or the parent's once it
 \* is vacant) and never doomed: what keeps the covered directory covered
-HashedHasRef == \A m \in MntIds : (~mt[m].freed /\ mt[m].hashed) => (mt[m].count >= 1 /\ ~mt[m].doomed)
+HashedHasRef == \A m \in MntIds : (~mt[m].freed /\ mt[m].hashed) =>
+    (~mt[m].doomed /\ (mt[m].count >= 1 \/ (NOREF /\ mt[m].vacant)))
 
 \* the walkers' references: __legitimize_mnt()'s increment until the
 \* walker's own decrement or mntput(), and the REF walk's lookup_mnt()
@@ -651,12 +715,17 @@ OwnRefOnRing == \A m \in MntIds : InSeq(m, uhead) =>
     ~mt[m].freed /\ ~mt[m].vacant /\ ~mt[m].doomed /\ mt[m].count >= 1
 InFlight(m) == mt[m].hashed \/ (\E t \in Tasks : InSeq(m, vq[t])) \/ InSeq(m, dhead)
 VacantCount == \A m \in MntIds : (mt[m].vacant /\ ~mt[m].doomed /\ ~mt[m].freed) =>
-    mt[m].count = (IF InFlight(m) THEN 1 ELSE 0) + WRefs(m)
+    mt[m].count = (IF NOREF THEN 0 ELSE IF InFlight(m) THEN 1 ELSE 0) + WRefs(m)
                   + (IF RELEASE_PUTS /\ mt[m].oldroot THEN 1 ELSE 0)
+
+\* NOREF: a walk that holds a stand-in has marked it, so a parent that finds
+\* no mark can free it without a sum
+HeldCoversRefs == \A m \in MntIds : (NOREF /\ mt[m].vacant /\ ~mt[m].freed /\ WRefs(m) > 0) => mt[m].held
 
 \* a vacant mount stands on knullfs' instance list until its last put, and
 \* the release of what it carried is pending until its release visit ran
-VacantOK == \A m \in MntIds : mt[m].vacant /\ ~mt[m].doomed => mt[m].inst = "null"
+VacantOK == \A m \in MntIds : mt[m].vacant /\ ~mt[m].doomed =>
+    mt[m].inst = (IF NOREF /\ ~mt[m].hashed THEN "none" ELSE "null")
 
 \* knullfs: only vacant mounts stand on its instance list, a vacant mount
 \* has no children (nothing can be mounted on it, its own were unhashed
@@ -701,6 +770,12 @@ NoLostRelease == ~hist.lost
 NoMarkRefused == ~hist.markrefused
 NoNullMark == hist.nullmarks = 0
 NoNullSeen == ~hist.nullseen
+\* NOREF: nobody but a walk ever puts a stand-in (the parent frees it), a
+\* walk's last put may leave a hashed stand-in at zero, and the parent or
+\* __detach_mounts() do free dead stand-ins
+NoOwnerPut == hist.ownerputs = 0
+NoHashedZero == hist.hashedzero = 0
+NoDeadFree == hist.deadfrees = 0
 \* an RCU walker that crossed into a mount is still inside it (on its
 \* dentries, before legitimizing) when the filesystem it carried is torn
 \* down: the series through the release of a vacated mount, upstream

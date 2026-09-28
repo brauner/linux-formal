@@ -1,4 +1,4 @@
-# TLA+ models of the vacant-mount series (work.mount.knullfs.4)
+# TLA+ models of the vacant-mount series (work.mount.knullfs.4 and .7)
 
 Tree: work.mount.knullfs.4 at 095b9753ac15, the b4 cover on top of the
 documentation commit eca972c8f1d8, the selftests, the fixup 757a689090dd
@@ -26,6 +26,18 @@ whose conventions this directory follows.
 `WEAK_VACATE`, the `sb` field of the mount record, the `NewRoot` and
 `NullSb` constants); diff the two files to see the delta.  `MntVacant.tla`
 is written for the series alone, with upstream's ownership as a switch.
+
+`NOREF` models work.mount.knullfs.7 at 7eeb6da1e4d7 instead: the series
+rebuilt on v2's code as the tree-order prep ff1eccdfc12d, the task-work
+prep 61cd492607aa and the mechanism 0c717623bb77, where a vacant mount
+has no reference of its own.  __legitimize_mnt() marks a stand-in before
+it bumps the count (and under mount_lock on its retry path); the parent's
+final put and __detach_mounts() disown a stand-in under mount_lock and,
+unless the mark and the count say a walk still holds it, doom it, to be
+freed once the release is done, by the parent's cleanup_mnt() through
+mnt_stuck_children or right away in __detach_mounts(); a walk's last put
+leaves a hashed stand-in at zero and dooms a disowned one, handing off to
+the release as before.
 
 ## Files
 
@@ -58,6 +70,12 @@ subtree of its root and of the root it had before it was vacated).
 | `FIX_OWN_REF` | upstream's ownership: an attached victim is owned by its unmounted parent, whose cleanup_mnt() puts every child its final put unhashed (the stuck children); `unmounted` holds only the disconnected victims |
 | `VACATE_MODE` | `"vacate"` is the series; `"doom"` keeps upstream's slow path with the own references: the last put of an attached mount sets MNT_DOOMED in place and frees it while it is still hashed; `"unhash"` disconnects it instead, revealing what it covered |
 | `FIX_PUT_VACANT_ONLY` | the parent's final put puts every child it unhashed, although the children hold their own references |
+| `NOREF` (off by default) | on: work.mount.knullfs.7, a vacant mount has no reference of its own: vacate_mount() takes none for the parent, __legitimize_mnt() marks a stand-in before it bumps the count (and under mount_lock on its retry path), the parent's final put and __detach_mounts() disown a stand-in under mount_lock and free it unless the mark and the count say a walk still holds it (the parent's cleanup_mnt() frees them through mnt_stuck_children, __detach_mounts() right away), a walk's last put leaves a hashed stand-in at zero and dooms a disowned one |
+| `NOREF_MARK` | the walk does not mark the stand-in it takes a reference to (mutation) |
+| `NOREF_TRUST_MARK` | the parent sums the count of every stand-in instead of freeing an unmarked one without the sum |
+| `NOREF_SUM` | the parent never sums: a marked stand-in is left to the walk's last put even when that put already happened (mutation, a leak) |
+| `NOREF_HASHED_DOOMS` (off by default) | on: a walk's last put dooms a stand-in that is still hashed (mutation) |
+| `NOREF_DETACH_FREES` | __detach_mounts() cuts a dead stand-in loose without freeing it (mutation, a leak) |
 | `FIX_TREE_ORDER` | namespace_unlock() puts the children before the parent (the hlist order upstream builds) |
 | `FIX_DETACH_PUTS_VACANT` | __detach_mounts() never puts a vacant mount it unhashes; `DETACH_PUTS_ALL` on: it puts every unmounted mount it unhashes (upstream's line kept) |
 | `FIX_DISOWNED` | a vacant mount __detach_mounts() cut loose rides the unmounted list (a grace period, then the put from task work carried in the first mount's mnt_rcu) instead of `disowned`; the carrier's mnt_rcu is the union its pending release sits in, so that release is lost |
@@ -213,3 +231,28 @@ mount carried while an RCU walker is still inside it is the witness pair
 above; the fresh unique mount id of a stand-in, the mnt_pins of a vacated
 mount and the order of locked propagated copies beyond their effect on
 the number of vacates are not modelled.
+
+### MntVacant with `NOREF` (work.mount.knullfs.7, jens, 2026-09-28)
+
+The same layout, tasks and memory model with the `.7` reference rule: a
+stand-in has no reference of its own, and what decides its fate when the
+parent lets go of it is the mark __legitimize_mnt() left and, if there is
+one, the count.  `HeldCoversRefs` states the rule the parent relies on
+(every walk that holds a stand-in has marked it), `NoOwnerPut` the claim of
+the series (nobody but a walk ever puts a stand-in).  The `.4`
+configurations were rerun from the same file: `mntvacant_fixed` has the
+identical 6,262,506 states and `mntvacant_last_unlocked` still catches the
+fixup's bug, so the `.4` mode is untouched by the additions.  No kernel
+defect found; one model slip on the way (the disowning step of the rmdir
+dropped the removed-mountpoint flag, a false `NoReveal`).
+
+| Configuration | Result | Meaning |
+|---------------|--------|---------|
+| `mntvacant_noref` | pass, 2,446,668 states | the `.7` protocol with every piece in place, both holders, the pins, the walker and the rmdirs: a vacant mount sits at zero while hashed, the parent's final put and __detach_mounts() free an unmarked stand-in without a put and sum a marked one, the last put of a walk's reference on a disowned stand-in dooms it and hands off to the release; every invariant of the `.4` runs holds, plus `HeldCoversRefs` and `NoOwnerPut`; deadlock detection on |
+| `mntvacant_noref_nopins`, `mntvacant_noref_noholder`, `mntvacant_noref_walk2`, `mntvacant_noref_2walkers`, `mntvacant_noref_inline`, `mntvacant_noref_marks` | pass, 1,632,324 / 1,810 / 21,932,346 / 31,976,168 / 2,163,857 / 7,917,612 states | the same without the pins, without holders, with two walks per walker, with two walkers at once, in the task-work shape, and with fanotify marks |
+| `mntvacant_noref_sum_only` | pass, 2,446,668 states | no mark at all and the parent always sums: correct under sequential consistency with the same state space, the mark only saves the sum |
+| `mntvacant_noref_no_mark` | `HeldCoversRefs` violated, 1,750 states | the walk does not mark the stand-in it holds while the parent trusts the mark: the parent would free it under the walker |
+| `mntvacant_noref_no_sum` | `Reaped` violated, 1,594,049 states | the parent never sums: a stand-in a walk marked and let go of is disowned but never freed |
+| `mntvacant_noref_hashed_dooms` | `HashedHasRef` violated, 5,842 states | a walk's last put dooms a stand-in that is still hashed: a doomed mount in the hash, where lookup_mnt() would spin |
+| `mntvacant_noref_detach_leak` | `Reaped` violated, 497,523 states | __detach_mounts() cuts a dead stand-in loose without freeing it |
+| `mntvacant_noref_witness_dead_free`, `mntvacant_noref_witness_hashed_zero`, `mntvacant_noref_witness_put_first`, `mntvacant_noref_witness_release_first` | violated, 1,436 / 5,807 / 8,767 / 716 states | the parent and __detach_mounts() do free stand-ins without a put, a walk's last put does leave a hashed stand-in at zero, and the handoff with the release runs both ways |
