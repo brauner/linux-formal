@@ -35,11 +35,14 @@ unless it says so, that is the tree the series sits on.
 
 | Constant | Meaning |
 |----------|---------|
-| `GP_ON_DEMAND` | on: the series; off: the tree without it |
+| `GP_ON_DEMAND` | on: the series as first written on work.mount.knullfs.4, where the puts run from task work after path_umount() dropped the caller's reference; off: the tree without it |
 | `PEEK_LOOSE` | on: mntput_unheld() finishes the mount off at a count of two as well (mutation) |
+| `CALLER_DROP` | on: the series on vfs-7.4.mount: do_umount() drops the caller's reference inside the write section that unmounted the mount (never the last one) and namespace_unlock()'s peek finds the own reference alone |
+| `OWN_DROP` | on: the shape the model rejected: do_umount() drops the own reference at a count of two and the caller's plain put is the final one |
 
 `NoFastFinal` is a witness: mntput_unheld() never finishes the mount off
 without the grace period; its violation shows the fast path being taken.
+`NoRootDrop` is the witness of `OWN_DROP`.
 
 ## Results (jens and local runs, 2026-09-27)
 
@@ -54,3 +57,13 @@ without the grace period; its violation shows the fast path being taken.
 | `mntput_ondemand_no_doomed_flag` | `NoUAF` violated | the walker whose increment the sum missed must see MNT_DOOMED under mount_lock (250cf3693060) |
 | `mntput_ondemand_torn_sum` | `SyncClean` violated | with the single counter of before 7eb84d54fac5 the sum of a migrating holder can read one with the reference held: the series depends on the split counters |
 | `mntput_upstream`, `mntput_upstream_lazy` | pass | the tree without the series, for reference |
+
+### The vfs-7.4.mount shape (local runs, 2026-09-28)
+
+| Configuration | Result | What it shows |
+|---------------|--------|---------------|
+| `mntput_caller74`, `mntput_caller74_lazy`, `mntput_caller74_migrate`, `mntput_caller74_migrate_lazy`, `mntput_caller74_weak_lazy` | pass | with the caller's reference dropped in do_umount() and the peek in namespace_unlock() dropping the own one, nothing is freed early, doomed early or leaked, with a migrating holder and weakly ordered stores as well; the caller's put is the last for a synchronous umount that returns 0 |
+| `mntput_caller74_witness_fast` | `NoFastFinal` violated | the witness: the root of an umount(2) goes without any grace period |
+| `mntput_caller74_no_rcu_delay` | `Freed` violated | a root somebody else holds still needs the grace period |
+| `mntput_caller74_torn_sum` | `SyncClean` violated | the single counter of before 7eb84d54fac5, as for the other shape |
+| `mntput_owndrop74`, `mntput_owndrop74_lazy` | `Freed` violated | the rejected shape: do_umount() drops the mount's own reference at a count of two and leaves the caller's put as the final one; that put finds the transient increment of a walker in its sum and leaves, and the walker, which never finishes a mount off (48a066e72d97), drops it to zero for nobody. The peek has to be the last put |

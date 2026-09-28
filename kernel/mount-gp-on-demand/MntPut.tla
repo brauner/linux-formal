@@ -59,6 +59,16 @@
 (* and the mount finished off right there; anything else means             *)
 (* synchronize_rcu_expedited(), then the plain put.  PEEK_LOOSE is the     *)
 (* mutation that also finishes the mount off at a count of two.            *)
+(*                                                                         *)
+(* CALLER_DROP is the shape of the series on vfs-7.4.mount, where the puts *)
+(* of namespace_unlock() run in do_umount() itself, before path_umount()   *)
+(* would have dropped the caller's reference: do_umount() drops that       *)
+(* reference inside the write section that unmounted the mount (never the  *)
+(* last one, the mount's own is still there) and the peek of               *)
+(* namespace_unlock() then finds the own reference alone.  OWN_DROP is the *)
+(* variant the model rejected: the own reference goes at a count of two    *)
+(* and the caller's plain put is the final one, which can find a walker's  *)
+(* transient increment and leave the count at zero for nobody.             *)
 (***************************************************************************)
 EXTENDS Naturals, Integers, Sequences, FiniteSets
 
@@ -83,7 +93,9 @@ CONSTANTS
     WEAK_STORES,    \* stores of one CPU may become visible out of order
     FIX_PUT_WMB,    \* smp_wmb() before the increment of the puts
     GP_ON_DEMAND,   \* mntput_unheld(): the grace period only if the count is not one
-    PEEK_LOOSE      \* mutation: mntput_unheld() finishes the mount off at two as well
+    PEEK_LOOSE,     \* mutation: mntput_unheld() finishes the mount off at two as well
+    CALLER_DROP,    \* the vfs-7.4.mount shape: do_umount() drops the caller's reference in the write section
+    OWN_DROP        \* the rejected shape: do_umount() drops the own reference at a count of two
 
 U == "U"
 Tasks == {TaskList[i] : i \in 1..Len(TaskList)}
@@ -218,7 +230,8 @@ UnlockStores(t) == <<StWmb, StSeq(SeenSeq(t) + 1), StWmb, StLock(NoTask)>>
 Touching == {"w_l1", "w_l2", "w_mb", "w_l4", "w_lock", "w_flags", "w_use",
              "p_enter", "p_fast", "p_lock", "p_mb", "p_dec", "p_sum", "p_check", "p_cleanup",
              "u_lock", "u_mb", "u_sum", "u_busy", "u_tree", "u_unlock", "u_nsput",
-             "u_peek", "u_peek_mb", "u_peek_sum", "u_peek_check"}
+             "u_peek", "u_peek_mb", "u_peek_sum", "u_peek_check",
+             "u_root_sum", "u_root_check", "u_caller_drop"}
 Done == {"done", "lost", "w_none"}
 
 (* ---- init -------------------------------------------------------------- *)
@@ -552,8 +565,35 @@ UTree ==
     /\ m' = [m EXCEPT !.umount = TRUE, !.sync = ~LAZY]
     /\ buf' = [buf EXCEPT ![U] = @ \o <<StHash(FALSE), StNs(FALSE)>>]
     /\ uresult' = "ok"
+    /\ acc' = [acc EXCEPT ![U] = 0]
+    /\ ci' = [ci EXCEPT ![U] = 1]
+    /\ pc' = [pc EXCEPT ![U] = IF OWN_DROP THEN "u_root_sum"
+                                ELSE IF CALLER_DROP THEN "u_caller_drop" ELSE "u_unlock"]
+    /\ UNCHANGED <<seqv, cntv, putv, lockv, cpu, rcu, gp, gpfree, ret, sq, refs, nsref, nsput, gets, migs, cleaner>>
+
+\* do_umount(): mnt_dec_count() of the caller's reference inside the write
+\* section; not the last one, the mount's own is still there
+UCallerDrop ==
+    /\ pc[U] = "u_caller_drop"
+    /\ PushAll(U, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[U], -1)>>)
+    /\ refs' = [refs EXCEPT ![U] = @ - 1]
     /\ pc' = [pc EXCEPT ![U] = "u_unlock"]
-    /\ UNCHANGED <<seqv, cntv, putv, lockv, cpu, rcu, gp, gpfree, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner>>
+    /\ Unchanged_vis
+    /\ UNCHANGED <<cpu, rcu, gp, gpfree, ret, sq, acc, ci, nsref, nsput, gets, migs, cleaner, uresult>>
+
+\* the rejected shape: mnt_get_count() of the unmounted root inside the write
+\* section, and at two the own reference goes, the caller's put is the last
+URootSum == pc[U] = "u_root_sum" /\ SumStep(U, "u_root_check")
+URootCheck ==
+    /\ pc[U] = "u_root_check"
+    /\ IF acc[U] = 2
+       THEN /\ PushAll(U, Wmb(FIX_PUT_WMB) \o <<StCnt(cpu[U], -1)>>)
+            /\ nsref' = FALSE
+            /\ Unchanged_vis
+       ELSE /\ UNCHANGED <<buf, nsref>>
+            /\ Unchanged_vis
+    /\ pc' = [pc EXCEPT ![U] = "u_unlock"]
+    /\ UNCHANGED <<cpu, rcu, gp, gpfree, ret, sq, acc, ci, refs, nsput, gets, migs, cleaner, uresult>>
 
 \* unlock_mount_hash()
 UUnlock ==
@@ -568,7 +608,9 @@ UUnlock ==
 UNsUnlock ==
     /\ pc[U] = "u_nsunlock"
     /\ Empty(U)
-    /\ pc' = [pc EXCEPT ![U] = IF GP_ON_DEMAND THEN "u_ownput" ELSE "u_gp"]
+    /\ pc' = [pc EXCEPT ![U] = IF OWN_DROP THEN (IF nsref THEN "u_gp" ELSE "u_ret")
+                                ELSE IF CALLER_DROP THEN "u_peek"
+                                ELSE IF GP_ON_DEMAND THEN "u_ownput" ELSE "u_gp"]
     /\ Unchanged_vis
     /\ UNCHANGED <<buf, cpu, rcu, gp, gpfree, ret, sq, acc, ci, refs, nsref, nsput, gets, migs, cleaner, uresult>>
 
@@ -644,7 +686,7 @@ UGpWait ==
 UNsPut ==
     /\ pc[U] = "u_nsput"
     /\ nsput' = TRUE
-    /\ ret' = [ret EXCEPT ![U] = IF GP_ON_DEMAND THEN "done" ELSE "u_ret"]
+    /\ ret' = [ret EXCEPT ![U] = IF (GP_ON_DEMAND \/ CALLER_DROP) /\ ~OWN_DROP THEN "done" ELSE "u_ret"]
     /\ pc' = [pc EXCEPT ![U] = "p_enter"]
     /\ Unchanged_vis
     /\ UNCHANGED <<buf, cpu, rcu, gp, gpfree, sq, acc, ci, refs, nsref, gets, migs, cleaner, uresult>>
@@ -658,8 +700,8 @@ URet ==
     /\ Unchanged_vis
     /\ UNCHANGED <<buf, cpu, rcu, gp, gpfree, sq, acc, ci, refs, nsref, gets, migs, cleaner, uresult>>
 
-Umount == ULock \/ UMb \/ USum \/ UBusy \/ UTree \/ UUnlock \/ UNsUnlock \/ UGp \/ UGpWait
-          \/ UOwnPut \/ UPeek \/ UPeekMb \/ UPeekSum \/ UPeekCheck \/ UNsPut \/ URet
+Umount == ULock \/ UMb \/ USum \/ UBusy \/ UTree \/ UCallerDrop \/ URootSum \/ URootCheck \/ UUnlock \/ UNsUnlock
+          \/ UGp \/ UGpWait \/ UOwnPut \/ UPeek \/ UPeekMb \/ UPeekSum \/ UPeekCheck \/ UNsPut \/ URet
 
 (* ---- the specification ------------------------------------------------- *)
 
@@ -725,5 +767,8 @@ AllDone == <>(\A t \in Tasks : pc[t] \in Done)
 \* the witness: mntput_unheld() never finishes the mount off without the
 \* grace period (its violation shows the fast path being taken)
 NoFastFinal == [][pc[U] = "u_peek_check" => pc'[U] # "p_cleanup"]_vars
+
+\* the witness for OWN_DROP: do_umount() never drops the own reference
+NoRootDrop == [][pc[U] = "u_root_check" => nsref' = nsref]_vars
 
 =============================================================================
