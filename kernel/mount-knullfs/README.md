@@ -39,6 +39,12 @@ mnt_stuck_children or right away in __detach_mounts(); a walk's last put
 leaves a hashed stand-in at zero and dooms a disowned one, handing off to
 the release as before.
 
+work.mount.knullfs.7.order, the same series with the tree-order prep
+replaced by one inside propagate_umount(), has its own directory,
+`kernel/work.mount.knullfs.7.order/`: these models rerun there, the mark
+protocol of `NOREF` under buffered stores, and the propagation algebra
+with that prep.
+
 ## Files
 
 | File | What it is |
