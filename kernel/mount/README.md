@@ -46,6 +46,7 @@ Two families of models, as in `~/notes/work.tla.mount/PLAN.md`:
 | `check.sh`, `check-all.sh`, `run-parallel.sh`, `summarize.sh` | run one, all, or all at once |
 | `show-trace.py` | print a counterexample from a log compactly |
 | `MC_parentcand.tla` | a scripted layout: the victim's parent is a candidate itself (from the review of the F5 fix) |
+| `MC_crossbind.tla`, `MC_propns.tla` | two scripted layouts: a candidate above a candidate that is discovered after it (the cognate of the victim's child sits above the cognate of the victim; trim_one() looks at the parent copy while its child copy is undecided, and trim_ancestors() keeps it), and one namespace receiving a two-level tree (a propagated copy with a child) |
 | `MC_dbg.tla`, `dbg_trace.cfg` | a debugging template: script a scenario as a prelude with `MaxOps = 0`; the `PreludeDone` invariant fails after the last step and TLC prints every state |
 | `MntPut.tla`, `MC_mntput.tla` | Family B: __legitimize_mnt(), mntput_no_expire() with its slow path, cleanup_mnt(), do_umount() (sync and MNT_DETACH), namespace_unlock(), mntget()/mntput() pairs of a task holding a reference, migration; per-CPU mnt_count summed CPU by CPU, or with `FIX_SPLIT_COUNT` per-CPU gets and puts summed in two passes; store buffers, in order (TSO) or with `WEAK_STORES` reordered between words and fenced by smp_wmb(); RCU grace periods |
 | `show-put-trace.py` | print a MntPut counterexample compactly |
@@ -118,6 +119,7 @@ root, pwd and open files.
 | `NsOK`, `RefsOK` | namespace roots attached, attached mounts in live namespaces, references to live mounts, detached mounts alive only while referenced |
 | `CoverOK` | an unprivileged process never reaches a position a lock hid from it |
 | `SyncUmountNotBusy` | a synchronous umount never takes a mount somebody references |
+| `DeadUnderDead` | an unmounted mount attached to a parent has an unmounted parent (the mirror of `ConnectedOK`, disconnect_mount()'s "umounted mounts may not be connected to mounted mounts"): the take-down leaves nothing dead under a live mount, so nothing unmounted stays reachable |
 
 Witness configurations (`*_witness_*`, expected to fail) show that
 tucking, lock transfer, reparenting, slave-of-slave copies, copies whose
@@ -386,6 +388,8 @@ Every fix on, every safety invariant including `BusyMirrorOK`:
 | `chain_fixed` (MaxOps 3) | pass | 359,356 |
 | `small_smoke` (MaxOps 3, plus `ReachOK`) | pass | 98,492 |
 | `parentcand_fixed` (scripted, MaxOps 1) | pass | 53 |
+| `crossbind_fixed`, `propns_fixed` (scripted, MaxOps 1; 2026-09-29, with `DeadUnderDead`) | pass | 122; 42 |
+| `peers_fixed`, `locked_fixed`, `chain_fixed`, `parentcand_fixed` rerun with `DeadUnderDead` (2026-09-29) | pass | 59,631; 191,799; 359,356; 53 |
 | `peers_fail`, `locked_fail`, `chain_fail`, `small_smoke_fail` (one injected allocation failure in propagate_mnt() per run, `UnwindOK` on) | pass | 63,437; 199,428; 370,306; 98,526 |
 | `locked_witness_fail` | `NoFail` fires | an injected failure is reached and the tree afterwards equals the tree before |
 | `algebra_smoke` (MaxOps 3, plus `ReachOK`) | pass | 418,049 (8h38m) |
@@ -403,12 +407,14 @@ One fix off at a time:
 
 | Configuration | Result | Meaning |
 |---------------|--------|---------|
-| `*_no_trim`, `*_no_handle_locked`, `*_reparent_early`, `*_find_master` (chain, locked, small) | `AlgebraOK` violated | the pre-2025 umount propagation bugs and the find_master() stop, each within seconds to an hour |
+| `*_no_handle_locked`, `*_reparent_early`, `*_find_master` (chain, locked, small) | `AlgebraOK` violated | the pre-2025 umount propagation bugs and the find_master() stop, each within seconds to an hour |
+| `crossbind_no_trim` | `AlgebraOK` violated, 54 states | trim_ancestors() dropped: the parent copy 6 is committed by handle_locked() although its child copy 7 stayed, and is unmounted with 7 inside it (2026-09-29); `locked_no_trim` and `chain_no_trim` rerun the same day pass within their three operations (191,799; 359,356 states), the 09-21 row that listed them as violations was wrong for those two layouts, `small_no_trim` (MaxOps 4) is the one that took an hour |
 | `locked_tuck_no_lock` | `CoverOK` violated | a tuck under a locked mount without the lock transfer of c62a4766937e uncovers it; `chain_tuck_no_lock`, `small_tuck_no_lock` pass (no locked mount to uncover, 361k and 3.2M states) |
 | `small_clone_unbindable` | `AlgebraOK` violated | **F1**: clone_mnt() drops T_UNBINDABLE, the copied namespace can bind what the original could not (fixed on `work.mount.unbindable_clone`) |
 | `locked_set_group_unbindable` | `Structure` violated | **F4**: do_set_group() takes an unbindable target; with a slave source the target ends up unbindable and a slave at once, reproduced on 7.1.12 (fixed on `work.move_mount.set_group_unbindable`) |
 | `locked_busy_victims`, `parentcand_busy_victims` | `SyncUmountNotBusy` violated | **F5**: propagate_mount_busy() skips a copy with several children, propagate_umount() pulls it out when they are victims plus one overmount, so a synchronous umount succeeds with the copy still referenced, reproduced on 7.1.12 and, by the review of the fix, back to v4.13 (fixed on `work.umount.busy_victims`; the green runs use the fix's rule and `BusyMirrorOK` checks it against the exact victim set; `parentcand_*` scripts the review's case of the victim's parent being a candidate) |
 | `*_doc` | `AlgebraOK` violated | sharedsubtree.rst as written, see the documentation items below |
+| `crossbind_witness_trim` | `NoTrim` fires | 51 states: trim_ancestors() keeps the parent copy whose child copy stays |
 | `chain_witness_*`, `locked_witness_*`, `small_witness_*` | witnesses fire | tucks, lock transfers, reparenting, slaves of slaves, skipped masters, expiry, covers, connected and kept locked mounts all occur |
 
 `small_witness_connected` and `small_witness_lockedkept` (MaxOps 4) ran

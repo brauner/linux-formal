@@ -8,7 +8,7 @@ FIXES = ["FIX_TRIM_ANCESTORS", "FIX_HANDLE_LOCKED", "FIX_REPARENT_LATE",
          "FIX_FIND_MASTER_STOP", "FIX_TUCK_LOCK", "FIX_PUT_MNT_NS_DISCONNECT",
          "FIX_CLONE_UNBINDABLE", "FIX_SET_GROUP_UNBINDABLE", "FIX_BUSY_VICTIMS"]
 SAFETY = ["TypeOK", "AlgebraOK", "Structure", "IteratorsOK", "NsOK", "RefsOK",
-          "CoverOK", "SyncUmountNotBusy", "BusyMirrorOK"]
+          "CoverOK", "SyncUmountNotBusy", "BusyMirrorOK", "DeadUnderDead"]
 WITNESSES = ["NoTuck", "NoLockTransfer", "NoReparent", "NoSlaveOfSlave",
              "NoSkippedMaster", "NoLockedKept", "NoConnected", "NoPutNs",
              "NoExpiry", "NoTrim", "NoCovers"]
@@ -21,6 +21,8 @@ LAYOUTS = {
     "peers":   (8, 3, 3, 1),
     "locked":  (9, 3, 3, 1),
     "parentcand": (6, 2, 1, 1),   # scripted: the victim's parent is a candidate
+    "crossbind": (9, 2, 1, 1),    # scripted: a candidate above a candidate discovered after it
+    "propns": (9, 3, 1, 1),       # scripted: a propagated copy with a child
 }
 
 # name: (layout, fixes off, invariants, expectation, overrides)
@@ -58,6 +60,15 @@ for lay in ["chain", "peers", "locked"]:
 CONFIGS["small_smoke_fail"] = ("small", [], SAFETY + ["ReachOK", "UnwindOK"], "pass", {"ops": 3, "fails": 1})
 CONFIGS["locked_witness_fail"] = ("locked", [], ["NoFail"], "violation", {"fails": 1})
 CONFIGS["parentcand_fixed"] = ("parentcand", [], SAFETY, "pass", {})
+# the cognate of the victim's child sits above the cognate of the victim and
+# is discovered after it (trim_one() looks at the parent copy while its child
+# copy is undecided), and one namespace receiving a two-level tree
+CONFIGS["crossbind_fixed"] = ("crossbind", [], SAFETY, "pass", {})
+CONFIGS["crossbind_witness_trim"] = ("crossbind", [], ["NoTrim"], "violation", {})
+# trim_ancestors() is what keeps the parent copy back once its child copy
+# turns out to stay: without it the parent copy is taken with the child inside
+CONFIGS["crossbind_no_trim"] = ("crossbind", ["FIX_TRIM_ANCESTORS"], ["AlgebraOK", "Structure"], "violation", {})
+CONFIGS["propns_fixed"] = ("propns", [], SAFETY, "pass", {})
 CONFIGS["parentcand_busy_victims"] = ("parentcand", ["FIX_BUSY_VICTIMS"], ["SyncUmountNotBusy"], "violation", {})
 CONFIGS["small_smoke"] = ("small", [], SAFETY + ["ReachOK"], "pass", {"ops": 3})
 for lay in ["chain", "peers", "locked"]:

@@ -951,6 +951,11 @@ CoverOK ==
 
 \* a synchronous umount never takes out a mount somebody still references
 SyncUmountNotBusy == ~hist.syncbusy
+\* an unmounted mount attached to a parent has an unmounted parent (the
+\* mirror of ConnectedOK, disconnect_mount()'s "umounted mounts may not be
+\* connected to mounted mounts"): the take-down leaves nothing dead under
+\* a live mount, so nothing unmounted stays reachable
+DeadUnderDead == \A c \in Live(mt) : (mt[c].umount /\ HasParent(mt, c)) => mt[mt[c].parent].umount
 \* the proposed propagate_mount_busy() agrees with the exact rule
 BusyMirrorOK == ~hist.busymismatch
 \* a failed mount, bind or move leaves the tree as it found it
