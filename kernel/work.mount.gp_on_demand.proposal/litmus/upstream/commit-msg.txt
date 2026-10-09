@@ -1,0 +1,51 @@
+Documentation/litmus-tests: add the mount reference count tests
+
+The reference count of a mount is split into per-CPU gets and puts and
+not everybody who touches it takes mount_lock. A holder drops a
+reference on the fast path of mntput_no_expire() under rcu_read_lock()
+as long as it sees ->mnt_ns non-NULL. A walker in __legitimize_mnt()
+takes one speculatively during an RCU path walk and drops it again
+under mount_lock when the seqcount has changed. And the unmounter sums
+the counters under mount_lock with mnt_get_count() and finishes the
+mount off without a grace period when the sum says nothing else holds
+it.
+
+That rests on three barriers and one grace period: the smp_wmb()
+before the fast-path put, the smp_mb() between the increment and the
+re-read of the seqcount in __legitimize_mnt(), the smp_mb() between
+the puts pass and the gets pass of mnt_get_count(), and the
+synchronize_rcu_expedited() that mntput_unmounted() waits for when the
+sum came out at more than one.
+
+Add the litmus tests that make that argument in the kernel's memory
+model. Each is a two-process cut of fs/namespace.c with the per-CPU
+counters as one variable per CPU, write_seqlock() spelled out as a
+spinlock, a seqcount store and smp_wmb(), and read_seqretry() as
+smp_rmb() and READ_ONCE(). The tests of the tree's shape are "Never".
+Next to them sit mutations with one ingredient removed, the holder's
+smp_wmb(), the inner smp_mb() of mnt_get_count() or the order of its
+two passes, the walker's smp_mb(), the lock around the walker's look
+at ->mnt_flags, the grace period, and each of those is "Sometimes".
+That shows which barrier carries which pairing.
+
+Two changes to fs/namespace.c lean on this. The first is finishing an
+unmounted mount off without a grace period when the count under
+mount_lock is one: a holder's get is counted whenever its put is, and
+a walker's increment is either counted or the walker sees the seqcount
+change and drops under the lock, so the one reference the sum found is
+the mount's own. The second is dropping the smp_mb() between
+lock_mount_hash() and the sum in mntput_no_expire_slowpath() and
+do_umount(): the smp_mb() inside mnt_get_count() sits after the
+seqcount store and before the gets loads in program order, which is
+the full barrier the store buffering pairing with the walker needs, so
+the outer one ordered nothing the inner one does not.
+
+The tests run with herd7 against tools/memory-model:
+
+    cd tools/memory-model
+    scripts/checklitmus.sh ../../Documentation/litmus-tests/fs/<test>
+
+The memory model is the contract that every architecture's smp_mb(),
+smp_wmb(), READ_ONCE(), WRITE_ONCE(), spinlock and RCU implementation
+has to satisfy. A "Never" there holds on every architecture the kernel
+runs on.
