@@ -1,0 +1,3 @@
+quick_mut_nogp_lazy rc=10
+quick_lazy rc=10
+quick_sync rc=10

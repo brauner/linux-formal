@@ -1,0 +1,7 @@
+quick_mut_nogp_lazy rc=10
+quick_lazy rc=10
+quick_sync rc=10
+quick_mut_torn_sync rc=10
+quick_lazy_c3_unguarded rc=6
+quick_lazy_c3_atomic rc=10
+quick_lazy_c3_noatomic rc=10

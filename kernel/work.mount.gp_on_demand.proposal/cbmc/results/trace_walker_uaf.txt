@@ -1,0 +1,2212 @@
+Trace for walker.assertion.2:
+
+State 9 file mntput_harness.c function __CPROVER_initialize line 253 thread 0
+----------------------------------------------------
+  dentries[0l]={ .unused=0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 10 file mntput_harness.c function __CPROVER_initialize line 253 thread 0
+----------------------------------------------------
+  dentries[0l].unused=0 (00000000 00000000 00000000 00000000)
+
+State 14 file mntput_harness.c function __CPROVER_initialize line 269 thread 0
+----------------------------------------------------
+  ghost_cleaned[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 16 file mntput_harness.c function __CPROVER_initialize line 270 thread 0
+----------------------------------------------------
+  ghost_cleaner[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 18 file mntput_harness.c function __CPROVER_initialize line 273 thread 0
+----------------------------------------------------
+  ghost_fast_final[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 20 file mntput_harness.c function __CPROVER_initialize line 271 thread 0
+----------------------------------------------------
+  ghost_freed[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 23 file mntput_harness.c function __CPROVER_initialize line 268 thread 0
+----------------------------------------------------
+  ghost_hashed[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 25 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[0l]={ 0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 26 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[0l][0l]=0 (00000000 00000000 00000000 00000000)
+
+State 27 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[1l]={ 0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 28 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[1l][0l]=0 (00000000 00000000 00000000 00000000)
+
+State 29 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[2l]={ 0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 30 file mntput_harness.c function __CPROVER_initialize line 266 thread 0
+----------------------------------------------------
+  ghost_refs[2l][0l]=0 (00000000 00000000 00000000 00000000)
+
+State 32 file mntput_harness.c function __CPROVER_initialize line 272 thread 0
+----------------------------------------------------
+  ghost_sb_torn[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 34 file mntput_harness.c function __CPROVER_initialize line 267 thread 0
+----------------------------------------------------
+  ghost_transient[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 35 file mntput_harness.c function __CPROVER_initialize line 267 thread 0
+----------------------------------------------------
+  ghost_transient[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 36 file mntput_harness.c function __CPROVER_initialize line 267 thread 0
+----------------------------------------------------
+  ghost_transient[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 38 file mntput_harness.c function __CPROVER_initialize line 276 thread 0
+----------------------------------------------------
+  ghost_umounted[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 40 file mntput_harness.c function __CPROVER_initialize line 415 thread 0
+----------------------------------------------------
+  in_rcu[0l]=FALSE (00000000)
+
+State 41 file mntput_harness.c function __CPROVER_initialize line 415 thread 0
+----------------------------------------------------
+  in_rcu[1l]=FALSE (00000000)
+
+State 42 file mntput_harness.c function __CPROVER_initialize line 415 thread 0
+----------------------------------------------------
+  in_rcu[2l]=FALSE (00000000)
+
+State 45 file mntput_harness.c function __CPROVER_initialize line 876 thread 0
+----------------------------------------------------
+  held.on[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 51 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l]={ .mnt_parent=0, .$pad1=0u, .mnt_mountpoint=((struct dentry *)NULL), .mnt={ .mnt_root=((struct dentry *)NULL), .mnt_sb=((struct super_block *)NULL), .mnt_flags=0,
+    .$pad3=0u },
+    .mnt_rcu={ .func=((const void (*)(struct rcu_head *))NULL) },
+    .mnt_pcp={ { .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 }, 
+    { .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 } },
+    .nr_children=0,
+    .mnt_ns=0, .mnt_expiry_mark=0, .$pad9=0u,
+    .mnt_pins=((struct hlist_node *)NULL) } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, { 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 }, { 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 }, { { 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 }, { 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 } }, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 52 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_parent=0 (00000000 00000000 00000000 00000000)
+
+State 53 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].$pad1=0u (00000000 00000000 00000000 00000000)
+
+State 54 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_mountpoint=((struct dentry *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 55 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt={ .mnt_root=((struct dentry *)NULL), .mnt_sb=((struct super_block *)NULL), .mnt_flags=0,
+    .$pad3=0u } ({ 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 })
+
+State 56 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_root=((struct dentry *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 57 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_sb=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 58 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_flags=0 (00000000 00000000 00000000 00000000)
+
+State 59 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.$pad3=0u (00000000 00000000 00000000 00000000)
+
+State 60 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_rcu={ .func=((const void (*)(struct rcu_head *))NULL) } ({ 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 61 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_rcu.func=((const void (*)(struct rcu_head *))NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 62 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp={ { .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 }, 
+    { .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 } } ({ { 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 }, { 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 } })
+
+State 63 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l]={ .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 })
+
+State 64 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_gets=0u (00000000 00000000 00000000 00000000)
+
+State 65 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_puts=0u (00000000 00000000 00000000 00000000)
+
+State 66 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_writers=0 (00000000 00000000 00000000 00000000)
+
+State 67 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l]={ .mnt_gets=0u, .mnt_puts=0u, .mnt_writers=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 })
+
+State 68 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_gets=0u (00000000 00000000 00000000 00000000)
+
+State 69 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_puts=0u (00000000 00000000 00000000 00000000)
+
+State 70 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_writers=0 (00000000 00000000 00000000 00000000)
+
+State 71 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].nr_children=0 (00000000 00000000 00000000 00000000)
+
+State 72 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_ns=0 (00000000 00000000 00000000 00000000)
+
+State 73 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_expiry_mark=0 (00000000 00000000 00000000 00000000)
+
+State 74 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].$pad9=0u (00000000 00000000 00000000 00000000)
+
+State 75 file mntput_harness.c function __CPROVER_initialize line 251 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pins=((struct hlist_node *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 77 file mntput_harness.c function __CPROVER_initialize line 1039 thread 0
+----------------------------------------------------
+  head.on[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 79 file mntput_harness.c function __CPROVER_initialize line 252 thread 0
+----------------------------------------------------
+  sbs[0l]={ .s_mounts=((struct mount *)NULL), .idx=0, .$pad2=0u } ({ 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 })
+
+State 80 file mntput_harness.c function __CPROVER_initialize line 252 thread 0
+----------------------------------------------------
+  sbs[0l].s_mounts=((struct mount *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 81 file mntput_harness.c function __CPROVER_initialize line 252 thread 0
+----------------------------------------------------
+  sbs[0l].idx=0 (00000000 00000000 00000000 00000000)
+
+State 82 file mntput_harness.c function __CPROVER_initialize line 252 thread 0
+----------------------------------------------------
+  sbs[0l].$pad2=0u (00000000 00000000 00000000 00000000)
+
+State 84 file mntput_harness.c function __CPROVER_initialize line 461 thread 0
+----------------------------------------------------
+  task_work_pending[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 86 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[0l]={ .flags=0u } ({ 00000000 00000000 00000000 00000000 })
+
+State 87 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[0l].flags=0u (00000000 00000000 00000000 00000000)
+
+State 88 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[1l]={ .flags=0u } ({ 00000000 00000000 00000000 00000000 })
+
+State 89 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[1l].flags=0u (00000000 00000000 00000000 00000000)
+
+State 90 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[2l]={ .flags=0u } ({ 00000000 00000000 00000000 00000000 })
+
+State 91 file mntput_harness.c function __CPROVER_initialize line 456 thread 0
+----------------------------------------------------
+  tasks[2l].flags=0u (00000000 00000000 00000000 00000000)
+
+State 93 file mntput_harness.c function __CPROVER_initialize line 1194 thread 0
+----------------------------------------------------
+  thread_done[0l]=FALSE (00000000)
+
+State 94 file mntput_harness.c function __CPROVER_initialize line 1194 thread 0
+----------------------------------------------------
+  thread_done[1l]=FALSE (00000000)
+
+State 95 file mntput_harness.c function __CPROVER_initialize line 1194 thread 0
+----------------------------------------------------
+  thread_done[2l]=FALSE (00000000)
+
+State 98 file mntput_harness.c function __CPROVER_initialize line 504 thread 0
+----------------------------------------------------
+  unmounted.on[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 103 file mntput_harness.c function main line 1257 thread 0
+----------------------------------------------------
+  retval=0 (00000000 00000000 00000000 00000000)
+
+State 104 file mntput_harness.c function main line 1257 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 105 file mntput_harness.c function main line 1259 thread 0
+----------------------------------------------------
+  tid=0 (00000000 00000000 00000000 00000000)
+
+State 108 file mntput_harness.c function init line 1167 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 109 file mntput_harness.c function init line 1169 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 113 file mntput_harness.c function init line 1170 thread 0
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 114 file mntput_harness.c function init line 1170 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 115 file mntput_harness.c function init_mount line 1141 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_sb=sbs (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 116 file mntput_harness.c function init_mount line 1142 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_root=dentries (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 117 file mntput_harness.c function init_mount line 1143 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_mountpoint=dentries (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 118 file mntput_harness.c function init_mount line 1144 thread 0
+----------------------------------------------------
+  sbs[0l].idx=0 (00000000 00000000 00000000 00000000)
+
+State 119 file mntput_harness.c function init_mount line 1149 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_gets=1u (00000000 00000000 00000000 00000001)
+
+State 120 file mntput_harness.c function init_mount line 1151 thread 0
+----------------------------------------------------
+  ghost_refs[0l][0l]=1 (00000000 00000000 00000000 00000001)
+
+State 121 file mntput_harness.c function init_mount line 1159 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_ns=1 (00000000 00000000 00000000 00000001)
+
+State 122 file mntput_harness.c function init_mount line 1160 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_parent=-1 (11111111 11111111 11111111 11111111)
+
+State 123 file mntput_harness.c function init_mount line 1161 thread 0
+----------------------------------------------------
+  ghost_hashed[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 125 file mntput_harness.c function init line 1169 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 128 file mntput_harness.c function init line 1176 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_gets=2u (00000000 00000000 00000000 00000010)
+
+State 129 file mntput_harness.c function init line 1178 thread 0
+----------------------------------------------------
+  ghost_refs[0l][0l]=2 (00000000 00000000 00000000 00000010)
+
+State 130 file mntput_harness.c function init line 1189 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_gets=1u (00000000 00000000 00000000 00000001)
+
+State 131 file mntput_harness.c function init line 1191 thread 0
+----------------------------------------------------
+  ghost_refs[1l][0l]=1 (00000000 00000000 00000000 00000001)
+
+State 167 file mntput_harness.c function main line 1272 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 168 file mntput_harness.c function main line 1272 thread 0
+----------------------------------------------------
+  flags=2 (00000000 00000000 00000000 00000010)
+
+State 170 file mntput_harness.c function do_umount line 1066 thread 0
+----------------------------------------------------
+  ref=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 175 file mntput_harness.c function walker line 1225 thread 2
+----------------------------------------------------
+  in_rcu[2l]=TRUE (00000001)
+
+State 178 file mntput_harness.c function walker line 1226 thread 2
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 183 file mntput_harness.c function do_umount line 1067 thread 0
+----------------------------------------------------
+  sb=sbs (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 184 file mntput_harness.c function do_umount line 1068 thread 0
+----------------------------------------------------
+  retval=0 (00000000 00000000 00000000 00000000)
+
+State 187 file mntput_harness.c function do_umount line 1070 thread 0
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 188 file mntput_harness.c function do_umount line 1070 thread 0
+----------------------------------------------------
+  flags=2 (00000000 00000000 00000000 00000010)
+
+State 190 file mntput_harness.c function security_sb_umount line 517 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=TRUE (00000001)
+
+State 191 file mntput_harness.c function security_sb_umount line 517 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$security_sb_umount=0 (00000000 00000000 00000000 00000000)
+
+State 193 file mntput_harness.c function do_umount line 1070 thread 0
+----------------------------------------------------
+  retval=0 (00000000 00000000 00000000 00000000)
+
+State 202 file mntput_harness.c function lock_mount_hash line 398 thread 0
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 206 file mntput_harness.c function mnt_inc_count line 542 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 207 file mntput_harness.c function mnt_inc_count line 542 thread 1
+----------------------------------------------------
+  is_puts=0 (00000000 00000000 00000000 00000000)
+
+State 208 file mntput_harness.c function mnt_inc_count line 542 thread 1
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 209 file mntput_harness.c function mnt_inc_count line 542 thread 1
+----------------------------------------------------
+  ghost_delta=1 (00000000 00000000 00000000 00000001)
+
+State 216 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  return_value_nondet_int=1 (00000000 00000000 00000000 00000001)
+
+State 217 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 218 file mntput_harness.c function nondet_cpu line 123 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 220 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  return_value_nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 221 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 226 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 230 file mntput_harness.c function read_seqbegin line 383 thread 2
+----------------------------------------------------
+  ret=0u (00000000 00000000 00000000 00000000)
+
+State 232 file mntput_harness.c function read_seqbegin line 386 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$read_seqbegin=0u (00000000 00000000 00000000 00000000)
+
+State 234 file mntput_harness.c function walker line 1226 thread 2
+----------------------------------------------------
+  seq=0u (00000000 00000000 00000000 00000000)
+
+State 236 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 238 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 239 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 240 file mntput_harness.c function percpu_add line 306 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 244 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 248 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 250 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 252 file mntput_harness.c function walker line 1233 thread 2
+----------------------------------------------------
+  found=1 (00000000 00000000 00000000 00000001)
+
+State 255 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 258 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 265 file mntput_harness.c function percpu_add line 322 thread 1
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_gets=4294967295u (11111111 11111111 11111111 11111111)
+
+State 266 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 271 file mntput_harness.c function percpu_add line 326 thread 1
+----------------------------------------------------
+  ghost_refs[1l][0l]=2 (00000000 00000000 00000000 00000010)
+
+State 281 file mntput_harness.c function holder line 1207 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 285 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 287 file mntput_harness.c function holder line 1207 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 291 file mntput_harness.c function holder line 1208 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 297 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 298 file mntput_harness.c function real_mount line 237 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 300 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  return_value_real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 301 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 305 file mntput_harness.c function mntput line 927 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 309 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 311 file mntput_harness.c function mntput line 927 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 315 file mntput_harness.c function walker line 1235 thread 2
+----------------------------------------------------
+  ghost_transient[2l]=1 (00000000 00000000 00000000 00000001)
+
+State 319 file mntput_harness.c function walker line 1236 thread 2
+----------------------------------------------------
+  bastard=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 320 file mntput_harness.c function walker line 1236 thread 2
+----------------------------------------------------
+  seq=0u (00000000 00000000 00000000 00000000)
+
+State 325 file mntput_harness.c function legitimize_mnt line 652 thread 2
+----------------------------------------------------
+  bastard=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 326 file mntput_harness.c function legitimize_mnt line 652 thread 2
+----------------------------------------------------
+  seq=0u (00000000 00000000 00000000 00000000)
+
+State 327 file mntput_harness.c function __legitimize_mnt line 619 thread 2
+----------------------------------------------------
+  mnt=((struct mount *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 331 file mntput_harness.c function __legitimize_mnt line 620 thread 2
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 332 file mntput_harness.c function __legitimize_mnt line 620 thread 2
+----------------------------------------------------
+  start=0u (00000000 00000000 00000000 00000000)
+
+State 337 file mntput_harness.c function mntput line 931 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 338 file mntput_harness.c function mntput_no_expire line 805 thread 1
+----------------------------------------------------
+  in_rcu[1l]=TRUE (00000001)
+
+State 342 file mntput_harness.c function mntput_no_expire line 806 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 346 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 348 file mntput_harness.c function mntput_no_expire line 806 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 356 file mntput_harness.c function mntput_no_expire line 820 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 364 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 365 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  is_puts=1 (00000000 00000000 00000000 00000001)
+
+State 366 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 367 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  ghost_delta=-1 (11111111 11111111 11111111 11111111)
+
+State 374 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 375 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 376 file mntput_harness.c function nondet_cpu line 123 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 378 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  return_value_nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 379 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 384 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 388 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 390 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 391 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 392 file mntput_harness.c function percpu_add line 306 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 396 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 400 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 402 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 408 file mntput_harness.c function percpu_add line 311 thread 1
+----------------------------------------------------
+  ghost_refs[1l][0l]=1 (00000000 00000000 00000000 00000001)
+
+State 409 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 415 file mntput_harness.c function percpu_add line 320 thread 1
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_puts=1u (00000000 00000000 00000000 00000001)
+
+State 417 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 421 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 427 file mntput_harness.c function read_seqretry line 392 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$read_seqretry=0u (00000000 00000000 00000000 00000000)
+
+State 429 file mntput_harness.c function __legitimize_mnt line 620 thread 2
+----------------------------------------------------
+  return_value_read_seqretry=0u (00000000 00000000 00000000 00000000)
+
+State 434 file mntput_harness.c function __legitimize_mnt line 624 thread 2
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 435 file mntput_harness.c function real_mount line 237 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 437 file mntput_harness.c function __legitimize_mnt line 624 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 440 file mntput_harness.c function __legitimize_mnt line 625 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 442 file mntput_harness.c function mntput_no_expire line 830 thread 1
+----------------------------------------------------
+  in_rcu[1l]=FALSE (00000000)
+
+State 448 file mntput_harness.c function run_task_work line 482 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 449 file mntput_harness.c function run_task_work line 483 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 452 file mntput_harness.c function run_task_work line 483 thread 1
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 456 file mntput_harness.c function holder line 1203 thread 1
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 461 file mntput_harness.c function holder line 1211 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 467 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 468 file mntput_harness.c function real_mount line 237 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 470 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  return_value_real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 471 file mntput_harness.c function mntput line 926 thread 1
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 475 file mntput_harness.c function mntput line 927 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 483 file mntput_harness.c function mnt_inc_count line 542 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 484 file mntput_harness.c function mnt_inc_count line 542 thread 2
+----------------------------------------------------
+  is_puts=0 (00000000 00000000 00000000 00000000)
+
+State 485 file mntput_harness.c function mnt_inc_count line 542 thread 2
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 486 file mntput_harness.c function mnt_inc_count line 542 thread 2
+----------------------------------------------------
+  ghost_delta=1 (00000000 00000000 00000000 00000001)
+
+State 493 file mntput_harness.c function nondet_cpu line 121 thread 2
+----------------------------------------------------
+  return_value_nondet_int=1 (00000000 00000000 00000000 00000001)
+
+State 494 file mntput_harness.c function nondet_cpu line 121 thread 2
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 495 file mntput_harness.c function nondet_cpu line 123 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 497 file mntput_harness.c function percpu_add line 304 thread 2
+----------------------------------------------------
+  return_value_nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 498 file mntput_harness.c function percpu_add line 304 thread 2
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 503 file mntput_harness.c function percpu_add line 305 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 507 file mntput_harness.c function mnt_idx line 259 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 509 file mntput_harness.c function percpu_add line 305 thread 2
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 510 file mntput_harness.c function percpu_add line 305 thread 2
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 511 file mntput_harness.c function percpu_add line 306 thread 2
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 515 file mntput_harness.c function percpu_add line 308 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 519 file mntput_harness.c function mnt_idx line 259 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 521 file mntput_harness.c function percpu_add line 308 thread 2
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 524 file mntput_harness.c function percpu_add line 313 thread 2
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 527 file mntput_harness.c function percpu_add line 313 thread 2
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 534 file mntput_harness.c function percpu_add line 322 thread 2
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_gets=1u (00000000 00000000 00000000 00000001)
+
+State 535 file mntput_harness.c function percpu_add line 313 thread 2
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 540 file mntput_harness.c function percpu_add line 326 thread 2
+----------------------------------------------------
+  ghost_refs[2l][0l]=1 (00000000 00000000 00000000 00000001)
+
+State 550 file mntput_harness.c function __legitimize_mnt line 629 thread 2
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 551 file mntput_harness.c function __legitimize_mnt line 629 thread 2
+----------------------------------------------------
+  start=0u (00000000 00000000 00000000 00000000)
+
+State 555 file mntput_harness.c function read_seqretry line 392 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$read_seqretry=0u (00000000 00000000 00000000 00000000)
+
+State 557 file mntput_harness.c function __legitimize_mnt line 629 thread 2
+----------------------------------------------------
+  return_value_read_seqretry$0=0u (00000000 00000000 00000000 00000000)
+
+State 559 file mntput_harness.c function __legitimize_mnt line 630 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$__legitimize_mnt=0 (00000000 00000000 00000000 00000000)
+
+State 562 file mntput_harness.c function legitimize_mnt line 652 thread 2
+----------------------------------------------------
+  return_value___legitimize_mnt=0 (00000000 00000000 00000000 00000000)
+
+State 563 file mntput_harness.c function legitimize_mnt line 652 thread 2
+----------------------------------------------------
+  res=0 (00000000 00000000 00000000 00000000)
+
+State 565 file mntput_harness.c function legitimize_mnt line 654 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$legitimize_mnt=TRUE (00000001)
+
+State 568 file mntput_harness.c function walker line 1236 thread 2
+----------------------------------------------------
+  return_value_legitimize_mnt=TRUE (00000001)
+
+State 572 file mntput_harness.c function write_seqlock line 362 thread 0
+----------------------------------------------------
+  mount_lock.locked=TRUE (00000001)
+
+State 576 file mntput_harness.c function write_seqlock line 366 thread 0
+----------------------------------------------------
+  mount_lock.sequence=1u (00000000 00000000 00000000 00000001)
+
+State 580 file mntput_harness.c function do_umount line 1080 thread 0
+----------------------------------------------------
+  retval=-22 (11111111 11111111 11111111 11101010)
+
+State 584 file mntput_harness.c function do_umount line 1081 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 587 file mntput_harness.c function check_mnt line 527 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$check_mnt=1 (00000000 00000000 00000000 00000001)
+
+State 589 file mntput_harness.c function do_umount line 1081 thread 0
+----------------------------------------------------
+  return_value_check_mnt=1 (00000000 00000000 00000000 00000001)
+
+State 597 file mntput_harness.c function do_umount line 1087 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 601 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 605 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 607 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 610 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_has_parent=1 (00000000 00000000 00000000 00000001)
+
+State 612 file mntput_harness.c function do_umount line 1087 thread 0
+----------------------------------------------------
+  return_value_mnt_has_parent=1 (00000000 00000000 00000000 00000001)
+
+State 615 file mntput_harness.c function do_umount line 1090 thread 0
+----------------------------------------------------
+  event=1 (00000000 00000000 00000000 00000001)
+
+State 619 file mntput_harness.c function do_umount line 1092 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 620 file mntput_harness.c function do_umount line 1092 thread 0
+----------------------------------------------------
+  how=/*enum*/UMOUNT_PROPAGATE (00000000 00000000 00000000 00000010)
+
+State 621 file mntput_harness.c function umount_tree line 992 thread 0
+----------------------------------------------------
+  p=((struct mount *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 622 file mntput_harness.c function umount_tree line 993 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 623 file mntput_harness.c function umount_tree line 997 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 625 file mntput_harness.c function umount_tree line 998 thread 0
+----------------------------------------------------
+  p=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 627 file mntput_harness.c function umount_tree line 1000 thread 0
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 629 file mntput_harness.c function umount_tree line 1001 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_flags=134217728 (00001000 00000000 00000000 00000000)
+
+State 630 file mntput_harness.c function umount_tree line 997 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 633 file mntput_harness.c function umount_tree line 1005 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 635 file mntput_harness.c function umount_tree line 1006 thread 0
+----------------------------------------------------
+  mounts[0l].nr_children=0 (00000000 00000000 00000000 00000000)
+
+State 636 file mntput_harness.c function umount_tree line 1005 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 639 file mntput_harness.c function umount_tree line 1009 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 641 file mntput_harness.c function umount_tree line 1010 thread 0
+----------------------------------------------------
+  p=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 642 file mntput_harness.c function umount_tree line 1011 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_ns=0 (00000000 00000000 00000000 00000000)
+
+State 646 file mntput_harness.c function umount_tree line 1012 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 650 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 652 file mntput_harness.c function umount_tree line 1012 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 653 file mntput_harness.c function umount_tree line 1012 thread 0
+----------------------------------------------------
+  ghost_umounted[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 658 file mntput_harness.c function umount_tree line 1016 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 662 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 666 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 668 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 671 file mntput_harness.c function mnt_has_parent line 244 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_has_parent=1 (00000000 00000000 00000000 00000001)
+
+State 673 file mntput_harness.c function umount_tree line 1016 thread 0
+----------------------------------------------------
+  return_value_mnt_has_parent=1 (00000000 00000000 00000000 00000001)
+
+State 677 file mntput_harness.c function umount_tree line 1017 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 681 file mntput_harness.c function umount_mnt line 976 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 685 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 687 file mntput_harness.c function umount_mnt line 976 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 690 file mntput_harness.c function umount_mnt line 976 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_parent=0 (00000000 00000000 00000000 00000000)
+
+State 694 file mntput_harness.c function umount_mnt line 978 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 698 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 700 file mntput_harness.c function umount_mnt line 978 thread 0
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 701 file mntput_harness.c function umount_mnt line 978 thread 0
+----------------------------------------------------
+  ghost_hashed[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 706 file mntput_harness.c function umount_tree line 1019 thread 0
+----------------------------------------------------
+  h=&unmounted!0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 707 file mntput_harness.c function umount_tree line 1019 thread 0
+----------------------------------------------------
+  p=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 708 file mntput_harness.c function umount_tree line 1019 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 713 file mntput_harness.c function unmounted_add line 967 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 717 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 719 file mntput_harness.c function unmounted_add line 967 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 720 file mntput_harness.c function unmounted_add line 967 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+Violated property:
+  file mntput_harness.c function unmounted_add line 968 thread 0
+  a mount is put on the unmounted list twice
+  !(h->on[(signed long int)i] != 0)
+
+
+State 724 file mntput_harness.c function unmounted_add line 970 thread 0
+----------------------------------------------------
+  unmounted.on[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 726 file mntput_harness.c function umount_tree line 1009 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 730 file mntput_harness.c function do_umount line 1093 thread 0
+----------------------------------------------------
+  retval=0 (00000000 00000000 00000000 00000000)
+
+State 735 file mntput_harness.c function do_umount line 1108 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 743 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 744 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  is_puts=1 (00000000 00000000 00000000 00000001)
+
+State 745 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 746 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  ghost_delta=-1 (11111111 11111111 11111111 11111111)
+
+State 753 file mntput_harness.c function nondet_cpu line 121 thread 0
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 754 file mntput_harness.c function nondet_cpu line 121 thread 0
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 755 file mntput_harness.c function nondet_cpu line 123 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 757 file mntput_harness.c function percpu_add line 304 thread 0
+----------------------------------------------------
+  return_value_nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 758 file mntput_harness.c function percpu_add line 304 thread 0
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 763 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 767 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 769 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 770 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 771 file mntput_harness.c function percpu_add line 306 thread 0
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 775 file mntput_harness.c function percpu_add line 308 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 779 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 781 file mntput_harness.c function percpu_add line 308 thread 0
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 785 file mntput_harness.c function percpu_add line 311 thread 0
+----------------------------------------------------
+  ghost_refs[0l][0l]=1 (00000000 00000000 00000000 00000001)
+
+State 786 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 792 file mntput_harness.c function percpu_add line 320 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_puts=2u (00000000 00000000 00000000 00000010)
+
+State 794 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 798 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 805 file mntput_harness.c function do_umount line 1109 thread 0
+----------------------------------------------------
+  ghost_caller_put=1 (00000000 00000000 00000000 00000001)
+
+State 806 file mntput_harness.c function do_umount line 1110 thread 0
+----------------------------------------------------
+  ref=((struct mount *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 811 file mntput_harness.c function unlock_mount_hash line 404 thread 0
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 815 file mntput_harness.c function write_sequnlock line 374 thread 0
+----------------------------------------------------
+  mount_lock.sequence=2u (00000000 00000000 00000000 00000010)
+
+State 819 file mntput_harness.c function write_sequnlock line 377 thread 0
+----------------------------------------------------
+  mount_lock.locked=FALSE (00000000)
+
+State 826 file mntput_harness.c function namespace_unlock line 1041 thread 0
+----------------------------------------------------
+  old=&unmounted!0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 827 file mntput_harness.c function namespace_unlock line 1041 thread 0
+----------------------------------------------------
+  new=&head!0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 828 file mntput_harness.c function hlist_move_list line 186 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 829 file mntput_harness.c function hlist_move_list line 187 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 835 file mntput_harness.c function hlist_move_list line 188 thread 0
+----------------------------------------------------
+  head.on[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 838 file mntput_harness.c function hlist_move_list line 189 thread 0
+----------------------------------------------------
+  unmounted.on[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 839 file mntput_harness.c function hlist_move_list line 187 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 849 file mntput_harness.c function namespace_unlock line 1045 thread 0
+----------------------------------------------------
+  h=&head!0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 850 file mntput_harness.c function hlist_empty line 178 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 852 file mntput_harness.c function hlist_empty line 178 thread 0
+----------------------------------------------------
+  any=0 (00000000 00000000 00000000 00000000)
+
+State 853 file mntput_harness.c function hlist_empty line 179 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 857 file mntput_harness.c function hlist_empty line 180 thread 0
+----------------------------------------------------
+  any=1 (00000000 00000000 00000000 00000001)
+
+State 858 file mntput_harness.c function hlist_empty line 179 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 861 file mntput_harness.c function hlist_empty line 181 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hlist_empty=0 (00000000 00000000 00000000 00000000)
+
+State 863 file mntput_harness.c function namespace_unlock line 1045 thread 0
+----------------------------------------------------
+  return_value_hlist_empty=0 (00000000 00000000 00000000 00000000)
+
+State 867 file mntput_harness.c function namespace_unlock line 1048 thread 0
+----------------------------------------------------
+  head=&head!0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 868 file mntput_harness.c function mntput_unmounted line 875 thread 0
+----------------------------------------------------
+  m=((struct mount *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 869 file mntput_harness.c function mntput_unmounted line 878 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 870 file mntput_harness.c function mntput_unmounted line 878 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 875 file mntput_harness.c function lock_mount_hash line 398 thread 0
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 878 file mntput_harness.c function write_seqlock line 362 thread 0
+----------------------------------------------------
+  mount_lock.locked=TRUE (00000001)
+
+State 882 file mntput_harness.c function write_seqlock line 366 thread 0
+----------------------------------------------------
+  mount_lock.sequence=3u (00000000 00000000 00000000 00000011)
+
+State 887 file mntput_harness.c function mntput_unmounted line 883 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 889 file mntput_harness.c function mntput_unmounted line 884 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 893 file mntput_harness.c function mntput_unmounted line 887 thread 0
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 897 file mntput_harness.c function mntput_unmounted line 888 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 898 file mntput_harness.c function mntput_unmounted line 888 thread 0
+----------------------------------------------------
+  shrink=&shrink!0 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 902 file mntput_harness.c function mntput_unheld line 848 thread 0
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 907 file mntput_harness.c function mntput_unheld line 856 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 909 file mntput_harness.c function mnt_get_count line 584 thread 0
+----------------------------------------------------
+  gets=0u (00000000 00000000 00000000 00000000)
+
+State 911 file mntput_harness.c function mnt_get_count line 584 thread 0
+----------------------------------------------------
+  puts=0u (00000000 00000000 00000000 00000000)
+
+State 912 file mntput_harness.c function mnt_get_count line 585 thread 0
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 916 file mntput_harness.c function mnt_get_count line 587 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 920 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 922 file mntput_harness.c function mnt_get_count line 587 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 924 file mntput_harness.c function mnt_get_count line 589 thread 0
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 928 file mntput_harness.c function mnt_get_count line 590 thread 0
+----------------------------------------------------
+  puts=2u (00000000 00000000 00000000 00000010)
+
+State 929 file mntput_harness.c function mnt_get_count line 589 thread 0
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 934 file mntput_harness.c function mnt_get_count line 590 thread 0
+----------------------------------------------------
+  puts=2u (00000000 00000000 00000000 00000010)
+
+State 935 file mntput_harness.c function mnt_get_count line 589 thread 0
+----------------------------------------------------
+  cpu=2 (00000000 00000000 00000000 00000010)
+
+State 939 file mntput_harness.c function mnt_get_count line 592 thread 0
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 943 file mntput_harness.c function mnt_get_count line 593 thread 0
+----------------------------------------------------
+  gets=2u (00000000 00000000 00000000 00000010)
+
+State 944 file mntput_harness.c function mnt_get_count line 592 thread 0
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 949 file mntput_harness.c function mnt_get_count line 593 thread 0
+----------------------------------------------------
+  gets=3u (00000000 00000000 00000000 00000011)
+
+State 950 file mntput_harness.c function mnt_get_count line 592 thread 0
+----------------------------------------------------
+  cpu=2 (00000000 00000000 00000000 00000010)
+
+State 953 file mntput_harness.c function mnt_get_count line 595 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_get_count=1 (00000000 00000000 00000000 00000001)
+
+State 955 file mntput_harness.c function mntput_unheld line 856 thread 0
+----------------------------------------------------
+  return_value_mnt_get_count=1 (00000000 00000000 00000000 00000001)
+
+State 959 file mntput_harness.c function mntput_unheld line 859 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 967 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 968 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  is_puts=1 (00000000 00000000 00000000 00000001)
+
+State 969 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 970 file mntput_harness.c function mnt_dec_count line 557 thread 0
+----------------------------------------------------
+  ghost_delta=-1 (11111111 11111111 11111111 11111111)
+
+State 977 file mntput_harness.c function nondet_cpu line 121 thread 0
+----------------------------------------------------
+  return_value_nondet_int=1 (00000000 00000000 00000000 00000001)
+
+State 978 file mntput_harness.c function nondet_cpu line 121 thread 0
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 979 file mntput_harness.c function nondet_cpu line 123 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 981 file mntput_harness.c function percpu_add line 304 thread 0
+----------------------------------------------------
+  return_value_nondet_cpu=1 (00000000 00000000 00000000 00000001)
+
+State 982 file mntput_harness.c function percpu_add line 304 thread 0
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 987 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 991 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 993 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 994 file mntput_harness.c function percpu_add line 305 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 995 file mntput_harness.c function percpu_add line 306 thread 0
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 999 file mntput_harness.c function percpu_add line 308 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1003 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1005 file mntput_harness.c function percpu_add line 308 thread 0
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 1009 file mntput_harness.c function percpu_add line 311 thread 0
+----------------------------------------------------
+  ghost_refs[0l][0l]=0 (00000000 00000000 00000000 00000000)
+
+State 1010 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 1013 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 1020 file mntput_harness.c function percpu_add line 320 thread 0
+----------------------------------------------------
+  mounts[0l].mnt_pcp[1l].mnt_puts=0u (00000000 00000000 00000000 00000000)
+
+State 1022 file mntput_harness.c function percpu_add line 313 thread 0
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 1030 file mntput_harness.c function mntput_unheld line 860 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1031 file mntput_harness.c function mntput_unheld line 860 thread 0
+----------------------------------------------------
+  shrink=&shrink!0 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1035 file mntput_harness.c function mntput_final_locked line 703 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1039 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1041 file mntput_harness.c function mntput_final_locked line 703 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1046 file mntput_harness.c function mntput_final_locked line 705 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1051 file mntput_harness.c function ghost_real_refs line 283 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1055 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1057 file mntput_harness.c function ghost_real_refs line 283 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1058 file mntput_harness.c function ghost_real_refs line 283 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 1059 file mntput_harness.c function ghost_real_refs line 283 thread 0
+----------------------------------------------------
+  t=0 (00000000 00000000 00000000 00000000)
+
+State 1061 file mntput_harness.c function ghost_real_refs line 283 thread 0
+----------------------------------------------------
+  sum=0 (00000000 00000000 00000000 00000000)
+
+State 1062 file mntput_harness.c function ghost_real_refs line 284 thread 0
+----------------------------------------------------
+  t=0 (00000000 00000000 00000000 00000000)
+
+State 1064 file mntput_harness.c function ghost_real_refs line 285 thread 0
+----------------------------------------------------
+  sum=0 (00000000 00000000 00000000 00000000)
+
+State 1065 file mntput_harness.c function ghost_real_refs line 284 thread 0
+----------------------------------------------------
+  t=1 (00000000 00000000 00000000 00000001)
+
+State 1069 file mntput_harness.c function ghost_real_refs line 285 thread 0
+----------------------------------------------------
+  sum=1 (00000000 00000000 00000000 00000001)
+
+State 1070 file mntput_harness.c function ghost_real_refs line 284 thread 0
+----------------------------------------------------
+  t=2 (00000000 00000000 00000000 00000010)
+
+State 1075 file mntput_harness.c function ghost_real_refs line 285 thread 0
+----------------------------------------------------
+  sum=1 (00000000 00000000 00000000 00000001)
+
+State 1076 file mntput_harness.c function ghost_real_refs line 284 thread 0
+----------------------------------------------------
+  t=3 (00000000 00000000 00000000 00000011)
+
+State 1079 file mntput_harness.c function ghost_real_refs line 286 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$ghost_real_refs=1 (00000000 00000000 00000000 00000001)
+
+State 1081 file mntput_harness.c function mntput_final_locked line 705 thread 0
+----------------------------------------------------
+  return_value_ghost_real_refs=1 (00000000 00000000 00000000 00000001)
+
+Violated property:
+  file mntput_harness.c function mntput_final_locked line 705 thread 0
+  DoomedIsLast: doomed while a counted reference exists
+  return_value_ghost_real_refs == 0
+
+
+State 1085 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1087 file mntput_harness.c function mntput line 927 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1092 file mntput_harness.c function mntput_final_locked line 707 thread 0
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 1098 file mntput_harness.c function mntput line 931 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1099 file mntput_harness.c function mntput_final_locked line 708 thread 0
+----------------------------------------------------
+  mounts[0l].mnt.mnt_flags=150994944 (00001001 00000000 00000000 00000000)
+
+State 1102 file mntput_harness.c function mntput_final_locked line 710 thread 0
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1106 file mntput_harness.c function mntput_no_expire line 805 thread 1
+----------------------------------------------------
+  in_rcu[1l]=TRUE (00000001)
+
+State 1110 file mntput_harness.c function mntput_no_expire line 806 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1114 file mntput_harness.c function mntput_final_locked line 714 thread 0
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 1120 file mntput_harness.c function mntput_unheld line 862 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1123 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1125 file mntput_harness.c function mntput_no_expire line 806 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1129 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1131 file mntput_harness.c function mntput_unheld line 862 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1133 file mntput_harness.c function mntput_unheld line 862 thread 0
+----------------------------------------------------
+  ghost_fast_final[0l]=1 (00000000 00000000 00000000 00000001)
+
+Violated property:
+  file mntput_harness.c function mntput_unheld line 863 thread 0
+  NoFastFinal (witness: this MUST fail, it shows the fast path)
+  0 != 0
+
+
+State 1135 file mntput_harness.c function mntput_unheld line 864 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mntput_unheld=TRUE (00000001)
+
+State 1137 file mntput_harness.c function mntput_unmounted line 888 thread 0
+----------------------------------------------------
+  return_value_mntput_unheld=TRUE (00000001)
+
+State 1140 file mntput_harness.c function mntput_unmounted line 883 thread 0
+----------------------------------------------------
+  k=-1 (11111111 11111111 11111111 11111111)
+
+State 1147 file mntput_harness.c function unlock_mount_hash line 404 thread 0
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1153 file mntput_harness.c function mntput_no_expire line 834 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1154 file mntput_harness.c function mntput_no_expire_slowpath line 738 thread 1
+----------------------------------------------------
+  count=0 (00000000 00000000 00000000 00000000)
+
+State 1158 file mntput_harness.c function mntput_no_expire_slowpath line 740 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1162 file mntput_harness.c function write_sequnlock line 374 thread 0
+----------------------------------------------------
+  mount_lock.sequence=4u (00000000 00000000 00000000 00000100)
+
+State 1166 file mntput_harness.c function write_sequnlock line 377 thread 0
+----------------------------------------------------
+  mount_lock.locked=FALSE (00000000)
+
+State 1171 file mntput_harness.c function mntput_unmounted line 894 thread 0
+----------------------------------------------------
+  l=&shrink!0 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1173 file mntput_harness.c function mntput_unmounted line 897 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1175 file mntput_harness.c function mntput_unmounted line 898 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1180 file mntput_harness.c function mntput_unmounted line 901 thread 0
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1182 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1184 file mntput_harness.c function mntput_no_expire_slowpath line 740 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1185 file mntput_harness.c function mntput_unmounted line 902 thread 0
+----------------------------------------------------
+  head.on[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 1188 file mntput_harness.c function mntput_unmounted line 903 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1197 file mntput_harness.c function mntput_queue_cleanup line 722 thread 0
+----------------------------------------------------
+  task=tasks (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1198 file mntput_harness.c function mntput_no_expire_slowpath line 741 thread 1
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 1204 file mntput_harness.c function lock_mount_hash line 398 thread 1
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1208 file mntput_harness.c function mntput_queue_cleanup line 724 thread 0
+----------------------------------------------------
+  twork=&mounts[0l].mnt_rcu (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00101000)
+
+State 1209 file mntput_harness.c function mntput_queue_cleanup line 724 thread 0
+----------------------------------------------------
+  func=__cleanup_mnt (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1214 file mntput_harness.c function mntput_queue_cleanup line 725 thread 0
+----------------------------------------------------
+  task=tasks (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1215 file mntput_harness.c function mntput_queue_cleanup line 725 thread 0
+----------------------------------------------------
+  twork=&mounts[0l].mnt_rcu (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00101000)
+
+State 1216 file mntput_harness.c function mntput_queue_cleanup line 725 thread 0
+----------------------------------------------------
+  notify=1 (00000000 00000000 00000000 00000001)
+
+State 1221 file mntput_harness.c function task_work_add line 472 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1225 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1227 file mntput_harness.c function task_work_add line 472 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1228 file mntput_harness.c function task_work_add line 472 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 1229 file mntput_harness.c function task_work_add line 475 thread 0
+----------------------------------------------------
+  task_work_pending[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 1230 file mntput_harness.c function task_work_add line 476 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$task_work_add=0 (00000000 00000000 00000000 00000000)
+
+State 1232 file mntput_harness.c function mntput_queue_cleanup line 725 thread 0
+----------------------------------------------------
+  return_value_task_work_add=0 (00000000 00000000 00000000 00000000)
+
+State 1236 file mntput_harness.c function mntput_unmounted line 897 thread 0
+----------------------------------------------------
+  k=-1 (11111111 11111111 11111111 11111111)
+
+State 1242 file mntput_harness.c function mntput_unmounted line 906 thread 0
+----------------------------------------------------
+  h=&held!0 (00001100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1243 file mntput_harness.c function hlist_empty line 178 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1245 file mntput_harness.c function hlist_empty line 178 thread 0
+----------------------------------------------------
+  any=0 (00000000 00000000 00000000 00000000)
+
+State 1246 file mntput_harness.c function hlist_empty line 179 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1250 file mntput_harness.c function write_seqlock line 362 thread 1
+----------------------------------------------------
+  mount_lock.locked=TRUE (00000001)
+
+State 1254 file mntput_harness.c function write_seqlock line 366 thread 1
+----------------------------------------------------
+  mount_lock.sequence=5u (00000000 00000000 00000000 00000101)
+
+State 1261 file mntput_harness.c function mntput_no_expire_slowpath line 748 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1268 file mntput_harness.c function hlist_empty line 180 thread 0
+----------------------------------------------------
+  any=0 (00000000 00000000 00000000 00000000)
+
+State 1269 file mntput_harness.c function hlist_empty line 179 thread 0
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 1272 file mntput_harness.c function hlist_empty line 181 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hlist_empty=1 (00000000 00000000 00000000 00000001)
+
+State 1274 file mntput_harness.c function mntput_unmounted line 906 thread 0
+----------------------------------------------------
+  return_value_hlist_empty=1 (00000000 00000000 00000000 00000001)
+
+State 1281 file mntput_harness.c function do_umount line 1117 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$do_umount=0 (00000000 00000000 00000000 00000000)
+
+State 1283 file mntput_harness.c function main line 1272 thread 0
+----------------------------------------------------
+  retval=0 (00000000 00000000 00000000 00000000)
+
+State 1286 file mntput_harness.c function run_task_work line 482 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1287 file mntput_harness.c function run_task_work line 483 thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1290 file mntput_harness.c function run_task_work line 485 thread 0
+----------------------------------------------------
+  task_work_pending[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 1293 file mntput_harness.c function run_task_work line 486 thread 0
+----------------------------------------------------
+  head=&mounts[0l].mnt_rcu (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00101000)
+
+State 1296 file mntput_harness.c function __cleanup_mnt line 694 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1301 file mntput_harness.c function cleanup_mnt line 665 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1305 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1307 file mntput_harness.c function cleanup_mnt line 665 thread 0
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1308 file mntput_harness.c function cleanup_mnt line 665 thread 0
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 1312 file mntput_harness.c function cleanup_mnt line 667 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1316 file mntput_harness.c function mnt_idx line 259 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1318 file mntput_harness.c function cleanup_mnt line 667 thread 0
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 1324 file mntput_harness.c function cleanup_mnt line 671 thread 0
+----------------------------------------------------
+  ghost_cleaned[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 1325 file mntput_harness.c function cleanup_mnt line 672 thread 0
+----------------------------------------------------
+  ghost_cleaner[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 1330 file mntput_harness.c function cleanup_mnt line 681 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1331 file mntput_harness.c function mnt_get_writers line 506 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_get_writers=0 (00000000 00000000 00000000 00000000)
+
+State 1333 file mntput_harness.c function cleanup_mnt line 681 thread 0
+----------------------------------------------------
+  return_value_mnt_get_writers=0 (00000000 00000000 00000000 00000000)
+
+State 1334 file mntput_harness.c function cleanup_mnt line 681 thread 0
+----------------------------------------------------
+  __c=0 (00000000 00000000 00000000 00000000)
+
+State 1340 file mntput_harness.c function cleanup_mnt line 684 thread 0
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 1348 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1349 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  is_puts=1 (00000000 00000000 00000000 00000001)
+
+State 1350 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  cnt_delta=1 (00000000 00000000 00000000 00000001)
+
+State 1351 file mntput_harness.c function mnt_dec_count line 557 thread 1
+----------------------------------------------------
+  ghost_delta=-1 (11111111 11111111 11111111 11111111)
+
+State 1358 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 1359 file mntput_harness.c function nondet_cpu line 121 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1360 file mntput_harness.c function nondet_cpu line 123 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1362 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  return_value_nondet_cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1363 file mntput_harness.c function percpu_add line 304 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1368 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1372 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1374 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1375 file mntput_harness.c function percpu_add line 305 thread 1
+----------------------------------------------------
+  idx=0 (00000000 00000000 00000000 00000000)
+
+State 1376 file mntput_harness.c function percpu_add line 306 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 1380 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1384 file mntput_harness.c function cleanup_mnt line 685 thread 0
+----------------------------------------------------
+  d=dentries (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1390 file mntput_harness.c function cleanup_mnt line 686 thread 0
+----------------------------------------------------
+  sb=sbs (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1392 file mntput_harness.c function cleanup_mnt line 687 thread 0
+----------------------------------------------------
+  ghost_sb_torn[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 1395 file mntput_harness.c function cleanup_mnt line 688 thread 0
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1399 file mntput_harness.c function __synchronize_rcu line 428 thread 0
+----------------------------------------------------
+  t=0 (00000000 00000000 00000000 00000000)
+
+State 1401 file mntput_harness.c function __synchronize_rcu line 431 thread 0
+----------------------------------------------------
+  t=0 (00000000 00000000 00000000 00000000)
+
+State 1404 file mntput_harness.c function __synchronize_rcu line 431 thread 0
+----------------------------------------------------
+  t=1 (00000000 00000000 00000000 00000001)
+
+State 1411 file mntput_harness.c function holder line 1199 thread 1
+----------------------------------------------------
+  m=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1412 file mntput_harness.c function holder line 1200 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1413 file mntput_harness.c function holder line 1202 thread 1
+----------------------------------------------------
+  tid=1 (00000000 00000000 00000000 00000001)
+
+State 1414 file mntput_harness.c function holder line 1203 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1417 file mntput_harness.c function holder line 1204 thread 1
+----------------------------------------------------
+  return_value_nondet_bool=TRUE (00000001)
+
+State 1421 file mntput_harness.c function holder line 1206 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 1426 file mntput_harness.c function mntget line 938 thread 1
+----------------------------------------------------
+  mnt=&mounts[0l].mnt (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 1427 file mntput_harness.c function real_mount line 237 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1429 file mntput_harness.c function mntget line 938 thread 1
+----------------------------------------------------
+  return_value_real_mount=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1432 file mntput_harness.c function mntget line 938 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1435 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1437 file mntput_harness.c function percpu_add line 308 thread 1
+----------------------------------------------------
+  return_value_mnt_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 1441 file mntput_harness.c function percpu_add line 311 thread 1
+----------------------------------------------------
+  ghost_refs[1l][0l]=0 (00000000 00000000 00000000 00000000)
+
+State 1442 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=0 (00000000 00000000 00000000 00000000)
+
+State 1448 file mntput_harness.c function percpu_add line 320 thread 1
+----------------------------------------------------
+  mounts[0l].mnt_pcp[0l].mnt_puts=3u (00000000 00000000 00000000 00000011)
+
+State 1450 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=1 (00000000 00000000 00000000 00000001)
+
+State 1454 file mntput_harness.c function percpu_add line 313 thread 1
+----------------------------------------------------
+  c=2 (00000000 00000000 00000000 00000010)
+
+State 1462 file mntput_harness.c function mntput_no_expire_slowpath line 749 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1464 file mntput_harness.c function mnt_get_count line 584 thread 1
+----------------------------------------------------
+  gets=0u (00000000 00000000 00000000 00000000)
+
+State 1466 file mntput_harness.c function mnt_get_count line 584 thread 1
+----------------------------------------------------
+  puts=0u (00000000 00000000 00000000 00000000)
+
+State 1467 file mntput_harness.c function mnt_get_count line 585 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1471 file mntput_harness.c function mnt_get_count line 587 thread 1
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1475 file mntput_harness.c function mnt_idx line 259 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1477 file mntput_harness.c function mnt_get_count line 587 thread 1
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1479 file mntput_harness.c function mnt_get_count line 589 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1483 file mntput_harness.c function mnt_get_count line 590 thread 1
+----------------------------------------------------
+  puts=3u (00000000 00000000 00000000 00000011)
+
+State 1484 file mntput_harness.c function mnt_get_count line 589 thread 1
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 1489 file mntput_harness.c function mnt_get_count line 590 thread 1
+----------------------------------------------------
+  puts=3u (00000000 00000000 00000000 00000011)
+
+State 1490 file mntput_harness.c function mnt_get_count line 589 thread 1
+----------------------------------------------------
+  cpu=2 (00000000 00000000 00000000 00000010)
+
+State 1494 file mntput_harness.c function mnt_get_count line 592 thread 1
+----------------------------------------------------
+  cpu=0 (00000000 00000000 00000000 00000000)
+
+State 1498 file mntput_harness.c function mnt_get_count line 593 thread 1
+----------------------------------------------------
+  gets=2u (00000000 00000000 00000000 00000010)
+
+State 1499 file mntput_harness.c function mnt_get_count line 592 thread 1
+----------------------------------------------------
+  cpu=1 (00000000 00000000 00000000 00000001)
+
+State 1504 file mntput_harness.c function mnt_get_count line 593 thread 1
+----------------------------------------------------
+  gets=3u (00000000 00000000 00000000 00000011)
+
+State 1505 file mntput_harness.c function mnt_get_count line 592 thread 1
+----------------------------------------------------
+  cpu=2 (00000000 00000000 00000000 00000010)
+
+State 1508 file mntput_harness.c function mnt_get_count line 595 thread 1
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_get_count=0 (00000000 00000000 00000000 00000000)
+
+State 1510 file mntput_harness.c function mntput_no_expire_slowpath line 749 thread 1
+----------------------------------------------------
+  count=0 (00000000 00000000 00000000 00000000)
+
+State 1515 file mntput_harness.c function mntput_no_expire_slowpath line 757 thread 1
+----------------------------------------------------
+  in_rcu[1l]=FALSE (00000000)
+
+State 1520 file mntput_harness.c function unlock_mount_hash line 404 thread 1
+----------------------------------------------------
+  sl=&mount_lock (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1524 file mntput_harness.c function write_sequnlock line 374 thread 1
+----------------------------------------------------
+  mount_lock.sequence=6u (00000000 00000000 00000000 00000110)
+
+State 1528 file mntput_harness.c function write_sequnlock line 377 thread 1
+----------------------------------------------------
+  mount_lock.locked=FALSE (00000000)
+
+State 1537 file mntput_harness.c function run_task_work line 482 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1538 file mntput_harness.c function run_task_work line 483 thread 1
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 1541 file mntput_harness.c function run_task_work line 483 thread 1
+----------------------------------------------------
+  i=1 (00000000 00000000 00000000 00000001)
+
+State 1545 file mntput_harness.c function walker line 1237 thread 2
+----------------------------------------------------
+  ghost_transient[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 1546 file mntput_harness.c function walker line 1238 thread 2
+----------------------------------------------------
+  in_rcu[2l]=FALSE (00000000)
+
+State 1550 file mntput_harness.c function walker line 1240 thread 2
+----------------------------------------------------
+  mnt=mounts (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1554 file mntput_harness.c function mnt_idx line 259 thread 2
+----------------------------------------------------
+  goto_symex$$return_value$$mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+State 1556 file mntput_harness.c function walker line 1240 thread 2
+----------------------------------------------------
+  return_value_mnt_idx=0 (00000000 00000000 00000000 00000000)
+
+Violated property:
+  file mntput_harness.c function walker line 1241 thread 2
+  NoUAF: a legitimized walker uses a shut-down filesystem
+  !(ghost_sb_torn[(signed long int)idx] != 0)
+
+
+
