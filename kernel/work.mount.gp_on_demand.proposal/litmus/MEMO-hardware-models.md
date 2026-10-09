@@ -42,7 +42,7 @@ what the kernel emits (from arch/*/include/asm/barrier.h in this tree):
 | smp_wmb() | DMB ISHST | lwsync (SMPWMB=LWSYNC) | barrier() (compiler only) |
 | smp_rmb() | DMB ISHLD | lwsync | barrier() (compiler only) |
 | smp_mb() | DMB ISH | sync | lock addl $0,-4(%rsp) |
-| spin_lock() | SWPA (acquire RMW; qspinlock's fast path is atomic_try_cmpxchg_acquire(), CASA on LSE) | lwarx/stwcx. + beq + isync (PPC_ACQUIRE_BARRIER) | -- |
+| spin_lock() | SWPA (acquire RMW; qspinlock's fast path is atomic_try_cmpxchg_acquire(), CASA on LSE) | lwarx; cmpwi; bne; stwcx.; bne; isync (arch_spin_lock shape, PPC_ACQUIRE_BARRIER) | -- |
 | spin_unlock() | STLR WZR (smp_store_release()) | lwsync; stw (PPC_RELEASE_BARRIER) | -- |
 
 Approximations, stated: (a) the lock is emulated without a spin loop; a herd7 `filter` clause keeps only
@@ -56,27 +56,45 @@ and then prints "Always 1 0", which means "witnessed" (allowed); where a full ru
 exact Sometimes counts are shown.  AArch64 runs are 20-400x slower than POWER ones because SWPA/STLR
 generate more candidate executions in that model.
 
+### A spurious POWER witness, and the fix
+
+The first POWER translation emulated the lock as `lwarx; stwcx.; beq ok; li r,1; ok: isync` (branch only on
+stwcx.'s CR0).  With it, MNT-B2-walker-bail-sees-doomed-lazy produced a witness under ppc.cat (state
+`0:r2=0; 0:r3=3; 0:r5=0; freed=1`: the walker saw the seqcount write of the unmounter's second section, took the
+"lock", read flags=0, while the unmounter had missed its increment and finished the mount off) although LKMM says
+Never.  Mechanism: in ppc.cat a control dependency runs from a *loaded value* to a branch; CR0 set by stwcx. is not
+treated as depending on the lwarx load, so the `isync` after that branch is not a ctrl+isync acquire and the
+critical section's loads may be satisfied before the lock is taken.  The walker's `lwz flags` was therefore
+unordered against the unmounter's `flags=3` store even though its ll/sc pair followed the unmounter's release in
+coherence order.  Probe: MP through such a lock is Sometimes 1 7 (`ppc/probe-lock-acq-emul.litmus`), Never 0 3
+with the kernel's `lwarx; cmpwi; bne-; stwcx.; bne-; isync` (`ppc/probe-lock-acq-kernel.litmus`).  gen-asm.py now
+emits the kernel shape; the old POWER outputs are in `ppc/old-emul/` and all 14 POWER tests were rerun.  "Never"
+results obtained with the weaker emulation remain valid (a weaker lock can only add behaviours); the witnessed
+ones needed the rerun.  The AArch64 emulation (SWPA, whose load half is an acquire in the Arm model) has no such
+gap.
+
 ### Results
 
-Table at hand-off (09:01 UTC; regenerate with `litmus/collect-results.sh`, which reads `aarch64/*.out`,
+Table at hand-off (10:56 UTC; regenerate with `litmus/collect-results.sh`, which reads `aarch64/*.out`,
 `ppc/*.out` and `x86-klitmus.txt`):
 
 | test | LKMM | AArch64 (Arm official model) | POWER (ppc.cat) | x86 hardware (klitmus7, KVM on EPYC 9754) |
 |------|------|------------------------------|-----------------|-------------------------------------------|
 | MNT-A1-holder-get-before-put | Never | Never | Never | Never 0/4000000 |
-| MNT-A1m-gets-first | Sometimes | Sometimes 1 5 | Sometimes 1 5 | Sometimes 21/3999979 |
-| MNT-A1m-nomb-in-sum | Sometimes | Sometimes 1 5 | Sometimes 1 5 | Never 0/4000000 (unobservable on TSO) |
-| MNT-A1m-nowmb | Sometimes | Sometimes 1 5 | Sometimes 1 5 | Never 0/4000000 (unobservable on TSO) |
-| MNT-B1-walker-inc-vs-peek | Never | still running at hand-off | still running at hand-off | Never 0/2103442 |
-| MNT-B1m-walker-nomb | Sometimes | still running at hand-off | still running at hand-off | Sometimes 988/2100421 |
+| MNT-A1m-gets-first | Sometimes | Sometimes 1 5 | witnessed | Sometimes 21/3999979 |
+| MNT-A1m-nomb-in-sum | Sometimes | Sometimes 1 5 | witnessed | Never 0/4000000 (unobservable on TSO) |
+| MNT-A1m-nowmb | Sometimes | Sometimes 1 5 | witnessed | Never 0/4000000 (unobservable on TSO) |
+| MNT-B1-walker-inc-vs-peek | Never | Never | still running at hand-off | Never 0/2103442 |
+| MNT-B1m-walker-nomb | Sometimes | witnessed | still running at hand-off | Sometimes 988/2100421 |
 | MNT-B1m-peek-no-outer-mb | Never | Never | still running at hand-off | Never 0/2122844 |
 | MNT-B2-walker-bail-sees-doomed-lazy | Never | still running at hand-off | still running at hand-off | Never 0/2073085 |
-| MNT-B2m-walker-flags-unlocked | Sometimes | still running at hand-off | witnessed | Sometimes 646/2130850 |
+| MNT-B2m-walker-flags-unlocked | Sometimes | witnessed | witnessed | Sometimes 646/2130850 |
 | MNT-C1-kern-unmount-get-before-put | Never | Never | Never | Never 0/4000000 |
 | MNT-D1-dekker-fastpath-recheck | Never | Never | Never | Never 0/4000000 |
-| MNT-D1m-holder-wmb-only | Sometimes | witnessed | Sometimes 1 4 | Sometimes 4252/3995748 |
-| MNT-E1-slowpath-no-outer-mb | Never | Never | still running at hand-off | Never 0/2096720 |
+| MNT-D1m-holder-wmb-only | Sometimes | Sometimes 1 4 | witnessed | Sometimes 4252/3995748 |
+| MNT-E1-slowpath-no-outer-mb | Never | Never | Never | Never 0/2096720 |
 | MNT-E2-busycheck-no-outer-mb | Never | Never | Never | Never 0/2123015 |
+| MNT-B2r-walker-bail-reduced | Never | Never | Never | - |
 
 Divergences: none among the finished cells.  The only "disagreements" are the x86 Never results for
 A1m-nomb-in-sum and A1m-nowmb, which are not disagreements: x86-TSO never reorders two loads or two stores,

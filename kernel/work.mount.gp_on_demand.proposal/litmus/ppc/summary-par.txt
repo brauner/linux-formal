@@ -1,5 +1,12 @@
-MNT-C1-kern-unmount-get-before-put         LKMM result: Never       Observation MNT-C1-kern-unmount-get-before-put Never 0 0  real	0m0.060s
-MNT-D1-dekker-fastpath-recheck             LKMM result: Never       Observation MNT-D1-dekker-fastpath-recheck Never 0 0  real	0m3.032s
-MNT-D1m-holder-wmb-only                    LKMM result: Sometimes   Observation MNT-D1m-holder-wmb-only Always 1 0  real	0m3.317s
-MNT-E2-busycheck-no-outer-mb               LKMM result: Never       Observation MNT-E2-busycheck-no-outer-mb Never 0 0  real	0m18.249s
-MNT-B2m-walker-flags-unlocked              LKMM result: Sometimes   Observation MNT-B2m-walker-flags-unlocked Always 2 0  real	4m18.739s
+MNT-C1-kern-unmount-get-before-put         LKMM result: Never       Observation MNT-C1-kern-unmount-get-before-put Never 0 0  real	0m0.047s
+MNT-D1m-holder-wmb-only                    LKMM result: Sometimes   Observation MNT-D1m-holder-wmb-only Always 1 0  real	0m0.632s
+MNT-D1-dekker-fastpath-recheck             LKMM result: Never       Observation MNT-D1-dekker-fastpath-recheck Never 0 0  real	0m0.771s
+MNT-A1-holder-get-before-put               LKMM result: Never       Observation MNT-A1-holder-get-before-put Never 0 0  real	0m0.848s
+MNT-A1m-nowmb                              LKMM result: Sometimes   Observation MNT-A1m-nowmb Always 1 0  real	0m0.897s
+MNT-A1m-nomb-in-sum                        LKMM result: Sometimes   Observation MNT-A1m-nomb-in-sum Always 1 0  real	0m0.942s
+MNT-A1m-gets-first                         LKMM result: Sometimes   Observation MNT-A1m-gets-first Always 1 0  real	0m0.960s
+MNT-E2-busycheck-no-outer-mb               LKMM result: Never       Observation MNT-E2-busycheck-no-outer-mb Never 0 0  real	0m5.135s
+MNT-B2m-walker-flags-unlocked              LKMM result: Sometimes   Observation MNT-B2m-walker-flags-unlocked Always 2 0  real	1m41.426s
+MNT-E1-slowpath-no-outer-mb                LKMM result: Never       Observation MNT-E1-slowpath-no-outer-mb Never 0 0  real	53m31.132s
+MNT-B2r-walker-bail-reduced                LKMM result: Never       Observation MNT-B2r-walker-bail-reduced Never 0 0  real	0m4.583s
+MNT-B2-walker-bail-sees-doomed-lazy        LKMM result: Never       Observation MNT-B2-walker-bail-sees-doomed-lazy Never 0 0  real	59m10.412s

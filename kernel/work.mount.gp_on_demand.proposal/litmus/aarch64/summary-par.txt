@@ -2,3 +2,6 @@ MNT-C1-kern-unmount-get-before-put         LKMM result: Never       Observation 
 MNT-E2-busycheck-no-outer-mb               LKMM result: Never       Observation MNT-E2-busycheck-no-outer-mb Never 0 0  real	0m6.068s
 MNT-D1m-holder-wmb-only                    LKMM result: Sometimes   Observation MNT-D1m-holder-wmb-only Always 1 0  real	1m51.969s
 MNT-D1-dekker-fastpath-recheck             LKMM result: Never       Observation MNT-D1-dekker-fastpath-recheck Never 0 0  real	2m2.503s
+MNT-B2m-walker-flags-unlocked              LKMM result: Sometimes   Observation MNT-B2m-walker-flags-unlocked Always 2 0  real	11m54.371s
+MNT-B1-walker-inc-vs-peek                  LKMM result: Never       Observation MNT-B1-walker-inc-vs-peek Never 0 0  real	17m18.612s
+MNT-B2r-walker-bail-reduced                LKMM result: Never       Observation MNT-B2r-walker-bail-reduced Never 0 0  real	0m4.306s

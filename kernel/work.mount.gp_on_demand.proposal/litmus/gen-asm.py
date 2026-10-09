@@ -11,9 +11,10 @@ Mapping (what the kernel emits):
                            only executions in which every acquisition found the
                            lock free (the lock-emulation trick of
                            tools/memory-model/Documentation/litmus-tests.txt)
-                                              | lwarx/stwcx. + beq + isync, a
-                                                failed stwcx. marks the
-                                                register and is filtered out
+                                              | lwarx; cmpwi; bne; stwcx.; bne; isync
+                                                (arch_spin_lock shape); a held lock
+                                                or failed stwcx. marks the register
+                                                and is filtered out
   spin_unlock()         -> STLR WZR           | lwsync; stw (PPC_RELEASE_BARRIER)
 """
 import sys, os
@@ -92,6 +93,14 @@ def e2_busycheck():
             ('brne_reg','r3','r1','L1'), ('st','mnt_ns',0), ('st','flags',1), ('st','freed',1), ('label','L1'),
             ('wmb',), ('st','seq',2), ('unlock','mlock')]
 
+def unmounter_b2_reduced():
+    # reduced B2 (lazy): only the peek's critical section, the two own-counter loads and mnt_ns dropped,
+    # flags=3 as the finish indicator; finish iff gets_w == puts_w (count == 1)
+    return [('lock','mlock','q2'), ('st','seq',1), ('wmb',),
+            ('ld','r1','puts_w'), ('mb',), ('ld','r3','gets_w'),
+            ('brne_reg','r3','r1','L1'), ('st','flags',3), ('label','L1'),
+            ('wmb',), ('st','seq',2), ('unlock','mlock')]
+
 A1_INIT = {'mnt_ns':1, 'gets_h':1, 'gets_u':1}
 B_INIT = {'mnt_ns':1, 'gets_u':1}
 
@@ -109,6 +118,7 @@ TESTS = {
  'MNT-B2-walker-bail-sees-doomed-lazy': (B_INIT, [walker(), unmounter_sections(decide=True, gets='gets_w', puts='puts_w')], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ freed=1', 'Never'),
  'MNT-E1-slowpath-no-outer-mb': (B_INIT, [walker(), e1_slowpath()], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
  'MNT-E2-busycheck-no-outer-mb': (B_INIT, [walker(), e2_busycheck()], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
+ 'MNT-B2r-walker-bail-reduced': ({}, [walker(), unmounter_b2_reduced()], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ flags=3', 'Never'),
  'MNT-B2m-walker-flags-unlocked': (B_INIT, [walker(locked=False), unmounter_sections(decide=True, gets='gets_w', puts='puts_w')], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ freed=1', 'Sometimes'),
 }
 WALKER_TESTS = {k for k in TESTS if '-B' in k or '-E' in k}
@@ -183,10 +193,15 @@ class PPC:
             elif k in ('wmb','rmb'): out += ['lwsync']
             elif k == 'mb':  out += ['sync']
             elif k == 'lock':
-                self.nlock += 1; lab = 'Lok%d%d' % (self.tid, self.nlock)
+                # kernel arch_spin_lock shape: lwarx; cmpwi; bne-; stwcx.; bne-; isync.  The branch on the
+                # LOADED value is what gives ctrl+isync acquire ordering in ppc.cat; a branch only on
+                # stwcx.'s CR0 (the first version of this emulation) carries no dependency from the lwarx
+                # and left the critical section's loads unordered (spurious witness in MNT-B2 on POWER).
+                self.nlock += 1; ok = 'Lok%d%d' % (self.tid, self.nlock); fail = 'Lfail%d%d' % (self.tid, self.nlock)
                 a, r = self.addr[op[1]], self.reg[op[2]]
-                out += ['li r10,1', 'lwarx r%d,r0,r%d' % (r, a), 'stwcx. r10,r0,r%d' % a,
-                        'beq %s' % lab, 'li r%d,1' % r, '%s:' % lab, 'isync']
+                out += ['li r10,1', 'lwarx r%d,r0,r%d' % (r, a), 'cmpwi r%d,0' % r, 'bne %s' % fail,
+                        'stwcx. r10,r0,r%d' % a, 'bne %s' % fail, 'isync', 'b %s' % ok,
+                        '%s:' % fail, 'li r%d,1' % r, '%s:' % ok]
             elif k == 'unlock': out += ['lwsync', 'li r10,0', 'stw r10,0(r%d)' % self.addr[op[1]]]
             elif k == 'brz':  out += ['cmpwi r%d,0' % self.reg[op[1]], 'beq %s%d' % (op[2], self.tid)]
             elif k == 'brnz': out += ['cmpwi r%d,0' % self.reg[op[1]], 'bne %s%d' % (op[2], self.tid)]

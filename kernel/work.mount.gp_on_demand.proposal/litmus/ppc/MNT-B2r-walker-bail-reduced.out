@@ -1,0 +1,14 @@
+Test MNT-B2r-walker-bail-reduced Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:r2=0 /\ not (0:r3=0) /\ 0:r5=0 /\ [flags]=3)
+Observation MNT-B2r-walker-bail-reduced Never 0 0
+Time MNT-B2r-walker-bail-reduced 4.57
+Hash=a91f17d9d61c819777b4fa699c0f191e
+
+
+real	0m4.583s
+user	0m4.561s
+sys	0m0.020s

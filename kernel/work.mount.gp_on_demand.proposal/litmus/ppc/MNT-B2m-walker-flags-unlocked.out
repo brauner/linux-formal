@@ -7,10 +7,10 @@ Witnesses
 Positive: 2 Negative: 0
 Condition exists (0:r2=0 /\ not (0:r3=0) /\ 0:r4=0 /\ [freed]=1)
 Observation MNT-B2m-walker-flags-unlocked Always 2 0
-Time MNT-B2m-walker-flags-unlocked 240.10
-Hash=0b773daf419b3ee9cd6616cc3a038b8a
+Time MNT-B2m-walker-flags-unlocked 101.33
+Hash=db263706988c61b35d0826530a79a55f
 
 
-real	4m18.739s
-user	3m59.681s
-sys	0m0.442s
+real	1m41.426s
+user	1m41.267s
+sys	0m0.076s

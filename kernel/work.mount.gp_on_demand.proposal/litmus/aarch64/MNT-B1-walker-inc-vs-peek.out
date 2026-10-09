@@ -1,0 +1,14 @@
+Test MNT-B1-walker-inc-vs-peek Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-B1-walker-inc-vs-peek Never 0 0
+Time MNT-B1-walker-inc-vs-peek 1013.00
+Hash=28f7c0d565b70ad542b15758358baa45
+
+
+real	17m18.612s
+user	16m52.464s
+sys	0m0.550s

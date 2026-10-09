@@ -1,0 +1,20 @@
+Test MNT-A1m-nomb-in-sum Allowed
+States 6
+0:r1=0; 1:r3=0; 1:r5=1;
+0:r1=0; 1:r3=0; 1:r5=2;
+0:r1=1; 1:r3=0; 1:r5=1;
+0:r1=1; 1:r3=0; 1:r5=2;
+0:r1=1; 1:r3=1; 1:r5=1;
+0:r1=1; 1:r3=1; 1:r5=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:r1=1 /\ 1:r3=1 /\ 1:r5=1)
+Observation MNT-A1m-nomb-in-sum Sometimes 1 5
+Time MNT-A1m-nomb-in-sum 1.07
+Hash=f360639151045993bb19e7d99c38fa65
+
+
+real	0m1.082s
+user	0m1.076s
+sys	0m0.006s

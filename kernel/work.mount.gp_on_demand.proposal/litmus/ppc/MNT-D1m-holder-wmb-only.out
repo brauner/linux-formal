@@ -6,10 +6,10 @@ Witnesses
 Positive: 1 Negative: 0
 Condition exists (0:r1=1 /\ 0:r2=1 /\ 1:r3=0)
 Observation MNT-D1m-holder-wmb-only Always 1 0
-Time MNT-D1m-holder-wmb-only 2.48
-Hash=d72a60b352a70ba527ffc3703915cc8a
+Time MNT-D1m-holder-wmb-only 0.62
+Hash=4fa21e18db68b20284a4eb4c36fe6e75
 
 
-real	0m3.317s
-user	0m2.478s
-sys	0m0.023s
+real	0m0.632s
+user	0m0.618s
+sys	0m0.012s

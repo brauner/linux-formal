@@ -6,10 +6,10 @@ Witnesses
 Positive: 1 Negative: 0
 Condition exists (0:r1=1 /\ 1:r3=1 /\ 1:r5=1)
 Observation MNT-A1m-nomb-in-sum Always 1 0
-Time MNT-A1m-nomb-in-sum 0.48
-Hash=f360639151045993bb19e7d99c38fa65
+Time MNT-A1m-nomb-in-sum 0.93
+Hash=18e951b485f7c2b39c90d844b1fcdaf3
 
 
-real	0m0.484s
-user	0m0.480s
-sys	0m0.004s
+real	0m0.942s
+user	0m0.926s
+sys	0m0.012s

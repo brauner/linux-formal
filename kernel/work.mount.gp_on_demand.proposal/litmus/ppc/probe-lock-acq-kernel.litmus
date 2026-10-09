@@ -1,0 +1,21 @@
+PPC probe-lock-acq-kernel
+(* kernel shape: lwarx; cmpwi; bne fail; stwcx.; bne fail; isync *)
+{
+0:r20=x; 0:r21=l;
+1:r20=x; 1:r21=l;
+l=1;
+}
+ P0                 | P1                 ;
+ li r10,1           | li r10,1           ;
+ stw r10,0(r20)     | lwarx r1,r0,r21    ;
+ lwsync             | cmpwi r1,0         ;
+ li r10,0           | bne Lfail          ;
+ stw r10,0(r21)     | stwcx. r10,r0,r21  ;
+                    | bne Lfail          ;
+                    | isync              ;
+                    | lwz r2,0(r20)      ;
+                    | b Lend             ;
+                    | Lfail:             ;
+                    | li r1,1            ;
+                    | Lend:              ;
+exists (1:r1=0 /\ 1:r2=0)

@@ -1,0 +1,17 @@
+PPC probe-lock-acq-emul
+(* my emulation: branch only on stwcx.'s CR0, then isync; lock release = lwsync; stw *)
+{
+0:r20=x; 0:r21=l;
+1:r20=x; 1:r21=l;
+l=1;
+}
+ P0                 | P1                 ;
+ li r10,1           | li r10,1           ;
+ stw r10,0(r20)     | lwarx r1,r0,r21    ;
+ lwsync             | stwcx. r10,r0,r21  ;
+ li r10,0           | beq Lok            ;
+ stw r10,0(r21)     | li r1,1            ;
+                    | Lok:               ;
+                    | isync              ;
+                    | lwz r2,0(r20)      ;
+exists (1:r1=0 /\ 1:r2=0)

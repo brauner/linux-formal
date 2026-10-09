@@ -1,0 +1,15 @@
+Test MNT-A1m-gets-first Allowed
+States 1
+0:r1=1; 1:r3=1; 1:r5=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Condition exists (0:r1=1 /\ 1:r5=1 /\ 1:r3=1)
+Observation MNT-A1m-gets-first Always 1 0
+Time MNT-A1m-gets-first 0.46
+Hash=6fe2f372d43c5dc94f9e40009edeca1c
+
+
+real	0m0.464s
+user	0m0.448s
+sys	0m0.016s

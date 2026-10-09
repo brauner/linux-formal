@@ -5,10 +5,10 @@ Witnesses
 Positive: 0 Negative: 0
 Condition exists (0:r1=1 /\ 1:r2=1 /\ 1:r4=1)
 Observation MNT-C1-kern-unmount-get-before-put Never 0 0
-Time MNT-C1-kern-unmount-get-before-put 0.05
-Hash=1dc57b8d055bdd395bd23b133b8bbc40
+Time MNT-C1-kern-unmount-get-before-put 0.04
+Hash=2c3d3ca2f45cbce13e64fdba515a6548
 
 
-real	0m0.060s
-user	0m0.052s
-sys	0m0.008s
+real	0m0.047s
+user	0m0.039s
+sys	0m0.007s

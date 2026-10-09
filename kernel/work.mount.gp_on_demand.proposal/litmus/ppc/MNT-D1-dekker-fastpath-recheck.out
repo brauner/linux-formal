@@ -5,10 +5,10 @@ Witnesses
 Positive: 0 Negative: 0
 Condition exists (0:r1=1 /\ 0:r2=1 /\ 1:r3=0)
 Observation MNT-D1-dekker-fastpath-recheck Never 0 0
-Time MNT-D1-dekker-fastpath-recheck 2.41
-Hash=498fb05303b35cd6cfdaca40d3d01e30
+Time MNT-D1-dekker-fastpath-recheck 0.75
+Hash=cf982a8f5c6cbea072005056393facc2
 
 
-real	0m3.032s
-user	0m2.407s
-sys	0m0.016s
+real	0m0.771s
+user	0m0.739s
+sys	0m0.023s

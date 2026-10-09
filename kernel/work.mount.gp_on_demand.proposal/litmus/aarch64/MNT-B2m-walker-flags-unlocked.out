@@ -1,0 +1,17 @@
+Test MNT-B2m-walker-flags-unlocked Allowed
+States 2
+0:X11=0; 0:X12=3; 0:X13=0; [freed]=1;
+0:X11=0; 0:X12=4; 0:X13=0; [freed]=1;
+Ok
+Witnesses
+Positive: 2 Negative: 0
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X11=0 /\ not (0:X12=0) /\ 0:X13=0 /\ [freed]=1)
+Observation MNT-B2m-walker-flags-unlocked Always 2 0
+Time MNT-B2m-walker-flags-unlocked 690.55
+Hash=7086ca8d5986654524518fe066651869
+
+
+real	11m54.371s
+user	11m30.174s
+sys	0m0.392s

@@ -43,3 +43,20 @@ Written 2026-10-09 ~08:45 UTC. Laptop session may be suspended; everything long-
   built from 4379d47fd314 (the tip when the task started); the klitmus modules carry the barriers of the litmus
   tests themselves, not of the kernel, so the results are unaffected by that commit.
 - jens: nothing of mine is running any more (tmux `klitmus` ended with STATE=vm-done).
+
+## POWER lock-emulation fix (09:58 UTC)
+- The first POWER translation emulated spin_lock as `lwarx; stwcx.; beq ok; li r,1; ok: isync`. Under ppc.cat the
+  branch on stwcx.'s CR0 carries no dependency from the lwarx load, so the isync is not a ctrl+isync acquire and
+  the critical section's loads were unordered against the lock: MNT-B2 on POWER produced a spurious witness
+  (walker read flags=0 under the "lock" after the unmounter had finished the mount). Probe files:
+  ppc/probe-lock-acq-emul.litmus (Sometimes) vs ppc/probe-lock-acq-kernel.litmus (Never).
+- gen-asm.py now emits the arch_spin_lock shape (lwarx; cmpwi; bne fail; stwcx.; bne fail; isync). Old outputs
+  are in ppc/old-emul/. All 14 POWER tests were relaunched (one herd7 each); results land in ppc/*.out and
+  ppc/summary-par.txt; `collect-results.sh` prints the table. "Never" results from the old emulation stay valid
+  (a weaker lock only adds behaviours); the witnessed ones needed the rerun.
+
+## Hand-off 2 (10:57 UTC)
+- Final table sent to the coordinator. Still running when sent: aarch64 MNT-B2 (>2 h CPU), POWER reruns of B1,
+  B1m-walker-nomb, B1m-peek, B2 (~55 min CPU each). They keep writing <arch>/<test>.out when done;
+  ./collect-results.sh prints the table. The reduced variant MNT-B2r (LKMM C file in litmus/, asm in aarch64/ and
+  ppc/) is Never under LKMM, the Arm model and ppc.cat with the corrected lock, and settles the B2 question.

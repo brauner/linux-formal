@@ -1,0 +1,15 @@
+Test MNT-B2-walker-bail-sees-doomed-lazy Allowed
+States 1
+0:r2=0; 0:r3=3; 0:r5=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Condition exists (0:r2=0 /\ not (0:r3=0) /\ 0:r5=0 /\ [freed]=1)
+Observation MNT-B2-walker-bail-sees-doomed-lazy Always 1 0
+Time MNT-B2-walker-bail-sees-doomed-lazy 1695.94
+Hash=707fa1f9f8f6236c59e79bd03f599e30
+
+
+real	28m44.715s
+user	28m15.190s
+sys	0m0.772s
