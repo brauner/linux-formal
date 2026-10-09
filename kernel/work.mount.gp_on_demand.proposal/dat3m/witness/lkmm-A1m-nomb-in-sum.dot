@@ -1,0 +1,194 @@
+digraph "lkmm-A1m-nomb-in-sum.ll" {
+label="lkmm-A1m-nomb-in-sum.ll"
+subgraph "T0" {
+e0 [label="main:T0\nE1 @mnt_gp.c#400\nW(&mnt[size=28] + 16, 1)"]
+e1 [label="main:T0\nE2 @mnt_gp.c#401\nW(&mnt[size=28] + 4, 1)"]
+e2 [label="main:T0\nE3 @mnt_gp.c#405\nW(&mnt[size=28], 1)"]
+e3 [label="main:T0\nE5 @mnt_gp.c#406\nW(&__com_holder#1[size=1], 3, RELEASE)"]
+e4 [label="main:T0\nE9 @mnt_gp.c#408\nW(&__com_unmounter#2[size=1], 3, RELEASE)"]
+e5 [label="main:T0\nE13 @mnt_gp.c#409\nbv8 __joinStatus#0(3) <- bv8(3)"]
+e6 [label="main:T0\nE14 @mnt_gp.c#409\n2 = R(&__com_holder#1[size=1], ACQUIRE)"]
+e7 [label="main:T0\nE15 @mnt_gp.c#409\nW(&__com_holder#1[size=1], 0, ACQUIRE)"]
+e9 [label="main:T0\nE19 @mnt_gp.c#409\nbv8 __joinStatus#0(0) <- bv8(0)"]
+e11 [label="main:T0\nE22 @mnt_gp.c#409\nAssertion(true)"]
+e12 [label="main:T0\nE25 @mnt_gp.c#410\nbv8 __joinStatus#1(3) <- bv8(3)"]
+e13 [label="main:T0\nE26 @mnt_gp.c#410\n2 = R(&__com_unmounter#2[size=1], ACQUIRE)"]
+e14 [label="main:T0\nE27 @mnt_gp.c#410\nW(&__com_unmounter#2[size=1], 0, ACQUIRE)"]
+e16 [label="main:T0\nE31 @mnt_gp.c#410\nbv8 __joinStatus#1(0) <- bv8(0)"]
+e18 [label="main:T0\nE34 @mnt_gp.c#410\nAssertion(true)"]
+e19 [label="main:T0\nE36 @mnt_gp.c#417\n1 = R(&mnt[size=28] + 24)"]
+e21 [label="main:T0\nE39 @mnt_gp.c#417\nAssertion(false)"]
+}
+subgraph "T1" {
+e23 [label="holder:T1\nE45 @unknown\n3 = R(&__com_holder#1[size=1], ACQUIRE)"]
+e24 [label="holder:T1\nE50 mnt_inc_count @mnt_gp.c#361 -> \n@mnt_gp.c#176\n1 = R(&mnt[size=28], ONCE)"]
+e25 [label="holder:T1\nE53 mnt_inc_count @mnt_gp.c#361 -> \n@mnt_gp.c#176\nW(&mnt[size=28], 2, ONCE)"]
+e26 [label="holder:T1\nE58 mntput_no_expire @mnt_gp.c#363 -> \n@mnt_gp.c#222\nRcu-lock"]
+e27 [label="holder:T1\nE61 mntput_no_expire @mnt_gp.c#363 -> \n@mnt_gp.c#223\n1 = R(&mnt[size=28] + 16, ONCE)"]
+e29 [label="holder:T1\nE67 mntput_no_expire @mnt_gp.c#363 -> \n@mnt_gp.c#225\nWmb"]
+e30 [label="holder:T1\nE71 mntput_no_expire @mnt_gp.c#363 -> \nmnt_dec_count @mnt_gp.c#227 -> \n@mnt_gp.c#181\n0 = R(&mnt[size=28] + 8, ONCE)"]
+e31 [label="holder:T1\nE74 mntput_no_expire @mnt_gp.c#363 -> \nmnt_dec_count @mnt_gp.c#227 -> \n@mnt_gp.c#181\nW(&mnt[size=28] + 8, 1, ONCE)"]
+e32 [label="holder:T1\nE78 mntput_no_expire @mnt_gp.c#363 -> \n@mnt_gp.c#236\nRcu-unlock"]
+e33 [label="holder:T1\nE80 mntput_no_expire @mnt_gp.c#363 -> \n@unknown\nbv32 2:r3@0__m2r#1(1) <- bv32(1)"]
+e35 [label="holder:T1\nE219 @mnt_gp.c#363\nW(&h_path[size=4], 1)"]
+e36 [label="holder:T1\nE220 @unknown\n3 = R(&__com_holder#1[size=1], RELEASE)"]
+e37 [label="holder:T1\nE221 @unknown\nW(&__com_holder#1[size=1], 2, RELEASE)"]
+}
+subgraph "T2" {
+e38 [label="unmounter:T2\nE225 @unknown\n3 = R(&__com_unmounter#2[size=1], ACQUIRE)"]
+e39 [label="unmounter:T2\nE233 umount_tree @mnt_gp.c#386 -> \nlock_mount_hash @mnt_gp.c#336 -> \n@mnt_gp.c#148\n0 = R(&mount_lock[size=4], ACQUIRE)"]
+e41 [label="unmounter:T2\nE238 umount_tree @mnt_gp.c#386 -> \nlock_mount_hash @mnt_gp.c#336 -> \n@mnt_gp.c#148\nW(&mount_lock[size=4], 1, ONCE)"]
+e42 [label="unmounter:T2\nE241 umount_tree @mnt_gp.c#386 -> \nlock_mount_hash @mnt_gp.c#336 -> \n@mnt_gp.c#149\n0 = R(&mount_seq[size=4], ONCE)"]
+e43 [label="unmounter:T2\nE244 umount_tree @mnt_gp.c#386 -> \nlock_mount_hash @mnt_gp.c#336 -> \n@mnt_gp.c#149\nW(&mount_seq[size=4], 1, ONCE)"]
+e44 [label="unmounter:T2\nE247 umount_tree @mnt_gp.c#386 -> \nlock_mount_hash @mnt_gp.c#336 -> \n@mnt_gp.c#150\nWmb"]
+e45 [label="unmounter:T2\nE251 umount_tree @mnt_gp.c#386 -> \n@mnt_gp.c#337\nW(&mnt[size=28] + 16, 0, ONCE)"]
+e46 [label="unmounter:T2\nE255 umount_tree @mnt_gp.c#386 -> \nunlock_mount_hash @mnt_gp.c#340 -> \n@mnt_gp.c#155\nWmb"]
+e47 [label="unmounter:T2\nE258 umount_tree @mnt_gp.c#386 -> \nunlock_mount_hash @mnt_gp.c#340 -> \n@mnt_gp.c#156\n1 = R(&mount_seq[size=4], ONCE)"]
+e48 [label="unmounter:T2\nE261 umount_tree @mnt_gp.c#386 -> \nunlock_mount_hash @mnt_gp.c#340 -> \n@mnt_gp.c#156\nW(&mount_seq[size=4], 2, ONCE)"]
+e49 [label="unmounter:T2\nE264 umount_tree @mnt_gp.c#386 -> \nunlock_mount_hash @mnt_gp.c#340 -> \n@mnt_gp.c#157\nW(&mount_lock[size=4], 0, RELEASE)"]
+e50 [label="unmounter:T2\nE273 mntput_unmounted @mnt_gp.c#391 -> \nlock_mount_hash @mnt_gp.c#319 -> \n@mnt_gp.c#148\n0 = R(&mount_lock[size=4], ACQUIRE)"]
+e52 [label="unmounter:T2\nE278 mntput_unmounted @mnt_gp.c#391 -> \nlock_mount_hash @mnt_gp.c#319 -> \n@mnt_gp.c#148\nW(&mount_lock[size=4], 1, ONCE)"]
+e53 [label="unmounter:T2\nE281 mntput_unmounted @mnt_gp.c#391 -> \nlock_mount_hash @mnt_gp.c#319 -> \n@mnt_gp.c#149\n2 = R(&mount_seq[size=4], ONCE)"]
+e54 [label="unmounter:T2\nE284 mntput_unmounted @mnt_gp.c#391 -> \nlock_mount_hash @mnt_gp.c#319 -> \n@mnt_gp.c#149\nW(&mount_seq[size=4], 3, ONCE)"]
+e55 [label="unmounter:T2\nE287 mntput_unmounted @mnt_gp.c#391 -> \nlock_mount_hash @mnt_gp.c#319 -> \n@mnt_gp.c#150\nWmb"]
+e56 [label="unmounter:T2\nE291 mntput_unmounted @mnt_gp.c#391 -> \n@mnt_gp.c#321\nMB"]
+e57 [label="unmounter:T2\nE295 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \n@mnt_gp.c#203\nbv64 7:r6(16) <- &mnt + bv64(8)"]
+e58 [label="unmounter:T2\nE298 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \nsum_slots @mnt_gp.c#203 -> \n@mnt_gp.c#186\n1 = R(&mnt[size=28] + 8, ONCE)"]
+e59 [label="unmounter:T2\nE301 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \nsum_slots @mnt_gp.c#203 -> \n@mnt_gp.c#186\n0 = R(&mnt[size=28] + 12, ONCE)"]
+e60 [label="unmounter:T2\nE306 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \nsum_slots @mnt_gp.c#207 -> \n@mnt_gp.c#186\n1 = R(&mnt[size=28], ONCE)"]
+e61 [label="unmounter:T2\nE309 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \nsum_slots @mnt_gp.c#207 -> \n@mnt_gp.c#186\n1 = R(&mnt[size=28] + 4, ONCE)"]
+e62 [label="unmounter:T2\nE312 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_get_count @mnt_gp.c#305 -> \n@mnt_gp.c#209\nbv32 7:r15(1) <- (bv32 9:__lkmm_temp#1 + bv32 9:__lkmm_temp#2) - (bv32 8:__lkmm_temp#1 + bv32 8:__lkmm_temp#2)"]
+e63 [label="unmounter:T2\nE314 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \n@mnt_gp.c#307\nW(&u_peek_count[size=4], 1)"]
+e66 [label="unmounter:T2\nE323 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_dec_count @mnt_gp.c#310 -> \n@mnt_gp.c#181\n0 = R(&mnt[size=28] + 12, ONCE)"]
+e67 [label="unmounter:T2\nE326 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmnt_dec_count @mnt_gp.c#310 -> \n@mnt_gp.c#181\nW(&mnt[size=28] + 12, 1, ONCE)"]
+e68 [label="unmounter:T2\nE331 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmntput_final_locked @mnt_gp.c#311 -> \n@mnt_gp.c#214\n0 = R(&mnt[size=28] + 20, ONCE)"]
+e69 [label="unmounter:T2\nE334 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmntput_final_locked @mnt_gp.c#311 -> \n@mnt_gp.c#214\nW(&mnt[size=28] + 20, 2, ONCE)"]
+e70 [label="unmounter:T2\nE337 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmntput_final_locked @mnt_gp.c#311 -> \n@mnt_gp.c#215\n0 = R(&mnt[size=28] + 24, ONCE)"]
+e71 [label="unmounter:T2\nE340 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \nmntput_final_locked @mnt_gp.c#311 -> \n@mnt_gp.c#215\nW(&mnt[size=28] + 24, 1, ONCE)"]
+e72 [label="unmounter:T2\nE343 mntput_unmounted @mnt_gp.c#391 -> \nmntput_unheld @mnt_gp.c#323 -> \n@unknown\nbv32 6:r2@0__m2r#1(1) <- bv32(1)"]
+e73 [label="unmounter:T2\nE348 mntput_unmounted @mnt_gp.c#391 -> \nunlock_mount_hash @mnt_gp.c#324 -> \n@mnt_gp.c#155\nWmb"]
+e74 [label="unmounter:T2\nE351 mntput_unmounted @mnt_gp.c#391 -> \nunlock_mount_hash @mnt_gp.c#324 -> \n@mnt_gp.c#156\n3 = R(&mount_seq[size=4], ONCE)"]
+e75 [label="unmounter:T2\nE354 mntput_unmounted @mnt_gp.c#391 -> \nunlock_mount_hash @mnt_gp.c#324 -> \n@mnt_gp.c#156\nW(&mount_seq[size=4], 4, ONCE)"]
+e76 [label="unmounter:T2\nE357 mntput_unmounted @mnt_gp.c#391 -> \nunlock_mount_hash @mnt_gp.c#324 -> \n@mnt_gp.c#157\nW(&mount_lock[size=4], 0, RELEASE)"]
+e78 [label="unmounter:T2\nE363 mntput_unmounted @mnt_gp.c#391 -> \n@mnt_gp.c#326\nW(&u_peek_finished[size=4], 1)"]
+e80 [label="unmounter:T2\nE536 @unknown\n3 = R(&__com_unmounter#2[size=1], RELEASE)"]
+e81 [label="unmounter:T2\nE537 @unknown\nW(&__com_unmounter#2[size=1], 2, RELEASE)"]
+}
+subgraph "po" {
+edge [color="#000000", weight=100, label="po"]
+e0 -> e1
+e1 -> e2
+e2 -> e3
+e3 -> e4
+e4 -> e5
+e5 -> e6
+e6 -> e7
+e7 -> e9
+e9 -> e11
+e11 -> e12
+e12 -> e13
+e13 -> e14
+e14 -> e16
+e16 -> e18
+e18 -> e19
+e19 -> e21
+e23 -> e24
+e24 -> e25
+e25 -> e26
+e26 -> e27
+e27 -> e29
+e29 -> e30
+e30 -> e31
+e31 -> e32
+e32 -> e33
+e33 -> e35
+e35 -> e36
+e36 -> e37
+e38 -> e39
+e39 -> e41
+e41 -> e42
+e42 -> e43
+e43 -> e44
+e44 -> e45
+e45 -> e46
+e46 -> e47
+e47 -> e48
+e48 -> e49
+e49 -> e50
+e50 -> e52
+e52 -> e53
+e53 -> e54
+e54 -> e55
+e55 -> e56
+e56 -> e57
+e57 -> e58
+e58 -> e59
+e59 -> e60
+e60 -> e61
+e61 -> e62
+e62 -> e63
+e63 -> e66
+e66 -> e67
+e67 -> e68
+e68 -> e69
+e69 -> e70
+e70 -> e71
+e71 -> e72
+e72 -> e73
+e73 -> e74
+e74 -> e75
+e75 -> e76
+e76 -> e78
+e78 -> e80
+e80 -> e81
+}
+subgraph "rf" {
+edge [color="#00AA00", label="rf"]
+e3 -> e36
+e37 -> e6
+e49 -> e50
+e4 -> e38
+e43 -> e47
+e48 -> e53
+"I(&mnt[size=28] + 12, 0)" -> e59
+"I(&mnt[size=28] + 8, 0)" -> e30
+"I(&mount_lock[size=4], 0)" -> e39
+e4 -> e80
+e71 -> e19
+"I(&mnt[size=28] + 12, 0)" -> e66
+"I(&mnt[size=28] + 20, 0)" -> e68
+"I(&mount_seq[size=4], 0)" -> e42
+"I(&mnt[size=28] + 24, 0)" -> e70
+e3 -> e23
+e54 -> e74
+e2 -> e24
+e2 -> e60
+e0 -> e27
+e31 -> e58
+e1 -> e61
+e81 -> e13
+}
+subgraph "co" {
+edge [color="#FF0000", label="co"]
+"I(&mnt[size=28] + 24, 0)" -> e71
+"I(&mount_lock[size=4], 0)" -> e41
+"I(&u_peek_count[size=4], 0)" -> e63
+"I(&mount_seq[size=4], 0)" -> e43
+"I(&h_path[size=4], 0)" -> e35
+"I(&mnt[size=28], 0)" -> e2
+e2 -> e25
+"I(&mnt[size=28] + 4, 0)" -> e1
+"I(&u_peek_finished[size=4], 0)" -> e78
+"I(&mnt[size=28] + 8, 0)" -> e31
+"I(&__com_holder#1[size=1], 0)" -> e3
+e3 -> e37
+e37 -> e7
+"I(&mnt[size=28] + 12, 0)" -> e67
+"I(&__com_unmounter#2[size=1], 0)" -> e4
+e4 -> e81
+e81 -> e14
+"I(&mnt[size=28] + 16, 0)" -> e0
+e0 -> e45
+"I(&mnt[size=28] + 20, 0)" -> e69
+}
+}
