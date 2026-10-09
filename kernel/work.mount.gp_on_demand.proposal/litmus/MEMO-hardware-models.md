@@ -4,6 +4,12 @@ Companion to research-weak-memory.md (same scratchpad).  Tree: work.mount.gp_on_
 4379d47fd314, untouched.  Everything here lives in scratchpad/litmus/ (`aarch64/`, `ppc/`, `gen-asm.py`,
 `collect-results.sh`, `x86-klitmus.txt`, `RESUME.md`) and on jens in `~/tmp/klitmus/`.
 
+Update 2026-10-09 15:12 UTC: the three POWER runs still going at hand-off finished on jens (B1-walker-inc-vs-peek
+Never, B1m-walker-nomb witnessed, B1m-peek-no-outer-mb Never), so every POWER cell is final and agrees with LKMM.
+The full-size AArch64 run of B2-walker-bail-sees-doomed-lazy died with the laptop before it finished;
+MNT-B2r-walker-bail-reduced settles that shape under every model.  `RESULTS-hardware.txt` is the current table,
+the one in section 1 is the hand-off snapshot.
+
 ## 0. Summary
 
 1. The load-bearing LKMM litmus tests (A1 + 3 mutations, B1 + 2 mutations, B2 + mutation, C1, D1 + mutation,

@@ -3,12 +3,12 @@ MNT-A1-holder-get-before-put             Never      Never                    Nev
 MNT-A1m-gets-first                       Sometimes  Sometimes 1 5 (full)     Sometimes 1 5 (full)     Sometimes 21/3999979
 MNT-A1m-nomb-in-sum                      Sometimes  Sometimes 1 5 (full)     Sometimes 1 5 (full)     Never 0/4000000
 MNT-A1m-nowmb                            Sometimes  Sometimes 1 5 (full)     Sometimes 1 5 (full)     Never 0/4000000
-MNT-B1m-peek-no-outer-mb                 Never      Never                    running                  Never 0/2122844
-MNT-B1m-walker-nomb                      Sometimes  witnessed (speedcheck)   running                  Sometimes 988/2100421
-MNT-B1-walker-inc-vs-peek                Never      Never                    running                  Never 0/2103442
+MNT-B1m-peek-no-outer-mb                 Never      Never                    Never                    Never 0/2122844
+MNT-B1m-walker-nomb                      Sometimes  witnessed (speedcheck)   witnessed (speedcheck)   Sometimes 988/2100421
+MNT-B1-walker-inc-vs-peek                Never      Never                    Never                    Never 0/2103442
 MNT-B2m-walker-flags-unlocked            Sometimes  witnessed (speedcheck)   witnessed (speedcheck)   Sometimes 646/2130850
 MNT-B2r-walker-bail-reduced              Never      Never                    Never                    -
-MNT-B2-walker-bail-sees-doomed-lazy      Never      running                  Never                    Never 0/2073085
+MNT-B2-walker-bail-sees-doomed-lazy      Never      unfinished               Never                    Never 0/2073085
 MNT-C1-kern-unmount-get-before-put       Never      Never                    Never                    Never 0/4000000
 MNT-D1-dekker-fastpath-recheck           Never      Never                    Never                    Never 0/4000000
 MNT-D1m-holder-wmb-only                  Sometimes  Sometimes 1 4 (full)     Sometimes 1 4 (full)     Sometimes 4252/3995748

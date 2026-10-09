@@ -1,12 +1,12 @@
 #!/bin/bash
 # Tabulate LKMM / AArch64 / PPC herd7 results (and x86 klitmus results if x86-klitmus.txt exists)
 cd "$(dirname "$0")"
-res() { # arch test -> Never|Sometimes|witnessed|running|-
+res() { # arch test -> Never|Sometimes|witnessed|unfinished|-
 	local f=$1/$2.out full=$1/$2.full.out o
 	[ -f "$full" ] && o=$(grep -E "^Observation" $full | awk '{print $3" "$4" "$5}') && [ -n "$o" ] && { echo "$o (full)"; return; }
 	[ -f "$f" ] || { echo "-"; return; }
 	o=$(grep -E "^Observation" $f | awk '{print $3" "$4" "$5}')
-	[ -z "$o" ] && { grep -q "rror" $f && echo "ERROR" || echo "running"; return; }
+	[ -z "$o" ] && { grep -q "rror" $f && echo "ERROR" || echo "unfinished"; return; }
 	case $o in Always*) echo "witnessed (speedcheck)";; Never*) echo "Never";; *) echo "$o";; esac
 }
 printf "%-40s %-10s %-24s %-24s %s\n" test LKMM AArch64 POWER x86-klitmus

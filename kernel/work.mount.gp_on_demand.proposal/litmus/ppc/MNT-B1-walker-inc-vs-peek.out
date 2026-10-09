@@ -1,0 +1,12 @@
+Test MNT-B1-walker-inc-vs-peek Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:r2=0 /\ 0:r3=0 /\ [freed]=1)
+Observation MNT-B1-walker-inc-vs-peek Never 0 0
+Time MNT-B1-walker-inc-vs-peek 4834.09
+Hash=9aee8e19f13f250aecb102fc33b4effb
+
+
+jens, /usr/bin/time -f "%e s %M KB": 4834.16 s 168040 KB
