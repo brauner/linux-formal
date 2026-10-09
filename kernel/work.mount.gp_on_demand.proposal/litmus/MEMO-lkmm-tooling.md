@@ -4,7 +4,7 @@ Scope: work.mount.gp_on_demand.proposal, tip 4379d47fd314, fs/namespace.c.
 Parties: holder fast path in mntput_no_expire(), walker in __legitimize_mnt(),
 unmounter in umount_tree() + mntput_unmounted()/mntput_unheld(), plus the
 kern_unmount_array() feeder (mnt_make_shortterm()).  The TLA+ model in
-~/src/git/linux-tla/kernel/mount-gp-on-demand/ reorders *stores* only (FIFO or
+~/src/git/linux-formal/kernel/work.mount.gp_on_demand/ reorders *stores* only (FIFO or
 WEAK_STORES buffers); it never reorders loads and its RCU/seqlock are
 abstractions, so it cannot check the barrier pairing under LKMM.
 

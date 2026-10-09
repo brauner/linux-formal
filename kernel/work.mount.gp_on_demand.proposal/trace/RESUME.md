@@ -1,7 +1,7 @@
 # gp-trace: TLA+ trace validation of the mount refcount protocol -- RESUME
 
 Working dir (local): this directory (scratchpad/trace). Copy to
-~/src/git/linux-tla/kernel/work.mount.gp_on_demand.proposal/trace/ at the end
+~/src/git/linux-formal/kernel/work.mount.gp_on_demand.proposal/trace/ at the end
 (never git add/commit there).
 
 ## State
@@ -19,7 +19,7 @@ Working dir (local): this directory (scratchpad/trace). Copy to
   -> extract.py -> ~/tmp/gp-trace/traces/{selftest,walk,held,expire}.txt
   Logs: ~/tmp/gp-trace/progress.log, build.out, vm.log, pipeline.out
 - Local tooling: downloads/cm/CommunityModules-deps.jar (fetched), tla2tools at
-  ~/src/git/linux-tla/kernel/mount/tla2tools.jar, Java 25 local and on jens.
+  ~/src/git/linux-formal/kernel/mount/tla2tools.jar, Java 25 local and on jens.
 
 ## Next steps
 1. `ssh jens cat ~/tmp/gp-trace/progress.log` -- wait for "pipeline: done".
@@ -28,7 +28,7 @@ Working dir (local): this directory (scratchpad/trace). Copy to
 3. Validate: `./validate.sh <outdir>` runs TLC on MntPutTrace.tla per mount file.
 
 ## Update (after the first validation runs)
-- Model used: ~/src/git/linux-tla/kernel/work.mount.gp_on_demand.proposal/MntPut.tla (its README existed), the
+- Model used: ~/src/git/linux-formal/kernel/work.mount.gp_on_demand.proposal/MntPut.tla (its README existed), the
   two-mount batch model; the traced mount is "A", "B" a phantom nobody touches; MODE from the trace
   ("umount" with mnt_caller_drop, else "nsdeath"), LAZY = ~sync.  Spec: MntPutTrace.tla + MntPutTrace.cfg,
   runner validate.sh (env TLA2TOOLS=./tla2tools-1.8.0.jar, the kernel/mount jar is too old for the

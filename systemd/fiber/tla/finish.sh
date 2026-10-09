@@ -2,7 +2,7 @@
 # Detached finisher, runs on jens: waits until no TLC run of this model is alive and the full
 # meson test of the fixed tree is done, then builds the summary, the traces, RESULTS.txt and the
 # README results table in place. Pull with
-#   rsync -a --exclude '*.jar' jens:src/git/linux-tla/systemd/fiber/ ~/src/git/linux-tla/systemd/fiber/
+#   rsync -a --exclude '*.jar' jens:src/git/linux-formal/systemd/fiber/ ~/src/git/linux-formal/systemd/fiber/
 cd "$(dirname "$0")"
 while true; do
     alive=0

@@ -56,7 +56,7 @@ with that prep.
 
 ## Switches
 
-`MountWalk.tla` (the mainline switches are documented in `kernel/mount/README.md`):
+`MountWalk.tla` (the mainline switches are documented in `kernel/mount/tla/README.md`):
 
 | Constant | Off means |
 |----------|-----------|
@@ -230,7 +230,7 @@ What is covered elsewhere or not at all: the store-buffer argument for
 __legitimize_mnt()'s increment against the slow path's sum is MntPut's
 (`kernel/mount/`), and the grace period before the own references are
 dropped against mntput_no_expire()'s fast path is
-`kernel/mount-gp-on-demand/`; the RCU walk's climb out of a vacated bind
+`kernel/work.mount.gp_on_demand/`; the RCU walk's climb out of a vacated bind
 mount and the weakly ordered loads and stores around vacate_mount() are
 the MountWalk section above; the teardown of the filesystem a vacated
 mount carried while an RCU walker is still inside it is the witness pair

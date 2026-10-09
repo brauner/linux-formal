@@ -6,10 +6,10 @@ current: every step below is either done, running on jens, or next.
 
 ## Where things are
 
-- Model, configurations, scripts: this directory, `~/src/git/linux-tla/systemd/fiber/`
-  (laptop), mirrored to `jens:src/git/linux-tla/systemd/fiber/`.  Push with
-  `rsync -a --exclude 'mount/' --exclude 'logs/' --exclude '*.jar' --exclude '.git/' ~/src/git/linux-tla/ jens:src/git/linux-tla/`,
-  pull results with `rsync -a jens:src/git/linux-tla/systemd/fiber/logs/ ~/src/git/linux-tla/systemd/fiber/logs/`.
+- Model, configurations, scripts: this directory, `~/src/git/linux-formal/systemd/fiber/`
+  (laptop), mirrored to `jens:src/git/linux-formal/systemd/fiber/`.  Push with
+  `rsync -a --exclude 'mount/' --exclude 'logs/' --exclude '*.jar' --exclude '.git/' ~/src/git/linux-formal/ jens:src/git/linux-formal/`,
+  pull results with `rsync -a jens:src/git/linux-formal/systemd/fiber/logs/ ~/src/git/linux-formal/systemd/fiber/logs/`.
 - TLC runs only on jens (512 cores, shared with other people's TLC jobs: never
   `pkill java`).  Jar: `jens:~/tmp/tla-coredump/tla2tools.jar`, copied to
   `tla2tools.jar` here (gitignored).  Java 25.
@@ -144,11 +144,11 @@ A detached `finish.sh` on jens waits for the last TLC run and the full
 the README results table and writes `FINISHED.txt` with the test-suite
 summary. So:
 
-    ssh jens 'cat src/git/linux-tla/systemd/fiber/FINISHED.txt'     # exists = all done
-    rsync -a --exclude '*.jar' jens:src/git/linux-tla/systemd/fiber/ ~/src/git/linux-tla/systemd/fiber/
+    ssh jens 'cat src/git/linux-formal/systemd/fiber/FINISHED.txt'     # exists = all done
+    rsync -a --exclude '*.jar' jens:src/git/linux-formal/systemd/fiber/ ~/src/git/linux-formal/systemd/fiber/
     grep MISMATCH RESULTS.txt                                         # must be empty
 
-If `FINISHED.txt` is missing, `ssh jens 'cd src/git/linux-tla/systemd/fiber && ./status.sh'`
+If `FINISHED.txt` is missing, `ssh jens 'cd src/git/linux-formal/systemd/fiber && ./status.sh'`
 tells what is still running or dead (`./resume.sh <cfg> 16 24g` for a dead one,
 16 workers is what the batch was started with); `pgrep -f finish.sh` on jens
 says whether the finisher is still waiting (restart it with
@@ -160,7 +160,7 @@ Then update the memory note (project_tla_fiber_model.md) and report.
 1. Wait for the big runs (`./status.sh` on jens); if one died, `./resume.sh <cfg>`
    with the SAME worker count it was started with (32 for the six restarted at
    21:12, 8 for the five liveness runs).
-2. `./summarize.sh` on jens, `rsync -a jens:src/git/linux-tla/systemd/fiber/logs/ logs/`,
+2. `./summarize.sh` on jens, `rsync -a jens:src/git/linux-formal/systemd/fiber/logs/ logs/`,
    `./fill-results.py --readme`, `cp logs/summary.txt RESULTS.txt`. Findings,
    design assessment, beyond-the-code and `traces/` are done.
 2b. Series on work.systemd.fiber, tip b51ab4e6be (19 commits): 8 fixes each followed

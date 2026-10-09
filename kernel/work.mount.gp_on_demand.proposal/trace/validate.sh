@@ -3,9 +3,9 @@
 # usage: validate.sh [-m MODELDIR] [-j JAR] FILE.ndjson...   (results appended to results.tsv)
 set -u
 cd "$(dirname "$0")"
-MODEL=${MODEL:-$HOME/src/git/linux-tla/kernel/work.mount.gp_on_demand.proposal}
-TLA=${TLA2TOOLS:-$HOME/src/git/linux-tla/kernel/mount/tla2tools.jar}
-CM=${COMMUNITY_MODULES:-$(dirname "$0")/CommunityModules-deps.jar}
+MODEL=${MODEL:-$(dirname "$0")/../tla}
+TLA=${TLA2TOOLS:-$(dirname "$0")/../../../tools/tla2tools-1.8.0.jar}
+CM=${COMMUNITY_MODULES:-$(dirname "$0")/../../../tools/CommunityModules-deps.jar}
 while getopts "m:j:" o; do case $o in m) MODEL=$OPTARG;; j) CM=$OPTARG;; esac; done; shift $((OPTIND-1))
 mkdir -p logs
 for f in "$@"; do

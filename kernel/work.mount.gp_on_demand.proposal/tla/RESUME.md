@@ -20,7 +20,7 @@ batch, mntput_unmounted()), run on jens, results into README.md/RESULTS.txt.
 
     ssh jens 'tail -3 ~/tmp/tla-gp-proposal/logs/summary.txt'        # ALL-DONE?
     ssh jens 'cd ~/tmp/tla-gp-proposal && ./summarize.sh'            # partial table any time
-    cd ~/src/git/linux-tla/kernel/work.mount.gp_on_demand.proposal
+    cd ~/src/git/linux-formal/kernel/work.mount.gp_on_demand.proposal
     rsync -a jens:tmp/tla-gp-proposal/logs/ logs/
     ./summarize.sh && { echo '# TLC on jens (16 workers x 8g per run, CPUs 256-511), 2026-10-09'; cat logs/summary.txt; } > RESULTS.txt
     # any MISMATCH: ./show-put-trace.py logs/<cfg>.log > traces/<cfg>.txt, read it,

@@ -7,7 +7,7 @@ split per-CPU counters and the smp_wmb() of 7eb84d54fac5).  The series
 is not in mainline; the mainline models are in `kernel/mount/`, whose
 conventions this directory follows.
 
-`MntPut.tla` here is `kernel/mount/MntPut.tla` plus the series: with
+`MntPut.tla` here is `kernel/mount/tla/MntPut.tla` plus the series: with
 `GP_ON_DEMAND` namespace_unlock() does not wait for a grace period.  The
 puts of the unmounted list run from task work after path_umount() has
 dropped the caller's own reference, and mntput_unheld() sums the count
@@ -29,7 +29,7 @@ two files to see the delta.
 
 ## Switches
 
-The mainline switches are documented in `kernel/mount/README.md`.  Every
+The mainline switches are documented in `kernel/mount/tla/README.md`.  Every
 configuration here runs with `FIX_SPLIT_COUNT` and `FIX_PUT_WMB` on
 unless it says so, that is the tree the series sits on.
 
