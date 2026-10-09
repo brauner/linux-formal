@@ -1,7 +1,6 @@
-# TLC on jens (16 workers x 8g per run, CPUs 256-511), 2026-10-09; RUNNING = still going at report time, states = distinct states so far; collect per RESUME.md
 config                         expected   result     states      time       check
-full_lazy_g0                   pass       RUNNING    12,619,166  -          RUNNING(jens tmux tlagp)
-full_lazy                      pass       RUNNING    8,058,413   -          RUNNING(jens tmux tlagp)
+full_lazy_g0                   pass       stopped                51269367          MISMATCH
+full_lazy                      pass       stopped                49664761          MISMATCH
 hh_kern_ba                     pass       pass       315664      23s        ok
 hh_kern                        pass       pass       315664      23s        ok
 hh_kern_no_mb_peek             pass       pass       420894      33s        ok
@@ -12,12 +11,12 @@ hh_kern_recheck_weak           pass       pass       18092599    18min52s   ok
 hh_kern_weak                   pass       pass       13816768    15min32s   ok
 hh_lazy                        pass       pass       349770      29s        ok
 hh_lazy_migrate                pass       pass       14595424    19min12s   ok
-hh_lazy_weak                   pass       RUNNING    7,176,816   -          RUNNING(jens tmux tlagp)
+hh_lazy_weak                   pass       pass       16302868    30min15s   ok
 hh_loose                       violation  violation  24092       01s        ok
 hh_no_rcu_delay                violation  violation  607248      49s        ok
 hh_nsdeath                     pass       pass       335866      28s        ok
 hh_recheck                     pass       pass       466868      31s        ok
-hh_recheck_weak                pass       RUNNING    14,902,943  -          RUNNING(jens tmux tlagp)
+hh_recheck_weak                pass       pass       19508688    24min28s   ok
 h_kern                         pass       pass       4252        02s        ok
 h_kern_witness_fast            violation  violation  923         00s        ok
 h_lazy_ba                      pass       pass       6501        02s        ok
@@ -62,3 +61,9 @@ ww_sync_loose                  pass       pass       18427       02s        ok
 ww_sync_no_mb_peek             pass       pass       26943       01s        ok
 ww_sync_no_rcu_delay           violation  violation  24481       03s        ok
 ww_sync_recheck                violation  violation  34845       04s        ok
+
+full_lazy and full_lazy_g0 (the five-task layouts, holder and walker on both
+mounts) were stopped by hand after 225M/181M states generated, 49.7M/51.3M
+distinct, with no violation found; their siblings with 14-18M distinct
+states finished in 15-19 minutes, these showed no end in sight. Every other
+configuration finished as expected.

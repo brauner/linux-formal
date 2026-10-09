@@ -273,3 +273,11 @@ __legitimize_mnt() would have to finish a mount off.
   gone from the series and is not modelled.
 * MNT_INTERNAL versus task-work cleanup timing is covered only by the two
   extremes (`UQueue` placement, `QUEUE_LATE`).
+
+### The two five-task runs
+
+`full_lazy` and `full_lazy_g0` (holder and walker on both mounts) were
+stopped by hand after 225M and 181M states generated (49.7M and 51.3M
+distinct), no violation found, when they showed no end in sight; every
+pairwise layout they combine passed. Rerun with `./check.sh full_lazy 64`
+if a full run is wanted.
