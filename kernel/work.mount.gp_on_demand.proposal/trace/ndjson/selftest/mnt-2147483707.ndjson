@@ -1,0 +1,6 @@
+{"id": 2147483707, "shape": "umount", "sync": true, "count_at_utree": 2, "upid": 122, "tasklist": ["U"], "walkers": [], "holders": [], "getbudget": 1, "ncpu": 2, "cpus_seen": [6], "nevents": 5, "nlocked": 4, "pruned": [], "inits": ["U:mnt_legitimize@316"], "preexisting": [], "has_free": false, "notes": []}
+{"i": 1, "task": "U", "ev": "mnt_umount_tree", "lk": 1, "ts": 817816, "cpu": 6, "pid": 122, "seq": 107, "count": 2, "sync": true}
+{"i": 2, "task": "U", "ev": "mnt_caller_drop", "lk": 2, "ts": 817816, "cpu": 6, "pid": 122, "seq": 107}
+{"i": 3, "task": "U", "ev": "mnt_peek", "lk": 3, "ts": 817817, "cpu": 6, "pid": 122, "seq": 109, "count": 1, "unheld": true}
+{"i": 4, "task": "U", "ev": "mnt_final", "lk": 4, "ts": 817817, "cpu": 6, "pid": 122, "seq": 109}
+{"i": 5, "task": "U", "ev": "mnt_cleanup", "lk": 0, "ts": 817818, "cpu": 6, "pid": 122, "seq": 110}

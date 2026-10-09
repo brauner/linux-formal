@@ -1,0 +1,1069 @@
+[
+ {
+  "id": 2147483649,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 22
+ },
+ {
+  "id": 2147483651,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 74
+ },
+ {
+  "id": 2147483655,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 20
+ },
+ {
+  "id": 2147483657,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 20
+ },
+ {
+  "id": 2147483668,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 8
+ },
+ {
+  "id": 2147483674,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 4
+ },
+ {
+  "id": 2147483675,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 2
+ },
+ {
+  "id": 2147483676,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 10
+ },
+ {
+  "id": 2147483678,
+  "skipped": [
+   "skipped: 0 umount_tree events"
+  ],
+  "n": 4
+ },
+ {
+  "id": 2147483679,
+  "file": "mnt-2147483679.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483680,
+  "file": "mnt-2147483680.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "H118.1",
+   "W118.1",
+   "W118.2"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483681,
+  "file": "mnt-2147483681.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483682,
+  "file": "mnt-2147483682.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483683,
+  "file": "mnt-2147483683.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483684,
+  "file": "mnt-2147483684.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W118.1",
+   "H118.1",
+   "W118.2",
+   "H118.2",
+   "W118.3",
+   "W118.4",
+   "W118.5",
+   "H118.3",
+   "W118.6",
+   "H118.4",
+   "W118.7",
+   "H118.5"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483685,
+  "file": "mnt-2147483685.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W118.1",
+   "W118.2",
+   "W118.3"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483686,
+  "file": "mnt-2147483686.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W118.1",
+   "H118.1",
+   "W118.2",
+   "W118.3",
+   "W118.4",
+   "W118.5"
+  ],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483687,
+  "file": "mnt-2147483687.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483688,
+  "file": "mnt-2147483688.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483689,
+  "file": "mnt-2147483689.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483690,
+  "file": "mnt-2147483690.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "H120.1",
+   "W120.1",
+   "W120.2"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483691,
+  "file": "mnt-2147483691.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483692,
+  "file": "mnt-2147483692.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483693,
+  "file": "mnt-2147483693.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483694,
+  "file": "mnt-2147483694.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W120.1",
+   "H120.1",
+   "W120.2",
+   "H120.2",
+   "W120.3",
+   "W120.4",
+   "W120.5",
+   "H120.3",
+   "W120.6",
+   "H120.4",
+   "W120.7",
+   "H120.5"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483695,
+  "file": "mnt-2147483695.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 5,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W120.1",
+   "W120.2",
+   "W120.3"
+  ],
+  "has_free": true,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483696,
+  "file": "mnt-2147483696.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W120.1",
+   "H120.1",
+   "W120.2",
+   "W120.3",
+   "W120.4",
+   "W120.5"
+  ],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483697,
+  "file": "mnt-2147483697.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483698,
+  "file": "mnt-2147483698.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 6,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": true,
+  "notes": []
+ },
+ {
+  "id": 2147483699,
+  "file": "mnt-2147483699.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483700,
+  "file": "mnt-2147483700.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "H122.1",
+   "W122.1",
+   "W122.2"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483701,
+  "file": "mnt-2147483701.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483702,
+  "file": "mnt-2147483702.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483703,
+  "file": "mnt-2147483703.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483704,
+  "file": "mnt-2147483704.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W122.1",
+   "H122.1",
+   "W122.2",
+   "H122.2",
+   "W122.3",
+   "W122.4",
+   "W122.5",
+   "H122.3",
+   "W122.6",
+   "H122.4",
+   "W122.7",
+   "H122.5"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483705,
+  "file": "mnt-2147483705.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W122.1",
+   "W122.2",
+   "W122.3"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483706,
+  "file": "mnt-2147483706.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W122.1",
+   "H122.1",
+   "W122.2",
+   "W122.3",
+   "W122.4",
+   "W122.5"
+  ],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483707,
+  "file": "mnt-2147483707.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483708,
+  "file": "mnt-2147483708.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 3,
+  "nevents": 9,
+  "nlocked": 6,
+  "walkers": [],
+  "holders": [
+   "H122.1"
+  ],
+  "pruned": [
+   "W122.1"
+  ],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483709,
+  "file": "mnt-2147483709.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483710,
+  "file": "mnt-2147483710.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "H124.1",
+   "W124.1",
+   "W124.2"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483711,
+  "file": "mnt-2147483711.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483712,
+  "file": "mnt-2147483712.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483713,
+  "file": "mnt-2147483713.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483714,
+  "file": "mnt-2147483714.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W124.1",
+   "H124.1",
+   "W124.2",
+   "H124.2",
+   "W124.3",
+   "W124.4",
+   "W124.5",
+   "H124.3",
+   "W124.6",
+   "H124.4",
+   "W124.7",
+   "H124.5"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483715,
+  "file": "mnt-2147483715.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W124.1",
+   "W124.2",
+   "W124.3"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483716,
+  "file": "mnt-2147483716.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W124.1",
+   "H124.1",
+   "W124.2",
+   "W124.3",
+   "W124.4",
+   "W124.5"
+  ],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483717,
+  "file": "mnt-2147483717.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483718,
+  "file": "mnt-2147483718.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W124.1",
+   "H124.1",
+   "W124.2"
+  ],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483719,
+  "file": "mnt-2147483719.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483720,
+  "file": "mnt-2147483720.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 9,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [
+   "H126.1"
+  ],
+  "pruned": [
+   "W126.1",
+   "W126.2",
+   "H127.1",
+   "H127.2",
+   "H127.3"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483721,
+  "file": "mnt-2147483721.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483722,
+  "file": "mnt-2147483722.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483723,
+  "file": "mnt-2147483723.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483724,
+  "file": "mnt-2147483724.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W126.1",
+   "H126.1",
+   "W126.2",
+   "H126.2",
+   "W126.3",
+   "W126.4",
+   "H126.3",
+   "W126.5",
+   "H126.4",
+   "W126.6",
+   "H126.5"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483725,
+  "file": "mnt-2147483725.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W126.1",
+   "W126.2",
+   "W126.3"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483726,
+  "file": "mnt-2147483726.ndjson",
+  "shape": "umount",
+  "sync": false,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W126.1",
+   "H126.1",
+   "W126.2",
+   "W126.3",
+   "W126.4"
+  ],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483727,
+  "file": "mnt-2147483727.ndjson",
+  "shape": "umount",
+  "sync": true,
+  "count_at_utree": 2,
+  "nevents": 5,
+  "nlocked": 4,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483728,
+  "file": "mnt-2147483728.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483729,
+  "file": "mnt-2147483729.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "H127.1"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483730,
+  "file": "mnt-2147483730.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483731,
+  "file": "mnt-2147483731.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483732,
+  "file": "mnt-2147483732.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483733,
+  "file": "mnt-2147483733.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W127.1"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483734,
+  "file": "mnt-2147483734.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ },
+ {
+  "id": 2147483735,
+  "file": "mnt-2147483735.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [
+   "W127.1"
+  ],
+  "has_free": false,
+  "notes": [
+   "U's own reference acquisition not in the trace (implicit)"
+  ]
+ },
+ {
+  "id": 2147483736,
+  "file": "mnt-2147483736.ndjson",
+  "shape": "nsdeath",
+  "sync": false,
+  "count_at_utree": 1,
+  "nevents": 4,
+  "nlocked": 3,
+  "walkers": [],
+  "holders": [],
+  "pruned": [],
+  "has_free": false,
+  "notes": []
+ }
+]

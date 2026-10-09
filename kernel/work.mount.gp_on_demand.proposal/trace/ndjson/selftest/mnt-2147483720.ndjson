@@ -1,0 +1,10 @@
+{"id": 2147483720, "shape": "nsdeath", "sync": false, "count_at_utree": 1, "upid": 126, "tasklist": ["U", "H126.1"], "walkers": [], "holders": ["H126.1"], "getbudget": 3, "ncpu": 2, "cpus_seen": [5, 6], "nevents": 9, "nlocked": 3, "pruned": ["W126.1", "W126.2", "H127.1", "H127.2", "H127.3"], "inits": ["H126.1:mnt_get@557", "H127.1:mnt_get@602"], "preexisting": [], "has_free": false, "notes": ["U's own reference acquisition not in the trace (implicit)"]}
+{"i": 1, "task": "H126.1", "ev": "mnt_get", "lk": 0, "ts": 819893, "cpu": 5, "pid": 126, "seq": 176}
+{"i": 2, "task": "H126.1", "ev": "mnt_get", "lk": 0, "ts": 820107, "cpu": 5, "pid": 126, "seq": 184}
+{"i": 3, "task": "H126.1", "ev": "mnt_get", "lk": 0, "ts": 820107, "cpu": 5, "pid": 126, "seq": 184}
+{"i": 4, "task": "H126.1", "ev": "mnt_put_fast", "lk": 0, "ts": 820426, "cpu": 5, "pid": 126, "seq": 208}
+{"i": 5, "task": "H126.1", "ev": "mnt_put_fast", "lk": 0, "ts": 820426, "cpu": 5, "pid": 126, "seq": 208}
+{"i": 6, "task": "U", "ev": "mnt_umount_tree", "lk": 1, "ts": 820428, "cpu": 5, "pid": 126, "seq": 209, "count": 1, "sync": false}
+{"i": 7, "task": "U", "ev": "mnt_peek", "lk": 2, "ts": 820433, "cpu": 5, "pid": 126, "seq": 211, "count": 1, "unheld": true}
+{"i": 8, "task": "U", "ev": "mnt_final", "lk": 3, "ts": 820433, "cpu": 5, "pid": 126, "seq": 211}
+{"i": 9, "task": "U", "ev": "mnt_cleanup", "lk": 0, "ts": 820435, "cpu": 5, "pid": 126, "seq": 212}
