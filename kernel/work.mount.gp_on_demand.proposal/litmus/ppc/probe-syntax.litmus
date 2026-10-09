@@ -1,0 +1,27 @@
+PPC probe-syntax
+{
+0:r20=x; 0:r21=y; 0:r22=l;
+1:r20=x; 1:r21=y; 1:r22=l;
+}
+ P0                | P1                ;
+ li r8,1           | li r8,1           ;
+ lwarx r9,r0,r22    | lwarx r9,r0,r22    ;
+ stwcx. r8,r0,r22   | stwcx. r8,r0,r22   ;
+ beq LC10          | beq LC20          ;
+ li r9,1           | li r9,1           ;
+ LC10:             | LC20:             ;
+ isync             | isync             ;
+ li r10,1          | lwz r10,0(r21)    ;
+ stw r10,0(r20)    | sync              ;
+ lwsync            | lwz r11,0(r20)    ;
+ stw r10,0(r21)    | cmpwi r11,1       ;
+ lwz r12,0(r21)    | bne LC21          ;
+ cmpwi r12,0       | li r12,2          ;
+ beq LC11          | stw r12,0(r21)    ;
+ lwsync            | LC21:             ;
+ LC11:             | lwsync            ;
+ lwsync            | li r13,0          ;
+ li r13,0          | stw r13,0(r22)    ;
+ stw r13,0(r22)    |                   ;
+filter (0:r9=0 /\ 1:r9=0)
+exists (1:r10=1 /\ 1:r11=0)

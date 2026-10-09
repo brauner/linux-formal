@@ -1,0 +1,5 @@
+MNT-A1-holder-get-before-put               LKMM result: Never       Observation MNT-A1-holder-get-before-put Never 0 0 
+MNT-A1m-gets-first                         LKMM result: Sometimes   Flag Assuming-common-inner-shareable-domain Observation MNT-A1m-gets-first Always 1 0 
+MNT-A1m-nomb-in-sum                        LKMM result: Sometimes   Flag Assuming-common-inner-shareable-domain Observation MNT-A1m-nomb-in-sum Always 1 0 
+MNT-A1m-nowmb                              LKMM result: Sometimes   Flag Assuming-common-inner-shareable-domain Observation MNT-A1m-nowmb Always 1 0 
+MNT-B1m-peek-no-outer-mb                   LKMM result: Never       Observation MNT-B1m-peek-no-outer-mb Never 0 0 

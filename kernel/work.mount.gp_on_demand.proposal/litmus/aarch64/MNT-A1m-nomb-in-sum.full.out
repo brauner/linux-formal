@@ -1,0 +1,21 @@
+Test MNT-A1m-nomb-in-sum Allowed
+States 6
+0:X10=0; 1:X12=0; 1:X14=1;
+0:X10=0; 1:X12=0; 1:X14=2;
+0:X10=1; 1:X12=0; 1:X14=1;
+0:X10=1; 1:X12=0; 1:X14=2;
+0:X10=1; 1:X12=1; 1:X14=1;
+0:X10=1; 1:X12=1; 1:X14=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X10=1 /\ 1:X12=1 /\ 1:X14=1)
+Observation MNT-A1m-nomb-in-sum Sometimes 1 5
+Time MNT-A1m-nomb-in-sum 114.41
+Hash=b62b7416582fb3ac6958c838e97eb4b3
+
+
+real	1m54.452s
+user	1m54.375s
+sys	0m0.042s

@@ -1,0 +1,14 @@
+Test MNT-B1m-peek-no-outer-mb Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-B1m-peek-no-outer-mb Never 0 0
+Time MNT-B1m-peek-no-outer-mb 389.72
+Hash=45e0ff827ab923e466aa3f22035d04bd
+
+
+real	6m29.854s
+user	6m29.672s
+sys	0m0.059s

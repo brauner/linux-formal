@@ -1,0 +1,21 @@
+Test MNT-A1m-nowmb Allowed
+States 6
+0:X10=0; 1:X12=0; 1:X14=1;
+0:X10=0; 1:X12=0; 1:X14=2;
+0:X10=1; 1:X12=0; 1:X14=1;
+0:X10=1; 1:X12=0; 1:X14=2;
+0:X10=1; 1:X12=1; 1:X14=1;
+0:X10=1; 1:X12=1; 1:X14=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X10=1 /\ 1:X12=1 /\ 1:X14=1)
+Observation MNT-A1m-nowmb Sometimes 1 5
+Time MNT-A1m-nowmb 116.52
+Hash=b04e1925b6844ed8972ab8b9b66f4386
+
+
+real	1m56.555s
+user	1m56.463s
+sys	0m0.070s

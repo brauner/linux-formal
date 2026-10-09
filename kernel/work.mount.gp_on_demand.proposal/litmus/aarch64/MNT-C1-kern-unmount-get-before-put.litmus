@@ -1,0 +1,37 @@
+AArch64 MNT-C1-kern-unmount-get-before-put
+(* LKMM result: Never; translation of litmus/MNT-C1-kern-unmount-get-before-put.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_h=1;
+gets_u=1;
+0:X0=gets_h;
+0:X1=mnt_ns;
+0:X2=puts_h;
+1:X0=mnt_ns;
+1:X1=mlock;
+1:X2=seq;
+1:X3=puts_h;
+1:X4=puts_u;
+1:X5=gets_h;
+1:X6=gets_u;
+}
+ P0            | P1                ;
+ MOV W9,#2     | MOV W9,#0         ;
+ STR W9,[X0]   | STR W9,[X0]       ;
+ LDR W10,[X1]  | MOV W9,#1         ;
+ CBZ W10,L00   | SWPA W9,W10,[X1]  ;
+ DMB ISHST     | MOV W9,#1         ;
+ MOV W9,#1     | STR W9,[X2]       ;
+ STR W9,[X2]   | DMB ISHST         ;
+ L00:          | DMB ISH           ;
+               | LDR W11,[X3]      ;
+               | LDR W12,[X4]      ;
+               | DMB ISH           ;
+               | LDR W13,[X5]      ;
+               | LDR W14,[X6]      ;
+               | DMB ISHST         ;
+               | MOV W9,#2         ;
+               | STR W9,[X2]       ;
+               | STLR WZR,[X1]     ;
+filter (1:X10=0)
+exists (0:X10=1 /\ 1:X11=1 /\ 1:X13=1)

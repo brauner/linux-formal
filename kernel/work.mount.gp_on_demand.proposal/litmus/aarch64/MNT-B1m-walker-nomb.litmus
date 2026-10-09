@@ -1,0 +1,66 @@
+AArch64 MNT-B1m-walker-nomb
+(* LKMM result: Sometimes; translation of litmus/MNT-B1m-walker-nomb.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:X0=seq;
+0:X1=gets_w;
+0:X2=mlock;
+0:X3=flags;
+0:X4=puts_w;
+1:X0=mlock;
+1:X1=seq;
+1:X2=mnt_ns;
+1:X3=flags;
+1:X4=puts_w;
+1:X5=puts_u;
+1:X6=gets_w;
+1:X7=gets_u;
+1:X8=freed;
+}
+ P0                | P1                ;
+ LDR W10,[X0]      | MOV W9,#1         ;
+ DMB ISHLD         | SWPA W9,W10,[X0]  ;
+ DMB ISHLD         | MOV W9,#1         ;
+ LDR W11,[X0]      | STR W9,[X1]       ;
+ CBNZ W11,Lend0    | DMB ISHST         ;
+ MOV W9,#1         | MOV W9,#0         ;
+ STR W9,[X1]       | STR W9,[X2]       ;
+ DMB ISHLD         | MOV W9,#1         ;
+ LDR W12,[X0]      | STR W9,[X3]       ;
+ CBZ W12,Lend0     | DMB ISHST         ;
+ MOV W9,#1         | MOV W9,#2         ;
+ SWPA W9,W13,[X2]  | STR W9,[X1]       ;
+ LDR W14,[X3]      | STLR WZR,[X0]     ;
+ CBZ W14,Lskip0    | MOV W9,#1         ;
+ MOV W9,#1         | SWPA W9,W11,[X0]  ;
+ STR W9,[X4]       | MOV W9,#3         ;
+ Lskip0:           | STR W9,[X1]       ;
+ STLR WZR,[X2]     | DMB ISHST         ;
+ Lend0:            | DMB ISH           ;
+                   | LDR W12,[X4]      ;
+                   | LDR W13,[X5]      ;
+                   | DMB ISH           ;
+                   | LDR W14,[X6]      ;
+                   | LDR W15,[X7]      ;
+                   | CBNZ W14,L11      ;
+                   | MOV W9,#3         ;
+                   | STR W9,[X3]       ;
+                   | MOV W9,#1         ;
+                   | STR W9,[X8]       ;
+                   | L11:              ;
+                   | CMP W14,#1        ;
+                   | B.NE L21          ;
+                   | CMP W12,#1        ;
+                   | B.NE L21          ;
+                   | MOV W9,#3         ;
+                   | STR W9,[X3]       ;
+                   | MOV W9,#1         ;
+                   | STR W9,[X8]       ;
+                   | L21:              ;
+                   | DMB ISHST         ;
+                   | MOV W9,#4         ;
+                   | STR W9,[X1]       ;
+                   | STLR WZR,[X0]     ;
+filter (0:X13=0 /\ 1:X10=0 /\ 1:X11=0 /\ 0:X10=0)
+exists (0:X11=0 /\ 0:X12=0 /\ freed=1)

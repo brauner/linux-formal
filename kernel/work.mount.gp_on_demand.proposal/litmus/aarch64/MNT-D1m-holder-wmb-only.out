@@ -1,0 +1,16 @@
+Test MNT-D1m-holder-wmb-only Allowed
+States 1
+0:X10=1; 0:X11=1; 1:X12=0;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X10=1 /\ 0:X11=1 /\ 1:X12=0)
+Observation MNT-D1m-holder-wmb-only Always 1 0
+Time MNT-D1m-holder-wmb-only 100.05
+Hash=b04282b2044e6fa6a9f42640c7163fd8
+
+
+real	1m51.969s
+user	1m39.847s
+sys	0m0.227s

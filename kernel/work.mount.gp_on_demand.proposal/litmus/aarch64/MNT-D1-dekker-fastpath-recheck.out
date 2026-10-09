@@ -1,0 +1,14 @@
+Test MNT-D1-dekker-fastpath-recheck Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X10=1 /\ 0:X11=1 /\ 1:X12=0)
+Observation MNT-D1-dekker-fastpath-recheck Never 0 0
+Time MNT-D1-dekker-fastpath-recheck 109.51
+Hash=39241a3c4ec304ef004797fc54510003
+
+
+real	2m2.503s
+user	1m49.293s
+sys	0m0.239s

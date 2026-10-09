@@ -1,0 +1,46 @@
+AArch64 MNT-E2-busycheck-no-outer-mb
+(* LKMM result: Never; translation of litmus/MNT-E2-busycheck-no-outer-mb.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:X0=seq;
+0:X1=gets_w;
+0:X2=mlock;
+0:X3=flags;
+0:X4=puts_w;
+1:X0=mlock;
+1:X1=seq;
+1:X2=puts_w;
+1:X3=puts_u;
+1:X4=gets_w;
+1:X5=gets_u;
+1:X6=mnt_ns;
+1:X7=flags;
+1:X8=freed;
+}
+ P0                | P1                ;
+ LDR W10,[X0]      | MOV W9,#1         ;
+ DMB ISHLD         | SWPA W9,W10,[X0]  ;
+ DMB ISHLD         | MOV W9,#1         ;
+ LDR W11,[X0]      | STR W9,[X1]       ;
+ CBNZ W11,Lend0    | DMB ISHST         ;
+ MOV W9,#1         | LDR W11,[X2]      ;
+ STR W9,[X1]       | LDR W12,[X3]      ;
+ DMB ISH           | DMB ISH           ;
+ DMB ISHLD         | LDR W13,[X4]      ;
+ LDR W12,[X0]      | LDR W14,[X5]      ;
+ CBZ W12,Lend0     | CMP W13,W11       ;
+ MOV W9,#1         | B.NE L11          ;
+ SWPA W9,W13,[X2]  | MOV W9,#0         ;
+ LDR W14,[X3]      | STR W9,[X6]       ;
+ CBZ W14,Lskip0    | MOV W9,#1         ;
+ MOV W9,#1         | STR W9,[X7]       ;
+ STR W9,[X4]       | MOV W9,#1         ;
+ Lskip0:           | STR W9,[X8]       ;
+ STLR WZR,[X2]     | L11:              ;
+ Lend0:            | DMB ISHST         ;
+                   | MOV W9,#2         ;
+                   | STR W9,[X1]       ;
+                   | STLR WZR,[X0]     ;
+filter (0:X13=0 /\ 1:X10=0 /\ 0:X10=0)
+exists (0:X11=0 /\ 0:X12=0 /\ freed=1)

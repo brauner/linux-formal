@@ -1,0 +1,5 @@
+MNT-A1m-nowmb                              LKMM result: Sometimes   speedcheck=false Observation MNT-A1m-nowmb Sometimes 1 5 
+MNT-A1m-nomb-in-sum                        LKMM result: Sometimes   speedcheck=false Observation MNT-A1m-nomb-in-sum Sometimes 1 5 
+MNT-A1m-gets-first                         LKMM result: Sometimes   speedcheck=false Observation MNT-A1m-gets-first Sometimes 1 5 
+MNT-D1m-holder-wmb-only                    LKMM result: Sometimes   speedcheck=false Observation MNT-D1m-holder-wmb-only Sometimes 1 4 
+DONE 08:47:10 MNT-A1m-nowmb MNT-A1m-nomb-in-sum MNT-A1m-gets-first MNT-D1m-holder-wmb-only

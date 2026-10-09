@@ -1,0 +1,14 @@
+Test MNT-A1-holder-get-before-put Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X10=1 /\ 1:X12=1 /\ 1:X14=1)
+Observation MNT-A1-holder-get-before-put Never 0 0
+Time MNT-A1-holder-get-before-put 18.08
+Hash=757f7a96e573de51bbe2adba34eb5087
+
+
+real	0m18.095s
+user	0m18.086s
+sys	0m0.004s

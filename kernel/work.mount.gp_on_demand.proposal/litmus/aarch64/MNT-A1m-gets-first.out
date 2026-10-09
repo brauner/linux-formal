@@ -1,0 +1,16 @@
+Test MNT-A1m-gets-first Allowed
+States 1
+0:X10=1; 1:X12=1; 1:X14=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X10=1 /\ 1:X14=1 /\ 1:X12=1)
+Observation MNT-A1m-gets-first Always 1 0
+Time MNT-A1m-gets-first 17.89
+Hash=a9969b5164301c6966137e56a03b8804
+
+
+real	0m17.896s
+user	0m17.884s
+sys	0m0.012s

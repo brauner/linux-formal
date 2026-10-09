@@ -1,0 +1,63 @@
+AArch64 MNT-B2m-walker-flags-unlocked
+(* LKMM result: Sometimes; translation of litmus/MNT-B2m-walker-flags-unlocked.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:X0=seq;
+0:X1=gets_w;
+0:X2=flags;
+0:X3=puts_w;
+1:X0=mlock;
+1:X1=seq;
+1:X2=mnt_ns;
+1:X3=puts_w;
+1:X4=puts_u;
+1:X5=gets_w;
+1:X6=gets_u;
+1:X7=flags;
+1:X8=freed;
+}
+ P0              | P1                ;
+ LDR W10,[X0]    | MOV W9,#1         ;
+ DMB ISHLD       | SWPA W9,W10,[X0]  ;
+ DMB ISHLD       | MOV W9,#1         ;
+ LDR W11,[X0]    | STR W9,[X1]       ;
+ CBNZ W11,Lend0  | DMB ISHST         ;
+ MOV W9,#1       | MOV W9,#0         ;
+ STR W9,[X1]     | STR W9,[X2]       ;
+ DMB ISH         | DMB ISHST         ;
+ DMB ISHLD       | MOV W9,#2         ;
+ LDR W12,[X0]    | STR W9,[X1]       ;
+ CBZ W12,Lend0   | STLR WZR,[X0]     ;
+ LDR W13,[X2]    | MOV W9,#1         ;
+ CBZ W13,Lskip0  | SWPA W9,W11,[X0]  ;
+ MOV W9,#1       | MOV W9,#3         ;
+ STR W9,[X3]     | STR W9,[X1]       ;
+ Lskip0:         | DMB ISHST         ;
+ Lend0:          | DMB ISH           ;
+                 | LDR W12,[X3]      ;
+                 | LDR W13,[X4]      ;
+                 | DMB ISH           ;
+                 | LDR W14,[X5]      ;
+                 | LDR W15,[X6]      ;
+                 | CBNZ W14,L11      ;
+                 | MOV W9,#3         ;
+                 | STR W9,[X7]       ;
+                 | MOV W9,#1         ;
+                 | STR W9,[X8]       ;
+                 | L11:              ;
+                 | CMP W14,#1        ;
+                 | B.NE L21          ;
+                 | CMP W12,#1        ;
+                 | B.NE L21          ;
+                 | MOV W9,#3         ;
+                 | STR W9,[X7]       ;
+                 | MOV W9,#1         ;
+                 | STR W9,[X8]       ;
+                 | L21:              ;
+                 | DMB ISHST         ;
+                 | MOV W9,#4         ;
+                 | STR W9,[X1]       ;
+                 | STLR WZR,[X0]     ;
+filter (1:X10=0 /\ 1:X11=0 /\ 0:X10=0)
+exists (0:X11=0 /\ ~(0:X12=0) /\ 0:X13=0 /\ freed=1)

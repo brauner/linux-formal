@@ -1,0 +1,14 @@
+Test MNT-C1-kern-unmount-get-before-put Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X10=1 /\ 1:X11=1 /\ 1:X13=1)
+Observation MNT-C1-kern-unmount-get-before-put Never 0 0
+Time MNT-C1-kern-unmount-get-before-put 0.07
+Hash=26bf70f9f1dce794997ed5f07749a1be
+
+
+real	0m0.112s
+user	0m0.066s
+sys	0m0.016s

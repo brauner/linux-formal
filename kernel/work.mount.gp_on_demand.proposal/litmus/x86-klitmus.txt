@@ -1,0 +1,14 @@
+Observation MNT-A1-holder-get-before-put Never 0 4000000
+Observation MNT-A1m-gets-first Sometimes 21 3999979
+Observation MNT-A1m-nomb-in-sum Never 0 4000000
+Observation MNT-A1m-nowmb Never 0 4000000
+Observation MNT-B1-walker-inc-vs-peek Never 0 2103442
+Observation MNT-B1m-peek-no-outer-mb Never 0 2122844
+Observation MNT-B1m-walker-nomb Sometimes 988 2100421
+Observation MNT-B2-walker-bail-sees-doomed-lazy Never 0 2073085
+Observation MNT-B2m-walker-flags-unlocked Sometimes 646 2130850
+Observation MNT-C1-kern-unmount-get-before-put Never 0 4000000
+Observation MNT-D1-dekker-fastpath-recheck Never 0 4000000
+Observation MNT-D1m-holder-wmb-only Sometimes 4252 3995748
+Observation MNT-E1-slowpath-no-outer-mb Never 0 2096720
+Observation MNT-E2-busycheck-no-outer-mb Never 0 2123015

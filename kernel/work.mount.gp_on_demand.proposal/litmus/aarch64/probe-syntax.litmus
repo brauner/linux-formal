@@ -1,0 +1,19 @@
+AArch64 probe-syntax
+{
+0:X0=x; 0:X1=y; 0:X2=l;
+1:X0=x; 1:X1=y; 1:X2=l;
+}
+ P0                | P1                ;
+ MOV W8,#1         | SWPA W8,W9,[X2]   ;
+ SWPA W8,W9,[X2]   | LDR W10,[X1]      ;
+ MOV W10,#1        | DMB ISH           ;
+ STR W10,[X0]      | LDR W11,[X0]      ;
+ DMB ISHST         | CMP W11,#1        ;
+ STR W10,[X1]      | B.NE LC00         ;
+ LDR W12,[X1]      | MOV W12,#2        ;
+ CBZ W12,LC01      | STR W12,[X1]      ;
+ DMB ISHLD         | LC00:             ;
+ LC01:             | STLR WZR,[X2]     ;
+ STLR WZR,[X2]     |                   ;
+filter (0:X9=0 /\ 1:X9=0)
+exists (1:X10=1 /\ 1:X11=0)

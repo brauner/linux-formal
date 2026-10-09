@@ -1,0 +1,14 @@
+Test MNT-E1-slowpath-no-outer-mb Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-E1-slowpath-no-outer-mb Never 0 0
+Time MNT-E1-slowpath-no-outer-mb 684.18
+Hash=610e5497cbb3e8272e0beafe67adf34a
+
+
+real	11m43.401s
+user	11m23.844s
+sys	0m0.347s
