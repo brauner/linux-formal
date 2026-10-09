@@ -1,6 +1,6 @@
 config                         expected   result     states      time       check
-full_lazy_g0                   pass       stopped                51269367          MISMATCH
-full_lazy                      pass       stopped                49664761          MISMATCH
+full_lazy_g0                   pass       stopped                51269367          stopped, no violation
+full_lazy                      pass       stopped                49664761          stopped, no violation
 hh_kern_ba                     pass       pass       315664      23s        ok
 hh_kern                        pass       pass       315664      23s        ok
 hh_kern_no_mb_peek             pass       pass       420894      33s        ok
