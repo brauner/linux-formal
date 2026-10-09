@@ -1,0 +1,12 @@
+Test MNT-A0-peek-can-miss-fastpath-put Allowed
+States 3
+0:r0=0; 1:r1=0;
+0:r0=1; 1:r1=0;
+0:r0=1; 1:r1=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:r0=1 /\ 1:r1=0)
+Observation MNT-A0-peek-can-miss-fastpath-put Sometimes 1 2
+Time MNT-A0-peek-can-miss-fastpath-put 0.02
+Hash=67416575b137fecb9afd4f3406c284ef

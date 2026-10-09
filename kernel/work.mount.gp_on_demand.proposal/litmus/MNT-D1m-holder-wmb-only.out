@@ -1,0 +1,14 @@
+Test MNT-D1m-holder-wmb-only Allowed
+States 5
+0:r0=0; 0:r1=0; 1:r1=0;
+0:r0=1; 0:r1=0; 1:r1=0;
+0:r0=1; 0:r1=0; 1:r1=1;
+0:r0=1; 0:r1=1; 1:r1=0;
+0:r0=1; 0:r1=1; 1:r1=1;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:r0=1 /\ 0:r1=1 /\ 1:r1=0)
+Observation MNT-D1m-holder-wmb-only Sometimes 1 4
+Time MNT-D1m-holder-wmb-only 0.03
+Hash=544186b30f28aa3b5ad89650bec18ec6

@@ -1,0 +1,11 @@
+Test MNT-C2-kern-unmount-gp-fallback Allowed
+States 2
+0:r0=0; 1:r5=0;
+0:r0=1; 1:r5=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:r0=1 /\ 1:r5=0)
+Observation MNT-C2-kern-unmount-gp-fallback Never 0 3
+Time MNT-C2-kern-unmount-gp-fallback 0.04
+Hash=20dc893d021148366a3aa1619c0a8570

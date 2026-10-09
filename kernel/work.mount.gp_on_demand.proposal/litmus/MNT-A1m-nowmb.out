@@ -1,0 +1,15 @@
+Test MNT-A1m-nowmb Allowed
+States 6
+0:r0=0; 1:r1=0; 1:r3=1;
+0:r0=0; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=0; 1:r3=1;
+0:r0=1; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=1; 1:r3=1;
+0:r0=1; 1:r1=1; 1:r3=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:r0=1 /\ 1:r1=1 /\ 1:r3=1)
+Observation MNT-A1m-nowmb Sometimes 1 5
+Time MNT-A1m-nowmb 0.04
+Hash=916724e0945b475b1c85680b6368a4a7

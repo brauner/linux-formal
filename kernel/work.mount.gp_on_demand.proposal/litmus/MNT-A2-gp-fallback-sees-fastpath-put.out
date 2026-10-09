@@ -1,0 +1,11 @@
+Test MNT-A2-gp-fallback-sees-fastpath-put Allowed
+States 2
+0:r0=0; 1:r5=0;
+0:r0=1; 1:r5=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:r0=1 /\ 1:r5=0)
+Observation MNT-A2-gp-fallback-sees-fastpath-put Never 0 3
+Time MNT-A2-gp-fallback-sees-fastpath-put 0.06
+Hash=12b49bc49acd39ea36b9fd2c7ab23a1d

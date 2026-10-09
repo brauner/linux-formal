@@ -1,0 +1,22 @@
+Test MNT-B1m-peek-no-outer-mb Allowed
+States 13
+0:r1=0; 0:r2=0; [freed]=0;
+0:r1=0; 0:r2=1; [freed]=0;
+0:r1=0; 0:r2=1; [freed]=1;
+0:r1=0; 0:r2=2; [freed]=0;
+0:r1=0; 0:r2=2; [freed]=1;
+0:r1=0; 0:r2=3; [freed]=0;
+0:r1=0; 0:r2=3; [freed]=1;
+0:r1=0; 0:r2=4; [freed]=0;
+0:r1=0; 0:r2=4; [freed]=1;
+0:r1=1; 0:r2=0; [freed]=1;
+0:r1=2; 0:r2=0; [freed]=1;
+0:r1=3; 0:r2=0; [freed]=1;
+0:r1=4; 0:r2=0; [freed]=1;
+No
+Witnesses
+Positive: 0 Negative: 13
+Condition exists (0:r1=0 /\ 0:r2=0 /\ [freed]=1)
+Observation MNT-B1m-peek-no-outer-mb Never 0 13
+Time MNT-B1m-peek-no-outer-mb 0.47
+Hash=b3592d777ea3babe733c894a6ae604ba

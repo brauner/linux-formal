@@ -1,0 +1,68 @@
+C MNT-A0-peek-can-miss-fastpath-put
+
+(*
+ * Expected: Sometimes.  Not a bug: it documents why mntput_unmounted()
+ * needs its grace-period branch.  A holder on the fast path of
+ * mntput_no_expire() saw ->mnt_ns non-NULL, so its put may land after
+ * the peek under mount_lock summed the counters; the peek then reads a
+ * count of two and must wait for the holder's read-side critical
+ * section (see MNT-A2).  This outcome is allowed even under SC.
+ *
+ * P0: holder, fast path of mntput_no_expire(); gets_h=1 is its
+ *     long-lived reference, taken before the test starts.
+ * P1: umount_tree() under write_seqlock(), then the peek of
+ *     mntput_unmounted() -> mnt_get_count(): puts first, smp_mb(), gets.
+ * gets_u=1 is the mount's own reference.
+ *)
+
+{
+	mnt_ns=1;
+	gets_h=1;
+	puts_h=0;
+	gets_u=1;
+	puts_u=0;
+}
+
+P0(int *mnt_ns, int *gets_h, int *puts_h)
+{
+	int r0;
+
+	rcu_read_lock();
+	r0 = READ_ONCE(*mnt_ns);
+	if (r0) {
+		smp_wmb();
+		WRITE_ONCE(*puts_h, 1);
+	}
+	rcu_read_unlock();
+}
+
+P1(spinlock_t *mlock, int *seq, int *mnt_ns, int *gets_h, int *puts_h, int *gets_u, int *puts_u)
+{
+	int r1;
+	int r2;
+	int r3;
+	int r4;
+
+	spin_lock(mlock);
+	WRITE_ONCE(*seq, 1);
+	smp_wmb();
+	WRITE_ONCE(*mnt_ns, 0);
+	smp_wmb();
+	WRITE_ONCE(*seq, 2);
+	spin_unlock(mlock);
+
+	spin_lock(mlock);
+	WRITE_ONCE(*seq, 3);
+	smp_wmb();
+	smp_mb();
+	r1 = READ_ONCE(*puts_h);
+	r2 = READ_ONCE(*puts_u);
+	smp_mb();
+	r3 = READ_ONCE(*gets_h);
+	r4 = READ_ONCE(*gets_u);
+	smp_wmb();
+	WRITE_ONCE(*seq, 4);
+	spin_unlock(mlock);
+}
+
+exists (0:r0=1 /\ 1:r1=0)

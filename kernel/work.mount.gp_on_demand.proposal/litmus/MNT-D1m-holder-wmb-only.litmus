@@ -1,0 +1,66 @@
+C MNT-D1m-holder-wmb-only
+
+(*
+ * Expected: Never.  The alternative without any grace period: the fast
+ * path puts, smp_mb(), re-reads ->mnt_ns and falls back to mount_lock if
+ * it is NULL; the unmounter stores NULL, smp_mb() (under mount_lock),
+ * sums.  Store buffering: not both the holder staying on the fast path
+ * (both reads non-NULL) and the peek missing the put.  What the holder's
+ * slow path then does (it has already put) is protocol design, not
+ * memory ordering: model it in TLA+.
+ *)
+
+{
+	mnt_ns=1;
+	gets_h=1;
+	puts_h=0;
+	gets_u=1;
+	puts_u=0;
+}
+
+P0(int *mnt_ns, int *gets_h, int *puts_h)
+{
+	int r0;
+	int r1;
+
+	rcu_read_lock();
+	r0 = READ_ONCE(*mnt_ns);
+	if (r0) {
+		smp_wmb();
+		WRITE_ONCE(*puts_h, 1);
+		smp_wmb();
+		r1 = READ_ONCE(*mnt_ns);
+	}
+	rcu_read_unlock();
+}
+
+P1(spinlock_t *mlock, int *seq, int *mnt_ns, int *gets_h, int *puts_h, int *gets_u, int *puts_u)
+{
+	int r1;
+	int r2;
+	int r3;
+	int r4;
+
+	spin_lock(mlock);
+	WRITE_ONCE(*seq, 1);
+	smp_wmb();
+	WRITE_ONCE(*mnt_ns, 0);
+	smp_wmb();
+	WRITE_ONCE(*seq, 2);
+	spin_unlock(mlock);
+
+	spin_lock(mlock);
+	WRITE_ONCE(*seq, 3);
+	smp_wmb();
+	smp_mb();
+	r1 = READ_ONCE(*puts_h);
+	r2 = READ_ONCE(*puts_u);
+	smp_mb();
+	r3 = READ_ONCE(*gets_h);
+	r4 = READ_ONCE(*gets_u);
+	smp_wmb();
+	WRITE_ONCE(*seq, 4);
+	spin_unlock(mlock);
+}
+
+exists (0:r0=1 /\ 0:r1=1 /\ 1:r1=0)

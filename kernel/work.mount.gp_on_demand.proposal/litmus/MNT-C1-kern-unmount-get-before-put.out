@@ -1,0 +1,14 @@
+Test MNT-C1-kern-unmount-get-before-put Allowed
+States 5
+0:r0=0; 1:r1=0; 1:r3=1;
+0:r0=0; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=0; 1:r3=1;
+0:r0=1; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=1; 1:r3=2;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (0:r0=1 /\ 1:r1=1 /\ 1:r3=1)
+Observation MNT-C1-kern-unmount-get-before-put Never 0 5
+Time MNT-C1-kern-unmount-get-before-put 0.02
+Hash=d44b5562c78304d7033c5920c306b47d

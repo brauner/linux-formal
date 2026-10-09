@@ -1,0 +1,14 @@
+Test MNT-A1-holder-get-before-put Allowed
+States 5
+0:r0=0; 1:r1=0; 1:r3=1;
+0:r0=0; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=0; 1:r3=1;
+0:r0=1; 1:r1=0; 1:r3=2;
+0:r0=1; 1:r1=1; 1:r3=2;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (0:r0=1 /\ 1:r1=1 /\ 1:r3=1)
+Observation MNT-A1-holder-get-before-put Never 0 5
+Time MNT-A1-holder-get-before-put 0.03
+Hash=4cf28de03d74dcfd840eb2976573a2c8
