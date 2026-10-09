@@ -1,0 +1,64 @@
+# TLC on jens (16 workers x 8g per run, CPUs 256-511), 2026-10-09; RUNNING = still going at report time, states = distinct states so far; collect per RESUME.md
+config                         expected   result     states      time       check
+full_lazy_g0                   pass       RUNNING    12,619,166  -          RUNNING(jens tmux tlagp)
+full_lazy                      pass       RUNNING    8,058,413   -          RUNNING(jens tmux tlagp)
+hh_kern_ba                     pass       pass       315664      23s        ok
+hh_kern                        pass       pass       315664      23s        ok
+hh_kern_no_mb_peek             pass       pass       420894      33s        ok
+hh_kern_no_rcu_delay           violation  violation  573142      42s        ok
+hh_kern_prev                   pass       pass       278925      21s        ok
+hh_kern_recheck                pass       pass       447511      29s        ok
+hh_kern_recheck_weak           pass       pass       18092599    18min52s   ok
+hh_kern_weak                   pass       pass       13816768    15min32s   ok
+hh_lazy                        pass       pass       349770      29s        ok
+hh_lazy_migrate                pass       pass       14595424    19min12s   ok
+hh_lazy_weak                   pass       RUNNING    7,176,816   -          RUNNING(jens tmux tlagp)
+hh_loose                       violation  violation  24092       01s        ok
+hh_no_rcu_delay                violation  violation  607248      49s        ok
+hh_nsdeath                     pass       pass       335866      28s        ok
+hh_recheck                     pass       pass       466868      31s        ok
+hh_recheck_weak                pass       RUNNING    14,902,943  -          RUNNING(jens tmux tlagp)
+h_kern                         pass       pass       4252        02s        ok
+h_kern_witness_fast            violation  violation  923         00s        ok
+h_lazy_ba                      pass       pass       6501        02s        ok
+h_lazy                         pass       pass       5016        02s        ok
+h_nsdeath_witness_after_held   violation  violation  1447        00s        ok
+h_prev_witness_after_held      pass       pass       6083        01s        ok
+h_queue_late                   pass       pass       3907        02s        ok
+h_sync                         pass       pass       969         01s        ok
+h_sync_torn_sum                violation  violation  2886        01s        ok
+hwa_lazy_ba                    pass       pass       460732      32s        ok
+hwa_lazy                       pass       pass       302916      22s        ok
+hwa_lazy_no_mb_legit           violation  violation  38813       01s        ok
+hwa_lazy_no_mb_peek            pass       pass       362110      04s        ok
+hwa_lazy_no_mb_put             violation  violation  350742      04s        ok
+hwa_recheck                    pass       pass       388849      26s        ok
+hwa_sync                       pass       pass       23413       03s        ok
+h_witness_after_held           violation  violation  1759        01s        ok
+h_witness_fast                 violation  violation  1676        00s        ok
+hw_lazy_ba                     pass       pass       177788      13s        ok
+hw_lazy                        pass       pass       143391      11s        ok
+hw_lazy_weak                   pass       pass       1046891     01min33s   ok
+hw_nsdeath_ba                  pass       pass       172536      13s        ok
+hw_nsdeath                     pass       pass       138200      11s        ok
+hw_prev_ba                     pass       pass       176283      13s        ok
+hw_prev                        pass       pass       153739      12s        ok
+hw_queue_late                  pass       pass       127054      11s        ok
+hw_recheck                     pass       pass       232157      16s        ok
+hw_sync                        pass       pass       20923       03s        ok
+wh_lazy_ba                     pass       pass       143391      12s        ok
+wh_lazy                        pass       pass       177788      14s        ok
+wh_sync_ba                     pass       pass       20923       03s        ok
+wh_sync                        pass       pass       24473       03s        ok
+wh_sync_prev                   pass       pass       25481       04s        ok
+wh_sync_weak                   pass       pass       152120      14s        ok
+wh_witness_after_held_ba       violation  violation  22485       01s        ok
+w_lazy                         pass       pass       2033        01s        ok
+w_lazy_no_doomed_flag          violation  violation  1258        01s        ok
+w_sync_no_mb_legit             violation  violation  681         00s        ok
+ww_lazy                        pass       pass       67912       06s        ok
+ww_sync                        pass       pass       20495       03s        ok
+ww_sync_loose                  pass       pass       18427       02s        ok
+ww_sync_no_mb_peek             pass       pass       26943       01s        ok
+ww_sync_no_rcu_delay           violation  violation  24481       03s        ok
+ww_sync_recheck                violation  violation  34845       04s        ok

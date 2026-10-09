@@ -1,0 +1,360 @@
+Error: Temporal properties were violated.
+  1 <Initial predicate> pc=[WA |-> "w_start", WB |-> "w_start", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> FALSE, WB |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  2 <TaskStep>       pc=[WA |-> "w_start", WB |-> "w_lookup", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  3 <TaskStep>       pc=[WA |-> "w_lookup", WB |-> "w_lookup", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  4 <TaskStep>       pc=[WA |-> "w_lookup", WB |-> "w_lookup", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<>>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+  5 <TaskStep>       pc=[WA |-> "w_l1", WB |-> "w_lookup", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<>>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+  6 <TaskStep>       pc=[WA |-> "w_l1", WB |-> "w_l1", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<>>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+  7 <TaskStep>       pc=[WA |-> "w_l2", WB |-> "w_l1", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<>>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+  8 <TaskStep>       pc=[WA |-> "w_l2", WB |-> "w_l2", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<>>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+  9 <TaskStep>       pc=[WA |-> "w_mb", WB |-> "w_l2", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, WB |-> <<>>, U |-> <<seq=1, wmb>> ]
+ 10 <Flush>          pc=[WA |-> "w_mb", WB |-> "w_l2", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+ 11 <TaskStep>       pc=[WA |-> "w_l4", WB |-> "w_l2", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 0, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> <<>>, U |-> <<seq=1, wmb>>]
+ 12 <TaskStep>       pc=[WA |-> "w_l4", WB |-> "w_mb", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> <<seq=1, wmb>> ]
+ 13 <TaskStep>       pc=[WA |-> "w_use", WB |-> "w_mb", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> <<seq=1, wmb>> ]
+ 14 <TaskStep>       pc=[WA |-> "p_enter", WB |-> "w_mb", U |-> "u_mb"] seq=0 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> <<seq=1, wmb>> ]
+ 15 <Flush>          pc=[WA |-> "p_enter", WB |-> "w_mb", U |-> "u_mb"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> <<wmb>> ]
+ 16 <PutEnter>       pc=[WA |-> "p_fast", WB |-> "w_mb", U |-> "u_mb"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> <<wmb>> ]
+ 17 <Flush>          pc=[WA |-> "p_fast", WB |-> "w_mb", U |-> "u_mb"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 18 <TaskStep>       pc=[WA |-> "p_fast", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, WB |-> 1, U |-> 1] rcu=[WA |-> TRUE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 19 <PutFast>        pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<wmb, cntA[1]-1>>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 20 <Flush>          pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=3,0 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]-1>>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 21 <Flush>          pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 22 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -1] ci=[WA |-> 1, WB |-> 1, U |-> 2] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 23 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -1] ci=[WA |-> 1, WB |-> 1, U |-> 3] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 24 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 4] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 25 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 26 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_busy"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 27 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 28 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 2] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 29 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 3] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 30 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 4] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 31 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_sum"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 32 <TaskStep>       pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_busy"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> <<cntB[1]+1>>, U |-> << >> ]
+ 33 <Flush>          pc=[WA |-> "done", WB |-> "w_mb", U |-> "u_busy"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 34 <TaskStep>       pc=[WA |-> "done", WB |-> "w_l4", U |-> "u_busy"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 35 <TaskStep>       pc=[WA |-> "done", WB |-> "w_l4", U |-> "u_tree"] seq=1 lock="U"
+      A[HN] cnt=2,0 puts=1,0 B[HN] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 36 <TaskStep>       pc=[WA |-> "done", WB |-> "w_l4", U |-> "u_caller_drop"] seq=1 lock="U"
+      A[HNUS] cnt=2,0 puts=1,0 B[HNUS] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> << hashedB=FALSE, nsB=FALSE, hashedA=FALSE, nsA=FALSE >> ]
+ 37 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_caller_drop"] seq=1 lock="U"
+      A[HNUS] cnt=2,0 puts=1,0 B[HNUS] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 1] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> << hashedB=FALSE, nsB=FALSE, hashedA=FALSE, nsA=FALSE >> ]
+ 38 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_unlock"] seq=1 lock="U"
+      A[HNUS] cnt=2,0 puts=1,0 B[HNUS] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> << hashedB=FALSE, nsB=FALSE, hashedA=FALSE, nsA=FALSE, cntA[1]-1 >> ]
+ 39 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_nsunlock"] seq=2 lock="none"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 40 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek"] seq=2 lock="none"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 41 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_mb"] seq=2 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> << >>, U |-> <<seq=3, wmb>>]
+ 42 <Flush>          pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_mb"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> << >>, U |-> <<wmb>>]
+ 43 <Flush>          pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_mb"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="B" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 44 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+ 45 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -2] ci=[WA |-> 1, WB |-> 1, U |-> 2] cleaner=[A |-> "none", B |-> "none"]
+ 46 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -2] ci=[WA |-> 1, WB |-> 1, U |-> 3] cleaner=[A |-> "none", B |-> "none"]
+ 47 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 4] cleaner=[A |-> "none", B |-> "none"]
+ 48 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 49 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_check"] seq=3 lock="U"
+      A[US] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 50 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 51 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 2] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 52 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 3] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 53 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 4] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 54 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 55 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_check"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 56 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_peek_unlock"] seq=3 lock="U"
+      A[USD] cnt=1,0 puts=2,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A"} held={"B"} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntA[1]-1>> ]
+ 57 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_queue"] seq=4 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A"} held={"B"} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+ 58 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_gp"] seq=4 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={} held={"B"} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 59 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_held_next"] seq=4 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={} held={"B"} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 60 <TaskStep>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_enter"] seq=4 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 61 <PutEnter>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_lock"] seq=4 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 62 <PutLock>        pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_mb"] seq=4 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> << >>, U |-> <<seq=5, wmb>>]
+ 63 <Flush>          pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_mb"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> << >>, U |-> <<wmb>>]
+ 64 <Flush>          pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_mb"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 65 <PutMb>          pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_dec"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 2] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 66 <PutDec>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_sum"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 0] ci=[WA |-> 1, WB |-> 1, U |-> 1] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 67 <PutSum>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_sum"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -1] ci=[WA |-> 1, WB |-> 1, U |-> 2] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 68 <PutSum>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_sum"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> -1] ci=[WA |-> 1, WB |-> 1, U |-> 3] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 69 <PutSum>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_sum"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 4] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 70 <PutSum>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_sum"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 71 <PutSum>         pc=[WA |-> "done", WB |-> "w_lock", U |-> "p_check"] seq=5 lock="U"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=2,0 puts=0,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> TRUE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[ WA |-> << >>, WB |-> << >>, U |-> <<cntB[1]-1>> ]
+ 72 <PutCheck>       pc=[WA |-> "done", WB |-> "w_lock", U |-> "u_held_next"] seq=6 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=1,0 puts=1,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 73 <TaskStep>       pc=[WA |-> "done", WB |-> "w_flags", U |-> "u_held_next"] seq=6 lock="WB"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=1,0 puts=1,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> <<seq=7, wmb>>, U |-> <<>>]
+ 74 <TaskStep>       pc=[WA |-> "done", WB |-> "w_flags", U |-> "done"] seq=6 lock="WB"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=1,0 puts=1,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 1, U |-> 0] rcu=[WA |-> FALSE, WB |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {"WB"}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+      buf=[WA |-> << >>, WB |-> <<seq=7, wmb>>, U |-> <<>>]
+ 75 <TaskStep>       pc=[WA |-> "done", WB |-> "lost", U |-> "done"] seq=8 lock="none"
+      A[USD] cnt=0,0 puts=3,0 B[US] cnt=0,0 puts=2,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 0, U |-> 0] rcu=[WA |-> FALSE, WB |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> TRUE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 76 <RcuFree>        pc=[WA |-> "done", WB |-> "lost", U |-> "done"] seq=8 lock="none"
+      A[USDF] cnt=0,0 puts=3,0 B[US] cnt=0,0 puts=2,0 own=[A |-> FALSE, B |-> FALSE]
+      um="B" ownput=TRUE bi=2 head={} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 0, WB |-> 0, U |-> 0] rcu=[WA |-> FALSE, WB |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, WB |-> 0, U |-> 1] ci=[WA |-> 1, WB |-> 1, U |-> 5] cleaner=[A |-> "U", B |-> "none"]
+ 77 Stuttering       pc=? seq=? lock=?
+      A[] cnt=? puts=? B[] cnt=? puts=? own=?
+      um=? ownput=? bi=? head=? held=? fin=? synced=? res=?
+      refs=? rcu=? gp=? gpfree=? acc=? ci=? cleaner=?

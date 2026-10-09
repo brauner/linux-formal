@@ -1,0 +1,132 @@
+Error: Invariant DoomedIsLast is violated.
+  1 <Initial predicate> pc=[WA |-> "w_start", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, HA |-> 1, U |-> 1] rcu=[WA |-> FALSE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  2 <TaskStep>       pc=[WA |-> "w_lookup", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  3 <TaskStep>       pc=[WA |-> "w_l1", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  4 <TaskStep>       pc=[WA |-> "w_l2", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 0, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+  5 <TaskStep>       pc=[WA |-> "w_mb", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<cntA[1]+1>>, HA |-> <<>>, U |-> <<>>]
+  6 <TaskStep>       pc=[WA |-> "w_l4", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<cntA[1]+1>>, HA |-> <<>>, U |-> <<>>]
+  7 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<cntA[1]+1>>, HA |-> <<>>, U |-> <<>>]
+  8 <TaskStep>       pc=[WA |-> "w_use", HA |-> "p_enter", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<cntA[1]+1>>, HA |-> <<>>, U |-> <<>>]
+  9 <PutEnter>       pc=[WA |-> "w_use", HA |-> "p_fast", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 1, U |-> 1] rcu=[WA |-> TRUE, HA |-> TRUE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[WA |-> <<cntA[1]+1>>, HA |-> <<>>, U |-> <<>>]
+ 10 <PutFast>        pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 0, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> <<wmb, cntA[2]-1>>, U |-> <<>> ]
+ 11 <Flush>          pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,1 puts=0,0 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 0, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> <<cntA[2]-1>>, U |-> <<>> ]
+ 12 <Flush>          pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_lock"] seq=0 lock="none"
+      A[HN] cnt=2,0 puts=0,1 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 0, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<>> ]
+ 13 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_tree"] seq=0 lock="U"
+      A[HN] cnt=2,0 puts=0,1 B[HN] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res=""
+      refs=[WA |-> 1, HA |-> 0, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<seq=1, wmb>> ]
+ 14 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_caller_drop"] seq=0 lock="U"
+      A[HNU] cnt=2,0 puts=0,1 B[HNU] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 1] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << seq=1, wmb, hashedB=FALSE, nsB=FALSE, hashedA=FALSE, nsA=FALSE >> ]
+ 15 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_unlock"] seq=0 lock="U"
+      A[HNU] cnt=2,0 puts=0,1 B[HNU] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << seq=1, wmb, hashedB=FALSE, nsB=FALSE, hashedA=FALSE, nsA=FALSE, cntA[1]-1 >> ]
+ 16 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_nsunlock"] seq=2 lock="none"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<>> ]
+ 17 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek"] seq=2 lock="none"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<>> ]
+ 18 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_mb"] seq=2 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<seq=3, wmb>> ]
+ 19 <Flush>          pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_mb"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<wmb>> ]
+ 20 <Flush>          pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_mb"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="none" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 21 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 22 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> -1] ci=[WA |-> 1, HA |-> 1, U |-> 2] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 23 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> -2] ci=[WA |-> 1, HA |-> 1, U |-> 3] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 24 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 4] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 25 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 1] ci=[WA |-> 1, HA |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 26 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_check"] seq=3 lock="U"
+      A[U] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> TRUE, B |-> TRUE]
+      um="A" ownput=FALSE bi=1 head={"A", "B"} held={} fin={} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 1] ci=[WA |-> 1, HA |-> 1, U |-> 5] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> << >> ]
+ 27 <TaskStep>       pc=[WA |-> "w_use", HA |-> "h_idle", U |-> "u_peek_sum"] seq=3 lock="U"
+      A[UD] cnt=1,0 puts=1,1 B[U] cnt=1,0 puts=0,0 own=[A |-> FALSE, B |-> TRUE]
+      um="B" ownput=FALSE bi=2 head={"A", "B"} held={} fin={"A"} synced=FALSE res="ok"
+      refs=[WA |-> 1, HA |-> 0, U |-> 0] rcu=[WA |-> TRUE, HA |-> FALSE, U |-> FALSE] 130800 states generated, 38813 distinct states found, 3363 states left on queue. The depth of the complete state graph search is 28. The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 5 and the 95th percentile is 2). Checkpointing of run /tmp/brauner-tlc-gp-proposal/hwa_lazy_no_mb_legit/26-10-09-08-33-37 Checkpointing completed at (2026-10-09 08:33:38) Finished in 01s at (2026-10-09 08:33:38) gp=[on |-> FALSE, wait |-> {}] gpfree=[A |-> [on |-> FALSE, wait |-> {}], B |-> [on |-> FALSE, wait |-> {}]] acc=[WA |-> 0, HA |-> 0, U |-> 0] ci=[WA |-> 1, HA |-> 1, U |-> 1] cleaner=[A |-> "none", B |-> "none"]
+      buf=[ WA |-> <<cntA[1]+1>>, HA |-> << >>, U |-> <<cntA[1]-1>> ]
