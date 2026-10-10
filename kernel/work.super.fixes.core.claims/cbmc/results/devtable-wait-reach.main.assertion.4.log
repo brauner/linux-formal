@@ -1,0 +1,2959 @@
+# cbmc devtable.c -DNSTEPS=10 -DNDEV=2 -DCHECK_REACH=1 --unwind 11 --unwinding-assertions --bounds-check --sat-solver cadical --trace --property main.assertion.4 --slice-formula
+CBMC version 6.6.0 (cbmc-6.6.0) 64-bit x86_64 linux
+Type-checking devtable
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Starting Bounded Model Checking
+The specified solver, 'cadical', is not available. The default solver will be used instead.
+Passing problem to propositional reduction
+converting SSA
+Running propositional reduction
+SAT checker: instance is SATISFIABLE
+Building error trace
+
+** Results:
+devtable.c function main
+[main.assertion.4] line 966 reach: super_dev_next() resumes after the unborn sb dropped its claim: FAILURE
+
+Trace for main.assertion.4:
+
+State 24 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 25 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 27 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 29 file devtable.c function kzalloc_super_dev line 246 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 143 file devtable.c function super_dev_alloc line 358 thread 0
+----------------------------------------------------
+  fsd=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 166 file devtable.c function super_dev_alloc line 364 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_alloc=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 168 file devtable.c function main line 795 thread 0
+----------------------------------------------------
+  return_value_super_dev_alloc=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 177 file devtable.c function main line 795 thread 0
+----------------------------------------------------
+  S0.s_super_dev=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 796 function main
+  SBP[(signed long int)s]->s_super_dev != ((struct super_dev *)NULL)
+
+State 213 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 214 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 216 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 218 file devtable.c function kzalloc_super_dev line 246 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 253 function kzalloc_super_dev
+  e != ((struct super_dev *)NULL)
+
+State 308 file devtable.c function kzalloc_super_dev line 257 thread 0
+----------------------------------------------------
+  E1.m_used=1 (00000000 00000000 00000000 00000001)
+
+State 333 file devtable.c function kzalloc_super_dev line 262 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$kzalloc_super_dev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 335 file devtable.c function super_dev_alloc line 358 thread 0
+----------------------------------------------------
+  fsd=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 349 file devtable.c function super_dev_alloc line 362 thread 0
+----------------------------------------------------
+  E1.sd_sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 352 file devtable.c function super_dev_alloc line 363 thread 0
+----------------------------------------------------
+  r=&E1.sd_ref (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 359 file devtable.c function refcount_set line 209 thread 0
+----------------------------------------------------
+  E1.sd_ref=1 (00000000 00000000 00000000 00000001)
+
+State 361 file devtable.c function super_dev_alloc line 364 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_alloc=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 363 file devtable.c function main line 795 thread 0
+----------------------------------------------------
+  return_value_super_dev_alloc=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 372 file devtable.c function main line 795 thread 0
+----------------------------------------------------
+  S1.s_super_dev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 796 function main
+  SBP[(signed long int)s]->s_super_dev != ((struct super_dev *)NULL)
+
+State 392 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 393 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=0 (00000000 00000000 00000000 00000000)
+
+State 394 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 395 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=0 (00000000 00000000 00000000 00000000)
+
+State 396 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=1 (00000000 00000000 00000000 00000001)
+
+State 397 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=1 (00000000 00000000 00000000 00000001)
+
+State 398 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=-2147483648 (10000000 00000000 00000000 00000000)
+
+State 399 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=-2147483648 (10000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 405 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 406 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 427 file devtable.c function main line 820 thread 0
+----------------------------------------------------
+  S0.s_dev=1u (00000000 00000000 00000000 00000001)
+
+State 430 file devtable.c function main line 821 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 437 file devtable.c function super_dev_register line 416 thread 0
+----------------------------------------------------
+  fsd=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 458 file devtable.c function super_dev_register line 423 thread 0
+----------------------------------------------------
+  E0.sd_dev=1u (00000000 00000000 00000000 00000001)
+
+State 461 file devtable.c function super_dev_register line 424 thread 0
+----------------------------------------------------
+  fsd=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 464 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  fsd=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 468 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 469 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 471 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 473 file devtable.c function rhltable_insert line 279 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 494 file devtable.c function rhltable_insert line 282 thread 0
+----------------------------------------------------
+  E0.m_linked=1 (00000000 00000000 00000000 00000001)
+
+State 503 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  E0.m_seq=1 (00000000 00000000 00000000 00000001)
+
+State 505 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 515 file devtable.c function super_dev_insert line 407 thread 0
+----------------------------------------------------
+  r=&S0.s_passive (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 524 file devtable.c function refcount_inc line 215 thread 0
+----------------------------------------------------
+  S0.s_passive=2 (00000000 00000000 00000000 00000010)
+
+State 532 file devtable.c function super_dev_insert line 410 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_insert=0 (00000000 00000000 00000000 00000000)
+
+State 534 file devtable.c function super_dev_register line 424 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 536 file devtable.c function super_dev_register line 427 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_register=0 (00000000 00000000 00000000 00000000)
+
+State 538 file devtable.c function main line 821 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 542 file devtable.c function main line 831 thread 0
+----------------------------------------------------
+  sget_claim[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 543 file devtable.c function main line 831 thread 0
+----------------------------------------------------
+  sget_claim[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 550 file devtable.c function main line 832 thread 0
+----------------------------------------------------
+  S0.m_state=1 (00000000 00000000 00000000 00000001)
+
+State 599 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 601 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 602 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 611 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 655 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 657 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 658 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 675 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=0 (00000000 00000000 00000000 00000000)
+
+State 723 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 725 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 726 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 743 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 787 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 789 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 790 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 807 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=0 (00000000 00000000 00000000 00000000)
+
+State 2437 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=3 (00000000 00000000 00000000 00000011)
+
+State 2438 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=3 (00000000 00000000 00000000 00000011)
+
+State 2439 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 2440 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=0 (00000000 00000000 00000000 00000000)
+
+State 2441 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=2 (00000000 00000000 00000000 00000010)
+
+State 2442 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=2 (00000000 00000000 00000000 00000010)
+
+State 2443 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=0 (00000000 00000000 00000000 00000000)
+
+State 2444 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 2450 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2451 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2463 file devtable.c function main line 854 thread 0
+----------------------------------------------------
+  r=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 856 function main
+  reg_state[(signed long int)r] == 0
+
+Assumption:
+  file devtable.c line 857 function main
+  sb->m_state == 1
+
+State 2477 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  s=0 (00000000 00000000 00000000 00000000)
+
+State 2478 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2487 file devtable.c function pair_busy line 627 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2498 file devtable.c function pair_busy line 627 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2503 file devtable.c function pair_busy line 628 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2504 file devtable.c function pair_busy line 629 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_busy=0 (00000000 00000000 00000000 00000000)
+
+State 2506 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  return_value_pair_busy$0=0 (00000000 00000000 00000000 00000000)
+
+State 2507 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  tmp_if_expr$1=TRUE (1)
+
+Assumption:
+  file devtable.c line 858 function main
+  tmp_if_expr$1
+
+State 2511 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2512 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2515 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2516 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2521 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2524 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2651 file devtable.c function chain_after line 309 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$chain_after=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2653 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  return_value_chain_after=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2654 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$rhltable_lookup=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2656 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  it=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2659 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  sb_dev=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2662 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  ret=1 (00000000 00000000 00000000 00000001)
+
+State 2666 file devtable.c function main line 865 thread 0
+----------------------------------------------------
+  reg_sb[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 2667 file devtable.c function main line 865 thread 0
+----------------------------------------------------
+  reg_sb[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 2670 file devtable.c function main line 866 thread 0
+----------------------------------------------------
+  reg_dev[0l]=2u (00000000 00000000 00000000 00000010)
+
+State 2671 file devtable.c function main line 866 thread 0
+----------------------------------------------------
+  reg_dev[1l]=0u (00000000 00000000 00000000 00000000)
+
+State 2674 file devtable.c function main line 867 thread 0
+----------------------------------------------------
+  reg_state[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 2675 file devtable.c function main line 867 thread 0
+----------------------------------------------------
+  reg_state[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 2679 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2680 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2681 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  r=0 (00000000 00000000 00000000 00000000)
+
+State 2684 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 2685 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2691 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 2692 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 2694 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 2696 file devtable.c function kzalloc_super_dev line 246 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 253 function kzalloc_super_dev
+  e != ((struct super_dev *)NULL)
+
+State 2768 file devtable.c function kzalloc_super_dev line 254 thread 0
+----------------------------------------------------
+  E2.sd_dev=0u (00000000 00000000 00000000 00000000)
+
+State 2775 file devtable.c function kzalloc_super_dev line 255 thread 0
+----------------------------------------------------
+  E2.sd_sb=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2782 file devtable.c function kzalloc_super_dev line 256 thread 0
+----------------------------------------------------
+  E2.sd_ref=0 (00000000 00000000 00000000 00000000)
+
+State 2789 file devtable.c function kzalloc_super_dev line 257 thread 0
+----------------------------------------------------
+  E2.m_used=1 (00000000 00000000 00000000 00000001)
+
+State 2796 file devtable.c function kzalloc_super_dev line 258 thread 0
+----------------------------------------------------
+  E2.m_linked=0 (00000000 00000000 00000000 00000000)
+
+State 2803 file devtable.c function kzalloc_super_dev line 259 thread 0
+----------------------------------------------------
+  E2.m_seq=0 (00000000 00000000 00000000 00000000)
+
+State 2816 file devtable.c function kzalloc_super_dev line 262 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$kzalloc_super_dev=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2818 file devtable.c function super_dev_alloc line 358 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2826 file devtable.c function super_dev_alloc line 361 thread 0
+----------------------------------------------------
+  E2.sd_dev=2u (00000000 00000000 00000000 00000010)
+
+State 2833 file devtable.c function super_dev_alloc line 362 thread 0
+----------------------------------------------------
+  E2.sd_sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2836 file devtable.c function super_dev_alloc line 363 thread 0
+----------------------------------------------------
+  r=&E2.sd_ref (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 2843 file devtable.c function refcount_set line 209 thread 0
+----------------------------------------------------
+  E2.sd_ref=1 (00000000 00000000 00000000 00000001)
+
+State 2845 file devtable.c function super_dev_alloc line 364 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_alloc=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2847 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  sb_dev=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2851 file devtable.c function fs_bdev_register_insert line 590 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2854 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2858 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 2859 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 2861 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 2863 file devtable.c function rhltable_insert line 279 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 2884 file devtable.c function rhltable_insert line 282 thread 0
+----------------------------------------------------
+  E2.m_linked=1 (00000000 00000000 00000000 00000001)
+
+State 2887 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  seq=2 (00000000 00000000 00000000 00000010)
+
+State 2888 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  tmp_if_expr=2 (00000000 00000000 00000000 00000010)
+
+State 2895 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  E2.m_seq=2 (00000000 00000000 00000000 00000010)
+
+State 2897 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 2907 file devtable.c function super_dev_insert line 407 thread 0
+----------------------------------------------------
+  r=&S0.s_passive (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2916 file devtable.c function refcount_inc line 215 thread 0
+----------------------------------------------------
+  S0.s_passive=3 (00000000 00000000 00000000 00000011)
+
+State 2924 file devtable.c function super_dev_insert line 410 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_insert=0 (00000000 00000000 00000000 00000000)
+
+State 2926 file devtable.c function fs_bdev_register_insert line 590 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 2930 file devtable.c function fs_bdev_register_insert line 595 thread 0
+----------------------------------------------------
+  reg_row[0l]=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2931 file devtable.c function fs_bdev_register_insert line 595 thread 0
+----------------------------------------------------
+  reg_row[1l]=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2933 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 2936 file devtable.c function main line 870 thread 0
+----------------------------------------------------
+  reg_state[0l]=2 (00000000 00000000 00000000 00000010)
+
+State 2937 file devtable.c function main line 870 thread 0
+----------------------------------------------------
+  reg_state[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 2957 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2968 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2972 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 2974 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 2990 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 2992 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 2993 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 3002 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 3017 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 3028 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 3032 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 3034 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 3050 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 3052 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 3053 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 3062 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 3081 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3092 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3096 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 3098 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 3114 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 3116 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 3117 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 3134 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 3149 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3160 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3164 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 3166 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 3182 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 3184 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 3185 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 3202 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=0 (00000000 00000000 00000000 00000000)
+
+State 4169 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 4170 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=0 (00000000 00000000 00000000 00000000)
+
+State 4171 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 4172 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 4173 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=2 (00000000 00000000 00000000 00000010)
+
+State 4174 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=2 (00000000 00000000 00000000 00000010)
+
+State 4175 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=0 (00000000 00000000 00000000 00000000)
+
+State 4176 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 4182 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4183 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+Assumption:
+  file devtable.c line 819 function main
+  sb->m_state == 0
+
+State 4205 file devtable.c function main line 820 thread 0
+----------------------------------------------------
+  S1.s_dev=2u (00000000 00000000 00000000 00000010)
+
+State 4208 file devtable.c function main line 821 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4215 file devtable.c function super_dev_register line 416 thread 0
+----------------------------------------------------
+  fsd=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4236 file devtable.c function super_dev_register line 423 thread 0
+----------------------------------------------------
+  E1.sd_dev=2u (00000000 00000000 00000000 00000010)
+
+State 4239 file devtable.c function super_dev_register line 424 thread 0
+----------------------------------------------------
+  fsd=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4242 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  fsd=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4246 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 4247 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 4249 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 4251 file devtable.c function rhltable_insert line 279 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 4272 file devtable.c function rhltable_insert line 282 thread 0
+----------------------------------------------------
+  E1.m_linked=1 (00000000 00000000 00000000 00000001)
+
+State 4275 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  seq=3 (00000000 00000000 00000000 00000011)
+
+State 4276 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  tmp_if_expr=3 (00000000 00000000 00000000 00000011)
+
+State 4283 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  E1.m_seq=3 (00000000 00000000 00000000 00000011)
+
+State 4285 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 4295 file devtable.c function super_dev_insert line 407 thread 0
+----------------------------------------------------
+  r=&S1.s_passive (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4304 file devtable.c function refcount_inc line 215 thread 0
+----------------------------------------------------
+  S1.s_passive=2 (00000000 00000000 00000000 00000010)
+
+State 4312 file devtable.c function super_dev_insert line 410 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_insert=0 (00000000 00000000 00000000 00000000)
+
+State 4314 file devtable.c function super_dev_register line 424 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 4316 file devtable.c function super_dev_register line 427 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_register=0 (00000000 00000000 00000000 00000000)
+
+State 4318 file devtable.c function main line 821 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 4322 file devtable.c function main line 831 thread 0
+----------------------------------------------------
+  sget_claim[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 4323 file devtable.c function main line 831 thread 0
+----------------------------------------------------
+  sget_claim[1l]=1 (00000000 00000000 00000000 00000001)
+
+State 4330 file devtable.c function main line 832 thread 0
+----------------------------------------------------
+  S1.m_state=1 (00000000 00000000 00000000 00000001)
+
+State 4350 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4361 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4365 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4367 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4383 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4385 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4386 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 4395 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 4410 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 4421 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 4425 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 4427 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 4443 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4445 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4446 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 4455 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 4474 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4485 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4489 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4491 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4507 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 4509 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 4510 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 4527 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 4542 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4553 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4557 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4559 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 4575 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4577 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 4578 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 4587 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 4908 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=13 (00000000 00000000 00000000 00001101)
+
+State 4909 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=13 (00000000 00000000 00000000 00001101)
+
+State 4910 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 4911 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 4912 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=1 (00000000 00000000 00000000 00000001)
+
+State 4913 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=1 (00000000 00000000 00000000 00000001)
+
+State 4914 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=-2147483648 (10000000 00000000 00000000 00000000)
+
+State 4915 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=-2147483648 (10000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 4921 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 4922 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+Assumption:
+  file devtable.c line 973 function main
+  sb->m_state == 1 && !((sb->s_flags & 1ul << 29) != 0ul)
+
+State 4955 file devtable.c function main line 974 thread 0
+----------------------------------------------------
+  s=1 (00000000 00000000 00000000 00000001)
+
+State 4962 file devtable.c function sb_busy line 637 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4971 file devtable.c function sb_busy line 637 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4976 file devtable.c function sb_busy line 638 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 4977 file devtable.c function sb_busy line 639 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sb_busy=0 (00000000 00000000 00000000 00000000)
+
+State 4979 file devtable.c function main line 974 thread 0
+----------------------------------------------------
+  return_value_sb_busy$1=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 974 function main
+  !(return_value_sb_busy$1 != 0)
+
+State 4987 file devtable.c function main line 975 thread 0
+----------------------------------------------------
+  S1.s_flags=536870912ul (00000000 00000000 00000000 00000000 00100000 00000000 00000000 00000000)
+
+State 5007 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5018 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5022 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5024 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5040 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5042 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5043 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 5052 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 5067 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 5078 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 5082 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 5084 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 5100 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5102 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5103 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 5112 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 5131 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5142 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5146 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5148 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5164 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 5166 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 5167 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 5184 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 5199 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5210 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 5214 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5216 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 5232 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5234 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 5235 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 5244 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 6941 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=8 (00000000 00000000 00000000 00001000)
+
+State 6942 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=8 (00000000 00000000 00000000 00001000)
+
+State 6943 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 6944 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 6945 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=2 (00000000 00000000 00000000 00000010)
+
+State 6946 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=2 (00000000 00000000 00000000 00000010)
+
+State 6947 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=0 (00000000 00000000 00000000 00000000)
+
+State 6948 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 6954 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 6955 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+Assumption:
+  file devtable.c line 932 function main
+  cursor[(signed long int)c] == ((struct super_dev *)NULL) && !(cursor_taken[(signed long int)c] != 0)
+
+Assumption:
+  file devtable.c line 933 function main
+  cursor_wait[(signed long int)c] == ((struct super_block *)NULL) && cursor_prev[(signed long int)c] == ((struct super_dev *)NULL)
+
+State 6982 file devtable.c function main line 935 thread 0
+----------------------------------------------------
+  cursor_dev[0l]=2 (00000000 00000000 00000000 00000010)
+
+State 6985 file devtable.c function main line 936 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 6988 file devtable.c function super_dev_first line 508 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 6995 file devtable.c function super_dev_get line 475 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 6998 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 7163 file devtable.c function chain_after line 309 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$chain_after=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7165 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  return_value_chain_after=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7166 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$rhltable_lookup=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7168 file devtable.c function super_dev_get line 475 thread 0
+----------------------------------------------------
+  pos=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7170 file devtable.c function super_dev_get line 480 thread 0
+----------------------------------------------------
+  sb_dev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7177 file devtable.c function super_dev_get line 481 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7181 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7195 file devtable.c function super_flags line 347 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=TRUE (00000001)
+
+State 7197 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  return_value_super_flags$0=TRUE (00000001)
+
+State 7198 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  tmp_if_expr=TRUE (1)
+
+State 7202 file devtable.c function super_dev_get line 483 thread 0
+----------------------------------------------------
+  r=&E1.sd_ref (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 7217 file devtable.c function refcount_inc_not_zero line 222 thread 0
+----------------------------------------------------
+  E1.sd_ref=2 (00000000 00000000 00000000 00000010)
+
+State 7219 file devtable.c function super_dev_get line 483 thread 0
+----------------------------------------------------
+  return_value_refcount_inc_not_zero=TRUE (00000001)
+
+State 7221 file devtable.c function super_dev_get line 484 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_get=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7224 file devtable.c function super_dev_first line 508 thread 0
+----------------------------------------------------
+  return_value_super_dev_get=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7225 file devtable.c function super_dev_first line 508 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_first=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7227 file devtable.c function main line 936 thread 0
+----------------------------------------------------
+  return_value_super_dev_first=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7230 file devtable.c function main line 936 thread 0
+----------------------------------------------------
+  cursor[0l]=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 7271 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7282 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7286 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7288 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7304 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7306 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7307 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 7316 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 7331 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 7342 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 7346 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 7348 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 7364 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7366 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7367 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 7376 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 7395 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7406 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7410 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7412 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7428 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 7430 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 7431 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 7448 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 7463 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7474 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 7478 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7480 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 7496 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7498 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 7499 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 7508 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 9293 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=9 (00000000 00000000 00000000 00001001)
+
+State 9294 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=9 (00000000 00000000 00000000 00001001)
+
+State 9295 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 9296 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 9297 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=1 (00000000 00000000 00000000 00000001)
+
+State 9298 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=1 (00000000 00000000 00000000 00000001)
+
+State 9299 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=0 (00000000 00000000 00000000 00000000)
+
+State 9300 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 9306 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9307 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+Assumption:
+  file devtable.c line 941 function main
+  cursor[(signed long int)c] != ((struct super_dev *)NULL)
+
+State 9328 file devtable.c function main line 942 thread 0
+----------------------------------------------------
+  prev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9331 file devtable.c function cur_next line 782 thread 0
+----------------------------------------------------
+  prev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9340 file devtable.c function super_dev_next line 513 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 9341 file devtable.c function super_dev_next line 513 thread 0
+----------------------------------------------------
+  prev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9344 file devtable.c function super_dev_get line 459 thread 0
+----------------------------------------------------
+  unborn=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9368 file devtable.c function super_dev_get line 473 thread 0
+----------------------------------------------------
+  pos=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9383 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 9384 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  below=3 (00000000 00000000 00000000 00000011)
+
+State 9537 file devtable.c function chain_after line 309 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$chain_after=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9539 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  return_value_chain_after=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9540 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$rhl_next=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9542 file devtable.c function super_dev_get line 473 thread 0
+----------------------------------------------------
+  pos=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9545 file devtable.c function super_dev_get line 480 thread 0
+----------------------------------------------------
+  sb_dev=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9552 file devtable.c function super_dev_get line 481 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9556 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9570 file devtable.c function super_flags line 347 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=FALSE (00000000)
+
+State 9572 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  return_value_super_flags$0=FALSE (00000000)
+
+State 9573 file devtable.c function super_dev_get line 482 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 9577 file devtable.c function super_dev_get line 485 thread 0
+----------------------------------------------------
+  r=&S0.s_passive (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9592 file devtable.c function refcount_inc_not_zero line 222 thread 0
+----------------------------------------------------
+  S0.s_passive=4 (00000000 00000000 00000000 00000100)
+
+State 9594 file devtable.c function super_dev_get line 485 thread 0
+----------------------------------------------------
+  return_value_refcount_inc_not_zero$0=TRUE (00000001)
+
+State 9596 file devtable.c function super_dev_get line 486 thread 0
+----------------------------------------------------
+  unborn=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9602 file devtable.c function super_dev_get line 498 thread 0
+----------------------------------------------------
+  cursor_wait[0l]=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9605 file devtable.c function super_dev_next line 513 thread 0
+----------------------------------------------------
+  return_value_super_dev_get=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9606 file devtable.c function super_dev_next line 513 thread 0
+----------------------------------------------------
+  sb_dev=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9612 file devtable.c function cur_next line 782 thread 0
+----------------------------------------------------
+  return_value_super_dev_next=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9615 file devtable.c function cur_next line 782 thread 0
+----------------------------------------------------
+  cursor[0l]=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9621 file devtable.c function cur_next line 785 thread 0
+----------------------------------------------------
+  cursor_prev[0l]=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 9653 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9664 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9668 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9670 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9686 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9688 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9689 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 9698 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 9713 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 9724 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 9728 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 9730 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 9746 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9748 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9749 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 9758 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 9777 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9788 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9792 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9794 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9810 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 9812 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 9813 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 9830 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=0 (00000000 00000000 00000000 00000000)
+
+State 9845 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9856 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 9860 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9862 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 9878 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9880 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 9881 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 9890 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 10921 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=3 (00000000 00000000 00000000 00000011)
+
+State 10922 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=3 (00000000 00000000 00000000 00000011)
+
+State 10923 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 10924 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 10925 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=1 (00000000 00000000 00000000 00000001)
+
+State 10926 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=1 (00000000 00000000 00000000 00000001)
+
+State 10927 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=1073741824 (01000000 00000000 00000000 00000000)
+
+State 10928 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=1073741824 (01000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 10934 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 10935 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 10947 file devtable.c function main line 854 thread 0
+----------------------------------------------------
+  r=1 (00000000 00000000 00000000 00000001)
+
+Assumption:
+  file devtable.c line 856 function main
+  reg_state[(signed long int)r] == 0
+
+Assumption:
+  file devtable.c line 857 function main
+  sb->m_state == 1
+
+State 10961 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  s=1 (00000000 00000000 00000000 00000001)
+
+State 10962 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 10971 file devtable.c function pair_busy line 627 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 10982 file devtable.c function pair_busy line 627 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 10987 file devtable.c function pair_busy line 628 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 10988 file devtable.c function pair_busy line 629 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_busy=0 (00000000 00000000 00000000 00000000)
+
+State 10990 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  return_value_pair_busy$0=0 (00000000 00000000 00000000 00000000)
+
+State 10991 file devtable.c function main line 858 thread 0
+----------------------------------------------------
+  tmp_if_expr$1=TRUE (1)
+
+Assumption:
+  file devtable.c line 858 function main
+  tmp_if_expr$1
+
+State 10995 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 10996 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 10999 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11000 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11005 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11008 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11154 file devtable.c function chain_after line 309 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$chain_after=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11156 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  return_value_chain_after=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11157 file devtable.c function rhltable_lookup line 314 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$rhltable_lookup=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11159 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  it=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11170 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  pos=&E0 (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11185 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11186 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  below=1 (00000000 00000000 00000000 00000001)
+
+State 11320 file devtable.c function chain_after line 309 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$chain_after=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11322 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  return_value_chain_after=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11323 file devtable.c function rhl_next line 320 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$rhl_next=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11325 file devtable.c function super_dev_lookup line 549 thread 0
+----------------------------------------------------
+  it=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11330 file devtable.c function fs_bdev_register_lookup line 572 thread 0
+----------------------------------------------------
+  sb_dev=((struct super_dev *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11333 file devtable.c function main line 859 thread 0
+----------------------------------------------------
+  ret=1 (00000000 00000000 00000000 00000001)
+
+State 11337 file devtable.c function main line 865 thread 0
+----------------------------------------------------
+  reg_sb[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 11338 file devtable.c function main line 865 thread 0
+----------------------------------------------------
+  reg_sb[1l]=1 (00000000 00000000 00000000 00000001)
+
+State 11341 file devtable.c function main line 866 thread 0
+----------------------------------------------------
+  reg_dev[0l]=2u (00000000 00000000 00000000 00000010)
+
+State 11342 file devtable.c function main line 866 thread 0
+----------------------------------------------------
+  reg_dev[1l]=1u (00000000 00000000 00000000 00000001)
+
+State 11345 file devtable.c function main line 867 thread 0
+----------------------------------------------------
+  reg_state[0l]=2 (00000000 00000000 00000000 00000010)
+
+State 11346 file devtable.c function main line 867 thread 0
+----------------------------------------------------
+  reg_state[1l]=1 (00000000 00000000 00000000 00000001)
+
+State 11350 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11351 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11352 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  r=1 (00000000 00000000 00000000 00000001)
+
+State 11355 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 11356 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11362 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 11363 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 11365 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 11367 file devtable.c function kzalloc_super_dev line 246 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 253 function kzalloc_super_dev
+  e != ((struct super_dev *)NULL)
+
+State 11439 file devtable.c function kzalloc_super_dev line 254 thread 0
+----------------------------------------------------
+  E3.sd_dev=0u (00000000 00000000 00000000 00000000)
+
+State 11446 file devtable.c function kzalloc_super_dev line 255 thread 0
+----------------------------------------------------
+  E3.sd_sb=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11453 file devtable.c function kzalloc_super_dev line 256 thread 0
+----------------------------------------------------
+  E3.sd_ref=0 (00000000 00000000 00000000 00000000)
+
+State 11460 file devtable.c function kzalloc_super_dev line 257 thread 0
+----------------------------------------------------
+  E3.m_used=1 (00000000 00000000 00000000 00000001)
+
+State 11467 file devtable.c function kzalloc_super_dev line 258 thread 0
+----------------------------------------------------
+  E3.m_linked=0 (00000000 00000000 00000000 00000000)
+
+State 11474 file devtable.c function kzalloc_super_dev line 259 thread 0
+----------------------------------------------------
+  E3.m_seq=0 (00000000 00000000 00000000 00000000)
+
+State 11481 file devtable.c function kzalloc_super_dev line 260 thread 0
+----------------------------------------------------
+  E3.m_dying=0 (00000000 00000000 00000000 00000000)
+
+State 11488 file devtable.c function kzalloc_super_dev line 262 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$kzalloc_super_dev=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11490 file devtable.c function super_dev_alloc line 358 thread 0
+----------------------------------------------------
+  fsd=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11498 file devtable.c function super_dev_alloc line 361 thread 0
+----------------------------------------------------
+  E3.sd_dev=1u (00000000 00000000 00000000 00000001)
+
+State 11505 file devtable.c function super_dev_alloc line 362 thread 0
+----------------------------------------------------
+  E3.sd_sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11508 file devtable.c function super_dev_alloc line 363 thread 0
+----------------------------------------------------
+  r=&E3.sd_ref (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 11515 file devtable.c function refcount_set line 209 thread 0
+----------------------------------------------------
+  E3.sd_ref=1 (00000000 00000000 00000000 00000001)
+
+State 11517 file devtable.c function super_dev_alloc line 364 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_alloc=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11519 file devtable.c function fs_bdev_register_insert line 586 thread 0
+----------------------------------------------------
+  sb_dev=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11523 file devtable.c function fs_bdev_register_insert line 590 thread 0
+----------------------------------------------------
+  fsd=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11526 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  fsd=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11530 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 11531 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 11533 file devtable.c function alloc_fail line 238 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 11535 file devtable.c function rhltable_insert line 279 thread 0
+----------------------------------------------------
+  return_value_alloc_fail=0 (00000000 00000000 00000000 00000000)
+
+State 11556 file devtable.c function rhltable_insert line 282 thread 0
+----------------------------------------------------
+  E3.m_linked=1 (00000000 00000000 00000000 00000001)
+
+State 11559 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  seq=4 (00000000 00000000 00000000 00000100)
+
+State 11560 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  tmp_if_expr=4 (00000000 00000000 00000000 00000100)
+
+State 11567 file devtable.c function rhltable_insert line 283 thread 0
+----------------------------------------------------
+  E3.m_seq=4 (00000000 00000000 00000000 00000100)
+
+State 11569 file devtable.c function super_dev_insert line 405 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 11579 file devtable.c function super_dev_insert line 407 thread 0
+----------------------------------------------------
+  r=&S1.s_passive (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11588 file devtable.c function refcount_inc line 215 thread 0
+----------------------------------------------------
+  S1.s_passive=3 (00000000 00000000 00000000 00000011)
+
+State 11596 file devtable.c function super_dev_insert line 410 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_dev_insert=0 (00000000 00000000 00000000 00000000)
+
+State 11598 file devtable.c function fs_bdev_register_insert line 590 thread 0
+----------------------------------------------------
+  err=0 (00000000 00000000 00000000 00000000)
+
+State 11602 file devtable.c function fs_bdev_register_insert line 595 thread 0
+----------------------------------------------------
+  reg_row[0l]=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11603 file devtable.c function fs_bdev_register_insert line 595 thread 0
+----------------------------------------------------
+  reg_row[1l]=&E3 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 11605 file devtable.c function main line 869 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 11608 file devtable.c function main line 870 thread 0
+----------------------------------------------------
+  reg_state[0l]=2 (00000000 00000000 00000000 00000010)
+
+State 11609 file devtable.c function main line 870 thread 0
+----------------------------------------------------
+  reg_state[1l]=2 (00000000 00000000 00000000 00000010)
+
+State 11629 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 11640 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 11644 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 11646 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 11662 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11664 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11665 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 11674 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 11689 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 11700 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 11704 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 11706 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 11722 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11724 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11725 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 11734 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 11753 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 11764 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 11768 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 11770 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 11786 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11788 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11789 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 11798 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 11813 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 11824 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 11828 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 11830 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 11846 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11848 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 11849 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 11858 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 12182 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=4 (00000000 00000000 00000000 00000100)
+
+State 12183 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=4 (00000000 00000000 00000000 00000100)
+
+State 12184 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=1 (00000000 00000000 00000000 00000001)
+
+State 12185 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=1 (00000000 00000000 00000000 00000001)
+
+State 12186 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=2 (00000000 00000000 00000000 00000010)
+
+State 12187 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=2 (00000000 00000000 00000000 00000010)
+
+State 12188 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=0 (00000000 00000000 00000000 00000000)
+
+State 12189 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 12195 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S1 (00000110 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12196 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+State 12209 file devtable.c function main line 875 thread 0
+----------------------------------------------------
+  r=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 877 function main
+  r >= 0 && r < 2 && reg_state[(signed long int)r] != 0
+
+State 12217 file devtable.c function main line 878 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12223 file devtable.c function main line 884 thread 0
+----------------------------------------------------
+  r=0 (00000000 00000000 00000000 00000000)
+
+State 12226 file devtable.c function fs_bdev_register_check line 601 thread 0
+----------------------------------------------------
+  sb_dev=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12227 file devtable.c function fs_bdev_register_check line 606 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=TRUE (00000001)
+
+State 12231 file devtable.c function fs_bdev_register_check line 608 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12235 file devtable.c function super_dev_put line 381 thread 0
+----------------------------------------------------
+  r=&E2.sd_ref (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 12244 file devtable.c function refcount_dec_and_test line 229 thread 0
+----------------------------------------------------
+  tmp_pre=0 (00000000 00000000 00000000 00000000)
+
+State 12245 file devtable.c function refcount_dec_and_test line 229 thread 0
+----------------------------------------------------
+  E2.sd_ref=0 (00000000 00000000 00000000 00000000)
+
+State 12246 file devtable.c function refcount_dec_and_test line 229 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$refcount_dec_and_test=TRUE (00000001)
+
+State 12248 file devtable.c function super_dev_put line 381 thread 0
+----------------------------------------------------
+  return_value_refcount_dec_and_test=TRUE (00000001)
+
+State 12263 file devtable.c function super_dev_put line 383 thread 0
+----------------------------------------------------
+  E2.m_dying=1 (00000000 00000000 00000000 00000001)
+
+State 12267 file devtable.c function super_dev_put line 385 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12287 file devtable.c function super_dev_put_finish line 393 thread 0
+----------------------------------------------------
+  E2.m_dying=0 (00000000 00000000 00000000 00000000)
+
+State 12290 file devtable.c function super_dev_put_finish line 394 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12310 file devtable.c function rhltable_remove line 290 thread 0
+----------------------------------------------------
+  E2.m_linked=0 (00000000 00000000 00000000 00000000)
+
+State 12327 file devtable.c function super_dev_put_finish line 397 thread 0
+----------------------------------------------------
+  s=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12330 file devtable.c function put_super line 332 thread 0
+----------------------------------------------------
+  r=&S0.s_passive (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12339 file devtable.c function refcount_dec_and_test line 229 thread 0
+----------------------------------------------------
+  tmp_pre=3 (00000000 00000000 00000000 00000011)
+
+State 12340 file devtable.c function refcount_dec_and_test line 229 thread 0
+----------------------------------------------------
+  S0.s_passive=3 (00000000 00000000 00000000 00000011)
+
+State 12346 file devtable.c function super_dev_put_finish line 398 thread 0
+----------------------------------------------------
+  fsd=&E2 (00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12369 file devtable.c function kfree line 272 thread 0
+----------------------------------------------------
+  E2.m_used=0 (00000000 00000000 00000000 00000000)
+
+State 12375 file devtable.c function fs_bdev_register_check line 612 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fs_bdev_register_check=-16 (11111111 11111111 11111111 11110000)
+
+State 12377 file devtable.c function main line 884 thread 0
+----------------------------------------------------
+  ret=-16 (11111111 11111111 11111111 11110000)
+
+State 12381 file devtable.c function main line 887 thread 0
+----------------------------------------------------
+  reg_state[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 12382 file devtable.c function main line 887 thread 0
+----------------------------------------------------
+  reg_state[1l]=2 (00000000 00000000 00000000 00000010)
+
+State 12402 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12413 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12417 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12419 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12435 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12437 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12438 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 12447 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 12462 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12473 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12477 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12479 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12495 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 12497 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 12498 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 12518 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[0l][2l]=0 (00000000 00000000 00000000 00000000)
+
+State 12537 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12548 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 12552 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 12554 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 12570 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12572 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12573 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 12582 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][1l]=1 (00000000 00000000 00000000 00000001)
+
+State 12597 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12608 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 12612 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12614 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 12630 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12632 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 12633 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 12642 file devtable.c function track_claims line 672 thread 0
+----------------------------------------------------
+  was_claimed[1l][2l]=1 (00000000 00000000 00000000 00000001)
+
+State 12963 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=13 (00000000 00000000 00000000 00001101)
+
+State 12964 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=13 (00000000 00000000 00000000 00001101)
+
+State 12965 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 12966 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=0 (00000000 00000000 00000000 00000000)
+
+State 12967 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=2 (00000000 00000000 00000000 00000010)
+
+State 12968 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=2 (00000000 00000000 00000000 00000010)
+
+State 12969 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=3 (00000000 00000000 00000000 00000011)
+
+State 12970 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=3 (00000000 00000000 00000000 00000011)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 12976 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 12977 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=2u (00000000 00000000 00000000 00000010)
+
+Assumption:
+  file devtable.c line 973 function main
+  sb->m_state == 1 && !((sb->s_flags & 1ul << 29) != 0ul)
+
+State 13010 file devtable.c function main line 974 thread 0
+----------------------------------------------------
+  s=0 (00000000 00000000 00000000 00000000)
+
+State 13017 file devtable.c function sb_busy line 637 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13026 file devtable.c function sb_busy line 637 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13031 file devtable.c function sb_busy line 638 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13032 file devtable.c function sb_busy line 639 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sb_busy=0 (00000000 00000000 00000000 00000000)
+
+State 13034 file devtable.c function main line 974 thread 0
+----------------------------------------------------
+  return_value_sb_busy$1=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 974 function main
+  !(return_value_sb_busy$1 != 0)
+
+State 13042 file devtable.c function main line 975 thread 0
+----------------------------------------------------
+  S0.s_flags=536870912ul (00000000 00000000 00000000 00000000 00100000 00000000 00000000 00000000)
+
+State 13062 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13073 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13077 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13079 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13095 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13097 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13098 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 13121 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13132 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13136 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13138 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13154 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 13156 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=0 (00000000 00000000 00000000 00000000)
+
+State 13157 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=0 (00000000 00000000 00000000 00000000)
+
+State 13192 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13203 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 13207 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 13209 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=1 (00000000 00000000 00000000 00000001)
+
+State 13225 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13227 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13228 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 13251 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13262 file devtable.c function pair_pending line 648 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 13266 file devtable.c function pair_pending line 649 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13268 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  return_value_pair_pending=0 (00000000 00000000 00000000 00000000)
+
+State 13284 file devtable.c function pair_claimed line 655 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13286 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  return_value_pair_claimed=1 (00000000 00000000 00000000 00000001)
+
+State 13287 file devtable.c function track_claims line 666 thread 0
+----------------------------------------------------
+  now=1 (00000000 00000000 00000000 00000001)
+
+State 13572 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  return_value_nondet_int=14 (00000000 00000000 00000000 00001110)
+
+State 13573 file devtable.c function main line 801 thread 0
+----------------------------------------------------
+  op=14 (00000000 00000000 00000000 00001110)
+
+State 13574 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 13575 file devtable.c function main line 802 thread 0
+----------------------------------------------------
+  sa=0 (00000000 00000000 00000000 00000000)
+
+State 13576 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  return_value_nondet_int$1=1 (00000000 00000000 00000000 00000001)
+
+State 13577 file devtable.c function main line 803 thread 0
+----------------------------------------------------
+  da=1 (00000000 00000000 00000000 00000001)
+
+State 13578 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  return_value_nondet_int$2=8192 (00000000 00000000 00100000 00000000)
+
+State 13579 file devtable.c function main line 804 thread 0
+----------------------------------------------------
+  xa=8192 (00000000 00000000 00100000 00000000)
+
+Assumption:
+  file devtable.c line 809 function main
+  op >= 0 && op < 15
+
+Assumption:
+  file devtable.c line 810 function main
+  sa >= 0 && sa < 2
+
+Assumption:
+  file devtable.c line 811 function main
+  da >= 1 && da <= 2
+
+State 13585 file devtable.c function main line 812 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 13586 file devtable.c function main line 813 thread 0
+----------------------------------------------------
+  dev=1u (00000000 00000000 00000000 00000001)
+
+State 13605 file devtable.c function main line 950 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+Assumption:
+  file devtable.c line 951 function main
+  sb != ((struct super_block *)NULL)
+
+Assumption:
+  file devtable.c line 953 function main
+  (sb->s_flags & (1ul << 29 | 1ul << 24)) != 0ul
+
+State 13622 file devtable.c function main line 955 thread 0
+----------------------------------------------------
+  prev=&E1 (00000101 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 13625 file devtable.c function main line 956 thread 0
+----------------------------------------------------
+  sb=&S0 (00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 13626 file devtable.c function sb_idx line 200 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sb_idx=0 (00000000 00000000 00000000 00000000)
+
+State 13628 file devtable.c function main line 956 thread 0
+----------------------------------------------------
+  return_value_sb_idx$0=0 (00000000 00000000 00000000 00000000)
+
+State 13635 file devtable.c function main line 956 thread 0
+----------------------------------------------------
+  dropped=1 (00000000 00000000 00000000 00000001)
+
+Violated property:
+  file devtable.c function main line 966 thread 0
+  reach: super_dev_next() resumes after the unborn sb dropped its claim
+  !(prev != ((struct super_dev *)NULL) && dropped != 0)
+
+
+
+** 1 of 1 failed (2 iterations)
+VERIFICATION FAILED
+# exit=10 wall=65s

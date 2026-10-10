@@ -1,0 +1,68 @@
+dtwalk_no_rcu_free: violation: NoFreedReach, a cursor that read the head or a ->next before the removal reaches the entry after kfree()
+
+** Invariant NoFreedReach is violated
+  1 Initial
+  2 fs_alloc   s2: fs_alloc -> fs_set
+      E[1]={sb: s2, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s2]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  3 fs_set     s2: fs_set -> fs_setpass
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=1
+  4 fs_setpass s2: fs_setpass -> fs_open
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s2]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  5 fs_open    s2: fs_open -> R0
+      L[s2] sb=s2 dev=d2 ret=fs_bdevchk
+      bdOpen[d2]=1
+  6 R0         s2: R0 -> R1
+      L[s2] pos=1
+      rcu={s2}
+  7 R1         s2: R1 -> R2
+      L[s2] fnd=1
+  8 R2         s2: R2 -> fs_bdevchk
+      L[s2] res=ok pos=0 fnd=0
+      E[1]={sb: s2, st: linked, dev: d2, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+  9 fs_bdevchk s2: fs_bdevchk -> fs_x
+      use[s2]={d1: False, d2: True}
+ 10 fs_x       s2: fs_x -> fs_born
+ 11 fs_born    s2: fs_born -> fs_fail
+ 12 fs_fail    s2: fs_fail -> fs_relx
+      S[s2]={pass: 2, ph: nascent, act: 0, um: fs, sget: 1, own: 1}
+ 13 fs_relx    s2: fs_relx -> fs_dying
+ 14 fs_dying   s2: fs_dying -> fs_relm
+      S[s2]={pass: 2, ph: dying, act: 0, um: free, sget: 1, own: 1}
+ 15 fs_relm    s2: fs_relm -> U0
+      L[s2] ret=fs_relmput
+      use[s2]={d1: False, d2: False}
+ 16 U0         s2: U0 -> U1
+      L[s2] pos=1
+      rcu={s2}
+ 17 C_start    C1: C_start -> W0
+      L[C1] dev=d2 ret=Done ph=ugs
+ 18 W0         C1: W0 -> W1
+      L[C1] pos=1 stab={1}
+      rcu={C1,s2}
+ 19 U1         s2: U1 -> U2
+      L[s2] fnd=1
+ 20 U2         s2: U2 -> P1
+      L[s2] pret=fs_relmput pos=0 fnd=0 pe=1
+      rcu={C1}
+ 21 P1         s2: P1 -> fs_relmput
+      L[s2] pe=0
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+ 22 fs_relmput s2: fs_relmput -> fs_notify
+      bdOpen[d2]=0
+ 23 fs_notify  s2: fs_notify -> P1
+      L[s2] pret=fs_dead pe=1
+      S[s2]={pass: 2, ph: dying, act: 0, um: free, sget: 0, own: 1}
+ 24 P1         s2: P1 -> P2
+      L[C1] stab={}
+      E[1]={sb: s2, st: linked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+ 25 P2         s2: P2 -> P3
+      E[1]={sb: s2, st: unlinked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+      head[d2]=0
+ 26 P3         s2: P3 -> fs_dead
+      L[s2] pe=0
+      E[1]={sb: s2, st: freed, dev: d2, ref: 0, next: 0, gp: {}, pass: 2}
+      S[s2]={pass: 1, ph: dying, act: 0, um: free, sget: 0, own: 1}

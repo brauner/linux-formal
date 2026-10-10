@@ -1,0 +1,104 @@
+dtreadd_no_first_match: violation: NoErr, super_dev_lookup() returning the last match finds a dying older entry behind the live one
+
+** Invariant NoErr is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_set
+      E[1]={sb: s1, st: alloc, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s1]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  3 fs_set     s1: fs_set -> fs_setpass
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d1]=1
+  4 fs_setpass s1: fs_setpass -> fs_open
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  5 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 dev=d1 ret=fs_bdevchk
+      bdOpen[d1]=1
+  6 R0         s1: R0 -> R1
+      L[s1] pos=1
+      rcu={s1}
+  7 R1         
+      L[s1] pos=0 fnd=1
+  8 R1         s1: R1 -> R2
+  9 R2         s1: R2 -> fs_bdevchk
+      L[s1] res=ok fnd=0
+      E[1]={sb: s1, st: linked, dev: d1, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 10 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+ 11 fs_x       s1: fs_x -> R0
+      L[s1] dev=d2 ret=fs_xchk
+      bdOpen[d2]=1
+      xst[s1]=1
+ 12 R0         s1: R0 -> R1
+      rcu={s1}
+ 13 R1         s1: R1 -> R2
+ 14 R2         s1: R2 -> R3
+      rcu={}
+ 15 R3         s1: R3 -> R4
+      L[s1] ne=2
+      E[2]={sb: s1, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 16 R4         s1: R4 -> R5
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=2
+ 17 R5         s1: R5 -> R6
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 3, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+ 18 R6         s1: R6 -> fs_xchk
+      L[s1] ne=0
+ 19 fs_xchk    s1: fs_xchk -> fs_xdrop
+      use[s1]={d1: True, d2: True}
+ 20 fs_xdrop   s1: fs_xdrop -> U0
+      L[s1] ret=fs_xdfput
+      use[s1]={d1: True, d2: False}
+      xst[s1]=2
+ 21 D_start    D1: D_start -> R0
+      L[D1] sb=s1 dev=d2 ret=D_reg
+      bdOpen[d2]=2
+ 22 U0         s1: U0 -> U1
+      L[s1] pos=2
+      rcu={s1}
+ 23 U1         
+      L[s1] pos=0 fnd=2
+ 24 U1         s1: U1 -> U2
+ 25 R0         D1: R0 -> R1
+      L[D1] pos=2
+      rcu={D1,s1}
+ 26 U2         s1: U2 -> P1
+      L[s1] pret=fs_xdfput fnd=0 pe=2
+      rcu={D1}
+ 27 R1         
+      L[D1] pos=0 fnd=2
+ 28 P1         s1: P1 -> P2
+      E[2]={sb: s1, st: linked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+ 29 R1         D1: R1 -> R2
+ 30 R2         D1: R2 -> R3
+      L[D1] fnd=0
+      rcu={}
+ 31 R3         D1: R3 -> R4
+      L[D1] ne=3
+      E[3]={sb: s1, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 32 R4         D1: R4 -> R5
+      E[3]={sb: s1, st: linked, dev: d2, ref: 1, next: 2, gp: {}, pass: 0}
+      head[d2]=3
+ 33 R5         D1: R5 -> R6
+      E[3]={sb: s1, st: linked, dev: d2, ref: 1, next: 2, gp: {}, pass: 1}
+      S[s1]={pass: 4, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+ 34 R6         D1: R6 -> D_reg
+      L[D1] res=ok ne=0
+ 35 D_reg      D1: D_reg -> U0
+      L[D1] ret=D_fput
+ 36 U0         D1: U0 -> U1
+      L[D1] pos=3
+      rcu={D1}
+ 37 U1         
+      L[D1] pos=2 fnd=3
+ 38 U1         
+      L[D1] pos=0 fnd=2
+ 39 U1         D1: U1 -> U2
+ 40 U2         D1: U2 -> P1
+      L[D1] pret=D_fput fnd=0 pe=2
+      rcu={}
+ 41 P1         D1: P1 -> D_fput
+      L[D1] pe=0
+      err={refcount underflow: super_dev_put() of an entry at zero}

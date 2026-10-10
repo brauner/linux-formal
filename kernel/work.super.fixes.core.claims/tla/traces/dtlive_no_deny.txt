@@ -1,0 +1,79 @@
+dtlive_no_deny: violation: NoErr, without bdev_deny_freeze() the live add/remove of d2 races the freeze walk: a freeze through a refused or removed claim outlives the thaw
+
+** Invariant NoErr is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_set
+      E[1]={sb: s1, st: alloc, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s1]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  3 F_bdf      F2: F_bdf -> F_hold
+      bdc[d2]=1
+  4 fs_set     s1: fs_set -> fs_setpass
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d1]=1
+  5 fs_setpass s1: fs_setpass -> fs_open
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  6 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 dev=d1 ret=fs_bdevchk
+      bdOpen[d1]=1
+  7 F_hold     F2: F_hold -> F_frozen
+  8 F_frozen   F2: F_frozen -> F_bdt
+  9 R0         s1: R0 -> R1
+      L[s1] pos=1
+      rcu={s1}
+ 10 R1         s1: R1 -> R2
+      L[s1] fnd=1
+ 11 R2         s1: R2 -> fs_bdevchk
+      L[s1] res=ok pos=0 fnd=0
+      E[1]={sb: s1, st: linked, dev: d1, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 12 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+ 13 fs_x       s1: fs_x -> fs_born
+ 14 fs_born    s1: fs_born -> fs_live
+      S[s1]={pass: 2, ph: born, act: 1, um: free, sget: 1, own: 1}
+ 15 fs_live    s1: fs_live -> R0
+      L[s1] dev=d2 ret=fs_addchk
+      bdOpen[d2]=1
+      xst[s1]=1
+ 16 R0         s1: R0 -> R1
+      rcu={s1}
+ 17 R1         s1: R1 -> R2
+ 18 R2         s1: R2 -> R3
+      rcu={}
+ 19 R3         s1: R3 -> R4
+      L[s1] ne=2
+      E[2]={sb: s1, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 20 R4         s1: R4 -> R5
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=2
+ 21 F_bdt      F2: F_bdt -> W0
+      L[F2] dev=d2 ret=T_end ph=thw
+ 22 W0         F2: W0 -> W1
+      L[F2] pos=2 stab={2}
+      rcu={F2}
+ 23 W1         F2: W1 -> W2
+      L[F2] pos=0 nxt=2
+      E[2]={sb: s1, st: linked, dev: d2, ref: 2, next: 0, gp: {}, pass: 0}
+      rcu={}
+ 24 W2         F2: W2 -> W3
+ 25 W3         F2: W3 -> T_gas
+      L[F2] sb=s1 pin=2 nxt=0 vis={2}
+ 26 T_gas      F2: T_gas -> T_thw
+      S[s1]={pass: 2, ph: born, act: 2, um: free, sget: 1, own: 1}
+ 27 T_thw      F2: T_thw -> WN
+      L[F2] cnt=1 perr=True
+      S[s1]={pass: 2, ph: born, act: 1, um: free, sget: 1, own: 1}
+ 28 WN         F2: WN -> W1
+      L[F2] frm=True wfrom=2
+      rcu={F2}
+ 29 W1         F2: W1 -> W2
+      rcu={}
+ 30 W2         F2: W2 -> P1
+      L[F2] pret=W3 pin=0 frm=False pe=2
+ 31 P1         F2: P1 -> W3
+      L[F2] pe=0
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 32 W3         F2: W3 -> T_end
+ 33 T_end      F2: T_end -> Done
+      err={bdev_thaw() failed: the device stays frozen for good}

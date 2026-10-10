@@ -1,0 +1,98 @@
+dtmultideg_no_unborn_wait: violation: NoErr, as dtdeg_no_unborn_wait; with d1 frozen as well a thaw of d2 can take d1's freeze
+
+** Invariant NoErr is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_set
+      E[1]={sb: s1, st: alloc, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s1]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  3 fs_set     s1: fs_set -> fs_setpass
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d1]=1
+  4 fs_setpass s1: fs_setpass -> fs_open
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  5 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 dev=d1 ret=fs_bdevchk
+      bdOpen[d1]=1
+  6 R0         s1: R0 -> R1
+      L[s1] pos=1
+      rcu={s1}
+  7 R1         s1: R1 -> R2
+      L[s1] fnd=1
+  8 R2         s1: R2 -> fs_bdevchk
+      L[s1] res=ok pos=0 fnd=0
+      E[1]={sb: s1, st: linked, dev: d1, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+  9 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+ 10 F_bdf      F1: F_bdf -> F_hold
+      bdc[d1]=1
+ 11 F_hold     F1: F_hold -> W0
+      L[F1] dev=d1 ret=F_fend ph=frz
+ 12 W0         F1: W0 -> W1
+      L[F1] pos=1 stab={1}
+      rcu={F1}
+ 13 W1         F1: W1 -> W2
+      L[F1] pos=0 nxt=1
+      E[1]={sb: s1, st: linked, dev: d1, ref: 3, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 14 W2         F1: W2 -> W3
+ 15 W3         F1: W3 -> F_gas
+      L[F1] sb=s1 pin=1 nxt=0 vis={1}
+ 16 F_bdf      F2: F_bdf -> F_hold
+      bdc[d2]=1
+ 17 F_hold     F2: F_hold -> F_frozen
+ 18 fs_x       s1: fs_x -> R0
+      L[s1] dev=d2 ret=fs_xchk
+      bdOpen[d2]=1
+      xst[s1]=1
+ 19 R0         s1: R0 -> R1
+      rcu={s1}
+ 20 R1         s1: R1 -> R2
+ 21 R2         s1: R2 -> R3
+      rcu={}
+ 22 R3         s1: R3 -> R4
+      L[s1] ne=2
+      E[2]={sb: s1, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 23 R4         s1: R4 -> R5
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=2
+ 24 R5         s1: R5 -> R6
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 3, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+ 25 F_frozen   F2: F_frozen -> F_bdt
+ 26 F_bdt      F2: F_bdt -> W0
+      L[F2] dev=d2 ret=T_end ph=thw
+ 27 W0         F2: W0 -> W1
+      L[F2] pos=2 stab={2}
+      rcu={F2}
+ 28 W1         F2: W1 -> W2
+      L[F2] pos=0 nxt=2
+      E[2]={sb: s1, st: linked, dev: d2, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 29 W2         F2: W2 -> W3
+ 30 W3         F2: W3 -> T_gas
+      L[F2] sb=s1 pin=2 nxt=0 vis={2}
+ 31 R6         s1: R6 -> P1
+      L[s1] pret=fs_xchk res=busy ne=0 pe=2
+ 32 P1         s1: P1 -> fs_xchk
+      L[s1] pe=0
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+ 33 fs_xchk    s1: fs_xchk -> fs_born
+      bdOpen[d2]=0
+ 34 fs_born    s1: fs_born -> fs_live
+      S[s1]={pass: 3, ph: born, act: 1, um: free, sget: 1, own: 1}
+ 35 F_gas      F1: F_gas -> F_frz
+      S[s1]={pass: 3, ph: born, act: 2, um: free, sget: 1, own: 1}
+ 36 T_gas      F2: T_gas -> T_thw
+      S[s1]={pass: 3, ph: born, act: 3, um: free, sget: 1, own: 1}
+ 37 F_frz      F1: F_frz -> WN
+      L[F1] cnt=1
+      ucount[s1]=1
+      fvia[s1]={d1: 1, d2: 0}
+ 38 T_thw      F2: T_thw -> WN
+      L[F2] cnt=1
+      S[s1]={pass: 3, ph: born, act: 1, um: free, sget: 1, own: 1}
+      ucount[s1]=0
+      fvia[s1]={d1: 0, d2: 0}
+      err={thaw through a device took another device's freeze}
