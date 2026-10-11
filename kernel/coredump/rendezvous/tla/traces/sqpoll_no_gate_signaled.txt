@@ -47,6 +47,28 @@ State 3: <GetSignal>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
+/\ dumper = NoThread
+/\ shared = {}
+/\ release_list = {}
+/\ wqexit = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ counted = {}
+/\ pc = [m |-> "dump_start", w |-> "run", s |-> "run", n |-> "none"]
+/\ flags = [m |-> {"SIGNALED"}, w |-> {}, s |-> {}, n |-> {}]
+/\ pending = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
+/\ hist = [kill |-> FALSE, freeze_mid_dump |-> FALSE, notify_dumper |-> FALSE]
+/\ freeze = "none"
+/\ core = [active |-> FALSE, remaining |-> 0, tasks |-> {}]
+/\ released = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ group = [exit |-> FALSE, exec |-> NoThread, quick |-> 3, notify_count |-> 0]
+/\ refput = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ notify = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ sigpending = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
+State 4: <DumpStart>
+/\ dump = [written |-> 0, result |-> "none"]
+/\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
+/\ blocked = [ m |-> {},
 /\ dumper = "m"
 /\ shared = {}
 /\ release_list = {}
@@ -65,7 +87,7 @@ State 3: <GetSignal>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> TRUE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
-State 4: <GetSignal>
+State 5: <GetSignal>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -87,7 +109,7 @@ State 4: <GetSignal>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
-State 5: <WorkerQueuesCreate>
+State 6: <WorkerQueuesCreate>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -109,7 +131,7 @@ State 5: <WorkerQueuesCreate>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {"w"}, n |-> {}]
-State 6: <SqCancel>
+State 7: <SqCancel>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -131,7 +153,7 @@ State 6: <SqCancel>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {"w"}, n |-> {}]
-State 7: <CreateWorker>
+State 8: <CreateWorker>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -153,7 +175,7 @@ State 7: <CreateWorker>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
-State 8: <WorkerSeesExit>
+State 9: <WorkerSeesExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -175,7 +197,7 @@ State 8: <WorkerSeesExit>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
-State 9: <WorkerExit>
+State 10: <WorkerExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -197,7 +219,7 @@ State 9: <WorkerExit>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, s |-> FALSE, n |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, s |-> {}, n |-> {}]
-State 10: <SyncGroupExit>
+State 11: <SyncGroupExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, s |-> FALSE, n |-> TRUE]
 /\ blocked = [ m |-> {},

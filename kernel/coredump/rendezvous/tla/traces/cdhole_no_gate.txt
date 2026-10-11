@@ -87,39 +87,39 @@ State 4: <WorkerQueuesCreate>
 /\ sigpending = [m |-> TRUE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {"w"}]
-State 5: <SyncGroupExit>
+State 5: <GetSignal>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
 /\ dumper = NoThread
-/\ shared = {"CORE"}
+/\ shared = {}
 /\ release_list = {}
 /\ wqexit = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ counted = {}
-/\ pc = [m |-> "run", w |-> "run", n |-> "none", x |-> "exit_cancel"]
-/\ flags = [m |-> {}, w |-> {}, n |-> {}, x |-> {"POSTCOREDUMP"}]
+/\ pc = [m |-> "dump_start", w |-> "run", n |-> "none", x |-> "exit_sync"]
+/\ flags = [m |-> {"SIGNALED"}, w |-> {}, n |-> {}, x |-> {}]
 /\ pending = [m |-> {}, w |-> {}, n |-> {}, x |-> {}]
 /\ hist = [kill |-> FALSE, freeze_mid_dump |-> FALSE, notify_dumper |-> FALSE]
 /\ freeze = "none"
 /\ core = [active |-> FALSE, remaining |-> 0, tasks |-> {}]
 /\ released = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
-/\ group = [exit |-> FALSE, exec |-> NoThread, quick |-> 2, notify_count |-> 0]
+/\ group = [exit |-> FALSE, exec |-> NoThread, quick |-> 3, notify_count |-> 0]
 /\ refput = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ notify = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> TRUE]
-/\ sigpending = [m |-> TRUE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ sigpending = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {"w"}]
-State 6: <ExitCancel>
+State 6: <SyncGroupExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
 /\ dumper = NoThread
-/\ shared = {"CORE"}
+/\ shared = {}
 /\ release_list = {}
-/\ wqexit = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> TRUE]
+/\ wqexit = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ counted = {}
-/\ pc = [m |-> "run", w |-> "run", n |-> "none", x |-> "exit_cancel_tw"]
-/\ flags = [m |-> {}, w |-> {}, n |-> {}, x |-> {"POSTCOREDUMP"}]
+/\ pc = [m |-> "dump_start", w |-> "run", n |-> "none", x |-> "exit_cancel"]
+/\ flags = [m |-> {"SIGNALED"}, w |-> {}, n |-> {}, x |-> {"POSTCOREDUMP"}]
 /\ pending = [m |-> {}, w |-> {}, n |-> {}, x |-> {}]
 /\ hist = [kill |-> FALSE, freeze_mid_dump |-> FALSE, notify_dumper |-> FALSE]
 /\ freeze = "none"
@@ -128,10 +128,32 @@ State 6: <ExitCancel>
 /\ group = [exit |-> FALSE, exec |-> NoThread, quick |-> 2, notify_count |-> 0]
 /\ refput = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ notify = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> TRUE]
-/\ sigpending = [m |-> TRUE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ sigpending = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {"w"}]
-State 7: <GetSignal>
+State 7: <DumpStart>
+/\ dump = [written |-> 0, result |-> "none"]
+/\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ blocked = [ m |-> {},
+/\ dumper = "m"
+/\ shared = {}
+/\ release_list = {}
+/\ wqexit = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ counted = {"w"}
+/\ pc = [m |-> "dump_wait", w |-> "run", n |-> "none", x |-> "exit_cancel"]
+/\ flags = [m |-> {"SIGNALED", "DUMPCORE"}, w |-> {}, n |-> {}, x |-> {"POSTCOREDUMP"}]
+/\ pending = [m |-> {}, w |-> {"KILL"}, n |-> {}, x |-> {}]
+/\ hist = [kill |-> FALSE, freeze_mid_dump |-> FALSE, notify_dumper |-> FALSE]
+/\ freeze = "none"
+/\ core = [active |-> TRUE, remaining |-> 1, tasks |-> {}]
+/\ released = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ group = [exit |-> TRUE, exec |-> NoThread, quick |-> 2, notify_count |-> 0]
+/\ refput = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ notify = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> TRUE]
+/\ sigpending = [m |-> FALSE, w |-> TRUE, n |-> FALSE, x |-> FALSE]
+/\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
+/\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {"w"}]
+State 8: <ExitCancel>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -153,7 +175,7 @@ State 7: <GetSignal>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {"w"}]
-State 8: <CreateWorker>
+State 9: <CreateWorker>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -175,7 +197,7 @@ State 8: <CreateWorker>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {}]
-State 9: <WorkerSeesExit>
+State 10: <WorkerSeesExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -197,7 +219,7 @@ State 9: <WorkerSeesExit>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {}]
-State 10: <WorkerExit>
+State 11: <WorkerExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ blocked = [ m |-> {},
@@ -219,7 +241,7 @@ State 10: <WorkerExit>
 /\ sigpending = [m |-> FALSE, w |-> TRUE, n |-> FALSE, x |-> FALSE]
 /\ freed = [m |-> FALSE, w |-> FALSE, n |-> FALSE, x |-> FALSE]
 /\ twq = [m |-> {}, w |-> {}, n |-> {}, x |-> {}]
-State 11: <SyncGroupExit>
+State 12: <SyncGroupExit>
 /\ dump = [written |-> 0, result |-> "none"]
 /\ decremented = [m |-> FALSE, w |-> FALSE, n |-> TRUE, x |-> FALSE]
 /\ blocked = [ m |-> {},
