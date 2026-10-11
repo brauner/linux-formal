@@ -1,7 +1,8 @@
 # The device table as a hashtable
 
-Status: proposed, as modelled. work.super.dev_hash.fixups only changes a
-comment in fs/super.c and the selftest.
+Status: proposed, as modelled. The two fixups on work.super.dev_hash
+since de417b144a46 only change a comment in fs/super.c and the
+selftest.
 
 | method | directory |
 |---|---|
