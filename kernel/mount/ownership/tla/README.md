@@ -1,22 +1,26 @@
 # TLA+ model of the ownership of unmounted mounts
 
-Tree: master at 50d05c7c76c9 (v7.3-rc3) plus the revert of put_mnt_ns() to
-`umount_tree(ns->root, 0)` (2e2142a35d80 in vfs.fixes since), with three
-unmerged answers to the reference count cycle Michael Vogt reported as
-switches: the tombstone mechanism of work.put_mnt_ns.tombstone (the design
-that became work.mount.knullfs, modelled as it stood on 2026-09-21: two
-references at conversion, the release visit ending in mntput()), the
-pinner rule of work.mount.pins, and the internal-clone rule of
-work.mount.private_clone.  None of the three is in mainline; the current
-form of the first is modelled precisely in `kernel/mount/vacant/`.  The
-mainline models are in `kernel/mount/core/`, whose conventions this directory
-follows.
+Tree: master at 50d05c7c76c9 (v7.3-rc3) plus the revert of put_mnt_ns()
+to `umount_tree(ns->root, 0)` (2e2142a35d80 in vfs.fixes since), with
+four answers to the reference count cycle Michael Vogt reported as
+switches: the tombstone mechanism of work.put_mnt_ns.tombstone (the
+design that became work.mount.knullfs, modelled as it stood on
+2026-09-21: two references at conversion, the release visit ending in
+mntput()), the pinner rule of work.mount.pins, the internal-clone rule
+of work.mount.private_clone, and the covers of "namespace: rework
+connected mounts" (01cbebb42070) as they are in master at a5ebb76233b7.
+The covers are the one mainline took, in vfs-7.3-rc7.fixes; the cover
+itself, the lookup that finds it and its lifetime are modelled in
+`kernel/mount/covers/`.  None of the other three is in mainline; the
+current form of the first is modelled precisely in
+`kernel/mount/vacant/`.  The mainline models are in
+`kernel/mount/core/`, whose conventions this directory follows.
 
 ## Files
 
 | File | What it is |
 |------|------------|
-| `MntOwn.tla`, `MC_mntown.tla` | Family B: who owns an unmounted mount. A namespace's tree of mounts on superblocks that may pin a mount through a file they keep open (a loop device's backing file, an ecryptfs lower path); umount_tree() with disconnect_mount() for umount(2) with MNT_DETACH, a synchronous umount, put_mnt_ns() and __detach_mounts(); namespace_unlock()'s puts, mntput_no_expire_slowpath()'s cascade over stuck children, cleanup_mnt(), deactivate_super() releasing the pin; the tombstone mechanism of work.put_mnt_ns.tombstone, the pinner rule of work.mount.pins and the internal-clone rule of work.mount.private_clone as switches. The layout is the loop topology of Michael Vogt's report plus an image inside the image and a subtree under a directory that gets removed |
+| `MntOwn.tla`, `MC_mntown.tla` | Family B: who owns an unmounted mount. A namespace's tree of mounts on superblocks that may pin a mount through a file they keep open (a loop device's backing file, an ecryptfs lower path); umount_tree() with disconnect_mount() for umount(2) with MNT_DETACH, a synchronous umount, put_mnt_ns() and __detach_mounts(); namespace_unlock()'s puts, mntput_no_expire_slowpath()'s cascade over stuck children, cleanup_mnt(), deactivate_super() releasing the pin; the tombstone mechanism of work.put_mnt_ns.tombstone, the pinner rule of work.mount.pins, the internal-clone rule of work.mount.private_clone and mainline's covers as switches. The layout is the loop topology of Michael Vogt's report plus an image inside the image and a subtree under a directory that gets removed |
 | `*.cfg` | TLC configurations from `gen-cfgs.py`; the header says what to expect |
 | `check.sh` | run one configuration (`TLA2TOOLS` must point at tla2tools.jar) |
 
@@ -29,6 +33,7 @@ follows.
 | `FIX_DISOWN` | the tombstone mechanism is absent, as upstream: a connected dead child is owned by its parent, so a child superblock that pins an ancestor holds the ancestor's count above zero for good; with the fix every victim keeps its own reference, the unmounted list is put in tree order, a mount that loses its last reference while attached becomes a tombstone owned by the parent |
 | `FIX_INTERNAL_CLONE` | the rule of work.mount.private_clone: a kernel holder keeps its file on an internal clone of the mount, mnt_clone_internal()'s private MNT_INTERNAL mount in no namespace with no parent, no children and the file's single reference; so a pin is a reference on the superblock the file lives on (the clone's s_active) and never on a mount; the clone is folded into that superblock's active count and goes when the pinning superblock releases the file, cleanup_mnt() running synchronously for MNT_INTERNAL |
 | `PIN_BUSY` | with the clone, a synchronous umount of a pinned mount still fails with EBUSY, the loop driver's busy fs_pin in that series; off, the mount goes and its filesystem lives on through the clone |
+| `FIX_COVER` | the covers are absent, as before 01cbebb42070: a victim that needs to keep its mountpoint covered stays attached to its parent; with them every victim is detached and put by namespace_unlock(), one that would have stayed attached leaves a cover on its parent first, the cover holds no reference, and the parent's final put drops it; nothing stays attached to an unmounted mount |
 | `SELF_PIN` | `ANY_PIN` may place a holder's file on a mount of the holder's own filesystem; off for the residual witnesses, whose counterexample is then a cycle of two filesystems |
 
 What is checked: `NoUAF` (nothing freed is still pointed at), `Reaped`
@@ -38,7 +43,10 @@ holds its own reference unless it is a tombstone), `TombOK`, `TombLeaf`
 (a tombstone is a superblock-less leaf), `LeaksAreCycles` (whatever
 survives once everything external is gone is rooted in a cycle of pins),
 `MountsReaped` and `SbLeaksAreCycles` (with the clone: every mount is
-freed and only cycles of superblocks survive).
+freed and only cycles of superblocks survive), `NothingAttached` and
+`CoversOK` (with the covers: no unmounted mount has a child attached,
+and only an unmounted mount that is neither doomed nor freed carries
+covers).  The witness `NoCoverLeft` shows that covers are left at all.
 
 ## Running
 
@@ -70,6 +78,31 @@ leave the namespace, holders close, and the model asks at the end
 | `mntown_clone`, `mntown_clone_locked`, `mntown_clone_connected`, `mntown_clone_busy` | pass, 1980, 1884, 2001 and 1980 states | the internal-clone rule on the report's layout with every entry point available, the revert or put_mnt_ns() connected (which is also dissolve_on_fput()'s teardown), locked children or not, the loop driver's busy pin on or off: `Reaped` holds, every mount is freed and every superblock is down. No mount is ever pinned, so A's count reaches zero as soon as its namespace and its holder are gone, its cascade puts L, L's cleanup takes the loop superblock down, the loop device releases its file, the clone's final put deactivates A's superblock |
 | `mntown_clone_anypin`, `mntown_clone_anypin_locked`, `mntown_clone_anypin_connected`, `mntown_clone_anypin_busy` | pass, 679140, 620830, 686343 and 679140 states | every way the three pinning superblocks can hold a file on a mount, self-pins and mutual pins included, every entry point: `MountsReaped` holds, every mount is freed whatever the pins, and `SbLeaksAreCycles` holds, a superblock that survives is kept by a cycle of superblocks each holding a file on another's filesystem, or by what such a cycle keeps |
 | `mntown_clone_anypin_reaped` | `Reaped` violated, 427307 states | the residual class with the clone, self-pins excluded: two filesystems each holding a file on the other, the loop image inside the filesystem whose fuse server's backing file is on the loop mount; every mount is freed in the counterexample, only the two superblocks stay, and no mount teardown can see through a loop device or a fuse server to know that those files are pins |
+
+### MntOwn with the covers (jens, 2026-10-11)
+
+The same layout with `FIX_COVER` and without the tombstones.  The
+earlier configurations were rerun with `FIX_COVER = FALSE` and
+reproduce the counts above.
+
+| Configuration | Result | Meaning |
+|---------------|--------|---------|
+| `mntown_cover`, `mntown_cover_locked`, `mntown_cover_connected` | pass, 1822, 1774 and 2090 states | the reported layout with every entry point, locked children or not, put_mnt_ns() connected or not: every mount is freed and every superblock is down, nothing stays attached to an unmounted mount, and a cover goes with its parent |
+| `mntown_cover_anypin`, `mntown_cover_anypin_locked`, `mntown_cover_anypin_connected` | pass, 467,704, 456,296 and 543,318 states | all 343 pin configurations: `LeaksAreCycles` holds, whatever survives is rooted in a cycle of pins, as with the tombstones |
+| `mntown_cover_anypin_reaped` | `Reaped` violated | the residual class, self-pins excluded: a ring of three filesystems each holding a file on the next one's mount, as in the tombstones' counterexample |
+| `mntown_cover_witness` | `NoCoverLeft` violated | a locked child of a lazily unmounted mount leaves a cover |
+
+Why the covers generalise.  With them the kernel-internal references
+are: a mount holds its superblock and a superblock holds the mounts its
+open files live on.  There is no ownership edge between mounts at all:
+every victim of umount_tree() is detached and keeps its own reference
+until namespace_unlock() drops it, and a cover holds no reference on any
+mount.  It keeps a mountpoint, a dentry of the parent's filesystem, and
+the parent's final put drops it before cleanup_mnt() lets go of that
+filesystem.  So the argument for the tombstones below goes through
+without the tombstone edge: a mount that never dies is pinned by a
+superblock of a mount that never dies, and the chain closes in a cycle
+of pins.
 
 Why the bounded runs generalise.  After the series the kernel-internal
 references between these objects are: a mount holds its superblock, a

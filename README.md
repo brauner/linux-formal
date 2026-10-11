@@ -83,7 +83,7 @@ Mounts, [`kernel/mount/`](kernel/mount/):
 | Model | What it models | Methods | Status |
 |---|---|---|---|
 | [`core/`](kernel/mount/core/) | the mount code: the propagation algebra against the documentation, a mount's reference count, the RCU path walk, do_lock_mount(), WRITE_HOLD and the lifetime of a mount namespace | TLA+ | mainline, at v7.3-rc3 |
-| [`ownership/`](kernel/mount/ownership/) | who owns an unmounted mount: the reference count cycle a loop device can close, and three answers to it compared | TLA+ | mainline, at v7.3-rc3; the answers not merged |
+| [`ownership/`](kernel/mount/ownership/) | who owns an unmounted mount: the reference count cycle a loop device can close, and four answers to it compared | TLA+ | mainline, at v7.3-rc3; three of the answers not merged |
 | [`covers/`](kernel/mount/covers/) | mainline's answer: the cover an unmounted mount leaves on its unmounted parent instead of staying attached, and the lookups that find it | TLA+ | mainline |
 | [`shrink-submounts/`](kernel/mount/shrink-submounts/) | shrink_submounts() taking the automounts below a mount down during a synchronous umount | TLA+ | mainline |
 | [`vacant/`](kernel/mount/vacant/) | the vacant-mount series: unmounted mounts keep their own reference and are vacated in place | TLA+ | not merged |
@@ -116,8 +116,8 @@ finding. In short:
 - **Mount ownership**: the reference count cycle Michael Vogt reported,
   and two more ways to close it that the revert of 0342482a4d15 doesn't
   cover, one of them reproduced on a running kernel. With mainline's
-  covers a lookup on a dead parent still never shows what a locked
-  mount covered.
+  covers only cycles of pins survive, and a lookup on a dead parent
+  still never shows what a locked mount covered.
   [`kernel/mount/ownership/`](kernel/mount/ownership/),
   [`kernel/mount/covers/`](kernel/mount/covers/)
 - **shrink_submounts()**: checking every shrinkable submount before

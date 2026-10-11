@@ -61,6 +61,15 @@
 (*   PIN_BUSY                   with the clone, a synchronous umount of a   *)
 (*                              pinned mount still fails with EBUSY (the    *)
 (*                              loop driver's busy fs_pin in that series)   *)
+(*   FIX_COVER                  mainline since 01cbebb42070 ("namespace:    *)
+(*                              rework connected mounts"): umount_tree()    *)
+(*                              detaches every victim and puts it on the    *)
+(*                              unmounted list; one that would have stayed  *)
+(*                              connected leaves a cover on its parent      *)
+(*                              instead (leave_cover()), which holds no     *)
+(*                              reference and is dropped by the parent's    *)
+(*                              final put; nothing stays attached to an     *)
+(*                              unmounted mount                             *)
 (***************************************************************************)
 EXTENDS Naturals, Integers, Sequences, FiniteSets
 CONSTANTS
@@ -83,6 +92,7 @@ CONSTANTS
     PINNERS_REEXAMINE,        \* ... and also every mount left connected by an earlier umount_tree()
     FIX_INTERNAL_CLONE,       \* holders keep their files on internal clones: pins are on superblocks
     PIN_BUSY,                 \* ... and a synchronous umount of a pinned mount is still busy
+    FIX_COVER,                \* mainline: victims are detached, covers are left on unmounted parents
     ANY_PIN,        \* let the pinning superblocks pin any mount, or none: every configuration
     SELF_PIN,       \* ... including a mount of the pinning superblock's own filesystem
     PinnerSbs       \* the superblocks that can pin a mount when ANY_PIN
@@ -141,7 +151,7 @@ Put(st, m) ==
                         IF x = m
                         THEN IF tomb THEN [t[x] EXCEPT !.count = 2, !.tomb = TRUE, !.release = TRUE, !.stuck = stuck,
                                                        !.sb = NullSb, !.oldsb = t[x].sb]
-                             ELSE [t[x] EXCEPT !.count = 0, !.doomed = TRUE, !.stuck = stuck]
+                             ELSE [t[x] EXCEPT !.count = 0, !.doomed = TRUE, !.stuck = stuck, !.covers = {}]
                         ELSE IF x \in kids THEN [t[x] EXCEPT !.attached = FALSE, !.parent = NoMnt]
                         ELSE t[x]]
             IN [st EXCEPT !.mt = t1, !.cleanq = st.cleanq \cup {m}]
@@ -203,14 +213,19 @@ Disconnect(t, sbs0, p, how) ==
 \* one victim: out of the namespace, disconnected or left attached; the
 \* unmounted list gets the disconnected ones (LIFO, as hlist_add_head()
 \* builds it), or every victim in tree order with FIX_DISOWN
+\* With FIX_COVER every victim is detached and listed; one that would have
+\* stayed connected (needs_cover()) leaves its cover on the parent first
 UmountOne(st, p, how) ==
     LET t == st.mt
         disc == Disconnect(t, st.sbs, p, how)
+        detach == disc \/ FIX_COVER
+        cover == FIX_COVER /\ ~disc
         t1 == [t EXCEPT ![p].umount = TRUE, ![p].ns = FALSE,
-                        ![p].attached = IF disc THEN FALSE ELSE t[p].attached,
-                        ![p].parent = IF disc THEN NoMnt ELSE t[p].parent]
-        listed == IF FIX_DISOWN THEN TRUE ELSE disc
-    IN [st EXCEPT !.mt = t1, !.unm = IF listed THEN st.unm \o <<p>> ELSE st.unm]
+                        ![p].attached = IF detach THEN FALSE ELSE t[p].attached,
+                        ![p].parent = IF detach THEN NoMnt ELSE t[p].parent]
+        t2 == IF cover THEN [t1 EXCEPT ![t[p].parent].covers = @ \cup {p}] ELSE t1
+        listed == IF FIX_DISOWN \/ FIX_COVER THEN TRUE ELSE disc
+    IN [st EXCEPT !.mt = t2, !.unm = IF listed THEN st.unm \o <<p>> ELSE st.unm]
 RECURSIVE UmountEach(_, _, _)
 UmountEach(st, s, how) == IF s = <<>> THEN st ELSE UmountEach(UmountOne(st, Head(s), how), Tail(s), how)
 \* a mount an earlier umount_tree() left connected under its dead parent
@@ -309,7 +324,7 @@ Init ==
               [parent |-> Parent[m], attached |-> TRUE, umount |-> FALSE, ns |-> TRUE,
                count |-> 1 + ExtRefs[m] + (IF FIX_INTERNAL_CLONE THEN 0 ELSE Cardinality({s \in SbIds : pin[s] = m})),
                doomed |-> FALSE, tomb |-> FALSE, release |-> FALSE, sb |-> Sb[m], oldsb |-> NullSb,
-               locked |-> m \in Locked, stuck |-> {}, freed |-> FALSE]]
+               locked |-> m \in Locked, stuck |-> {}, covers |-> {}, freed |-> FALSE]]
     /\ sbs = [s \in SbIds |-> [active |-> Cardinality({m \in MntIds : Sb[m] = s})
                                           + (IF FIX_INTERNAL_CLONE
                                              THEN Cardinality({t \in SbIds : pin[t] # NoMnt /\ Sb[pin[t]] = s})
@@ -376,6 +391,16 @@ KeptFrom(S) == LET N == S \cup {x \in Alive : \E y \in S : Keeps(y, x)}
 \* those own.  Nothing survives through the ownership of an attached
 \* unmounted mount by itself
 LeaksAreCycles == Settled => \A m \in Alive : \E S \in SUBSET Alive : PinCycle(S) /\ m \in KeptFrom(S)
+
+\* with covers nothing stays attached to an unmounted mount (the
+\* VFS_WARN_ON_ONCE() in mntput_no_expire_slowpath()), only an unmounted
+\* mount carries covers, and its final put drops them
+NothingAttached == FIX_COVER =>
+    \A m \in Alive : mt[m].umount => (~mt[m].attached /\ Children(m) = {})
+CoversOK == FIX_COVER =>
+    \A m \in MntIds : (mt[m].covers # {} => (mt[m].umount /\ ~mt[m].doomed /\ ~mt[m].freed))
+\* witness: a cover is left behind
+NoCoverLeft == \A m \in MntIds : mt[m].covers = {}
 
 \* with the clone nothing in the kernel holds a mount's count once its
 \* namespace and its holders are gone: every mount is freed, whatever the

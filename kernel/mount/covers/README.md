@@ -24,15 +24,21 @@ anything else. The parent's final mntput() and __detach_mounts() on the
 covered dentry drop the cover under mount_lock and free it with
 kfree_rcu().
 
-The model, `MntCover`, is the cover itself: path walks that look a
-mountpoint up on an unmounted parent, one read per step, against
-umount_tree(), the drops, the final puts, cleanup_mnt() and RCU.
+Two models look at it:
+
+- `MntCover` is the cover itself: path walks that look a mountpoint up
+  on an unmounted parent, one read per step, against umount_tree(), the
+  drops, the final puts, cleanup_mnt() and RCU.
+- `MntOwn` in [`kernel/mount/ownership/`](../ownership/) has the covers
+  as a fourth answer to the reference count cycle, the one mainline
+  took (`FIX_COVER`).
 
 Tree: master at a5ebb76233b7 (v7.3-rc6-386).
 
 | Method | Directory | What it covers |
 |---|---|---|
 | TLA+ (TLC) | [`tla/`](tla/README.md) | `MntCover`: umount2(MNT_DETACH), rmdir of a mountpoint and the death of a namespace against path walks from a file on the unmounted parent, the final puts, cleanup_mnt() and RCU |
+| TLA+ (TLC) | [`../ownership/tla/`](../ownership/tla/README.md) | `MntOwn` with `FIX_COVER`: who owns an unmounted mount once covers exist |
 
 ## Results
 
@@ -56,5 +62,9 @@ Tree: master at a5ebb76233b7 (v7.3-rc6-386).
 - An unlocked child of a lazily unmounted mount or of a dead namespace
   leaves no cover, and the walk lands on its mountpoint. That's what a
   lazy umount always did and the series doesn't change it.
+- With covers, every mount on the reported layout is freed, and on all
+  343 pin configurations of `MntOwn` the only survivors are cycles of
+  pins, as with the tombstones. Filesystems that hold files on each
+  other's mounts still survive. No mount teardown can see those pins.
 
 Every configuration finishes in seconds.
