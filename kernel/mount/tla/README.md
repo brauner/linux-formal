@@ -18,21 +18,22 @@ live next to this directory: `kernel/work.mount.knullfs.4/` (the vacant-mount
 series) and `kernel/mount-ownership/` (the three answers to the ownership
 cycle compared against each other).
 
-Two families of models, as in `~/notes/work.tla.mount/PLAN.md`:
+Two families of models:
 
-* **Family A, the propagation algebra** (this directory so far): one
-  sequential state machine, one syscall per step, because every change to
-  the tree runs under `namespace_sem`.  The algorithms of fs/pnode.c and
-  the tree surgery of fs/namespace.c are transcribed as functions with
-  the kernel's traversal orders, list insertion sides and marks; every
-  step compares the result with a declarative specification and with the
+* **Family A, the propagation algebra**: one sequential state machine,
+  one syscall per step, because every change to the tree runs under
+  `namespace_sem`.  The algorithms of fs/pnode.c and the tree surgery of
+  fs/namespace.c are transcribed as functions with the kernel's
+  traversal orders, list insertion sides and marks; every step compares
+  the result with a declarative specification and with the
   documentation, and the states the walks of an unprivileged process can
   reach are checked against what MNT_LOCKED mounts hid from it.
-* **Family B, the lockless protocols**: `MntPut.tla` so far, the
-  reference count of one mount under __legitimize_mnt(), do_umount() and
-  the final mntput(), with per-CPU counters and TSO store buffers.  RCU
-  path walk vs. tree changes, lock_mount, WRITE_HOLD and namespace
-  lifetime are still to come.
+* **Family B, the lockless protocols**: `MntPut.tla`, the reference
+  count of one mount under __legitimize_mnt(), do_umount() and the final
+  mntput(), with per-CPU counters and store buffers; `MountWalk.tla`,
+  the RCU path walk against tree changes; `LockMount.tla`,
+  do_lock_mount() against rmdir and d_invalidate(); `MntWriters.tla`,
+  WRITE_HOLD; `MntNs.tla`, the lifetime of a mount namespace.
 
 ## Files
 
