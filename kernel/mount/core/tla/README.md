@@ -13,10 +13,12 @@ yet: `FIX_CLONE_UNBINDABLE` (F1), `FIX_SET_GROUP_UNBINDABLE` (F4),
 configurations run with the first three on; with them off the models
 describe mainline as it is, and `small_clone_unbindable`,
 `locked_set_group_unbindable`, `locked_busy_victims` and
-`mntput_torn_sum` show the four bugs there.  Models of unmerged series
+`mntput_torn_sum` show the four bugs there.  Models of other series
 live next to this directory: `kernel/mount/vacant/` (the vacant-mount
-series) and `kernel/mount/ownership/` (the three answers to the ownership
-cycle compared against each other).
+series, not merged), `kernel/mount/ownership/` (the three answers to the
+ownership cycle compared against each other) and `kernel/mount/covers/`
+(the answer mainline took, which replaced connected mounts after these
+models ran).
 
 Two families of models:
 

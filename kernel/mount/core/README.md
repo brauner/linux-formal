@@ -3,7 +3,9 @@
 Status: mainline, modelled at v7.3-rc3. The fixes for F1, F2, F4 and F5
 below are in mainline since vfs-7.3-rc7.fixes. The mount code has
 changed since the models ran, most of all with "namespace: rework
-connected mounts" (01cbebb42070), which isn't modelled.
+connected mounts" (01cbebb42070). umount_tree() here still leaves
+connected mounts attached. The covers that replaced them are modelled
+in [`kernel/mount/covers/`](../covers/).
 
 Models of the mount code as it is in mainline. They come in two
 families. The first is the propagation algebra: fs/pnode.c and the tree

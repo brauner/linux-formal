@@ -1,7 +1,7 @@
 # The vacant-mount series
 
 Status: not merged. Mainline took "namespace: rework connected mounts"
-(01cbebb42070) instead, see [`kernel/mount/ownership/`](../ownership/).
+(01cbebb42070) instead, see [`kernel/mount/covers/`](../covers/).
 knullfs itself went in on its own with "namespace: keep the private
 nullfs instance in knullfs" (4209cd7f546b).
 
