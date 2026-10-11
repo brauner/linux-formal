@@ -1,11 +1,31 @@
-# work.mount.gp_on_demand.proposal: the grace period on demand
+# The grace period on demand, as proposed
 
-The series that lets namespace_unlock() finish an unmounted mount off
-without a grace period when the count under mount_lock is one (branch
-`work.mount.gp_on_demand.proposal`, on vfs-7.4.mount c947dc6ab4f4), checked
-five ways. Each directory pins the tree it was run against.
+Status: proposed, not applied. The branch has been rebased onto mainline
+and reworked since the models ran. It now also drops the three outer
+smp_mb() calls, as [`BARRIERS.md`](BARRIERS.md) argues, and carries the
+litmus tests for Documentation/litmus-tests/.
 
-| method | directory | what it covers |
+The series that lets the VFS finish unmounted mounts off without waiting
+for an RCU grace period when nothing else holds them, as proposed on
+vfs-7.4.mount. umount_tree() hands namespace_unlock() a batch of mounts,
+and mntput_unmounted() walks the batch under a single hold of
+mount_lock. Every mount whose count is one is finished off right there.
+The held ones are put after one grace period. do_umount() drops the
+caller's reference inside the write section, and kern_unmount_array()
+feeds its mounts through the same path.
+
+The protocol rests on lockless counting, so it was checked five ways:
+the protocol itself in TLA+, the barrier pairings in the kernel's memory
+model, the same pairings under the AArch64 and POWER models and on x86
+hardware, the C functions under two bounded model checkers, and real
+kernel traces against the TLA+ model.
+
+Tree: work.mount.gp_on_demand.proposal at 4379d47fd314 on vfs-7.4.mount
+c947dc6ab4f4. Each directory pins the tree it was run against. The
+first shapes of the series, one mount at a time, are in
+[`kernel/mount/gp-on-demand/`](../gp-on-demand/).
+
+| Method | Directory | What it covers |
 |---|---|---|
 | TLA+ model (TLC) | [`tla/`](tla/README.md) | two mounts unmounted as one batch, umount(2)/namespace death/kern_unmount_array(), holders, migrating holders, walkers, weakly ordered stores; 62 configurations |
 | LKMM litmus tests (herd7), the same under the AArch64 and POWER models, klitmus7 on x86 | [`litmus/`](litmus/README.md) | the barrier pairings: holder get before put, walker increment against the seqcount, bail-out under MNT_DOOMED, kern_unmount's plain store, the grace period fallback, the Dekker alternative, the tree's shapes without the outer smp_mb()s; `upstream/` generates the Documentation/litmus-tests/ patch |
@@ -13,5 +33,41 @@ five ways. Each directory pins the tree it was run against.
 | CBMC (bounded model checking of the C functions) | [`cbmc/`](cbmc/README.md) | verbatim copies of the functions with per-CPU counters, seqlock and grace period modelled; the TLA+ invariants as assertions |
 | TLA+ trace validation | [`trace/`](trace/README.md) | a debug-only tracepoint patch, ftrace to NDJSON per mount, `MntPutTrace.tla` driving the model through real traces from the selftest and the stress runs |
 
-`BARRIERS.md` is the argument, backed by the litmus tests, why the three
-outer smp_mb() calls could go.
+[`BARRIERS.md`](BARRIERS.md) is the argument, backed by the litmus
+tests, why the three outer smp_mb() calls could go.
+
+## Results
+
+- **TLA+**: the safety argument holds in every layout, order and mode. A
+  count of exactly one under mount_lock is the mount's own reference.
+  The split counters, the walker's barrier, the slow path's barrier, the
+  MNT_DOOMED test and the grace period for every other count are each
+  load-bearing: take one out and TLC finds the trace. 60 of the 62
+  configurations finished, the two biggest were stopped by hand after
+  about fifty million states without a violation.
+- **LKMM**: every pairing the code relies on is Never, and taking out
+  any of the barriers it relies on makes it Sometimes. The one thing
+  this shows that the TLA+ model can't: the smp_mb() between the two
+  passes of mnt_get_count() is
+  load-bearing, because without it the loads of the two passes reorder
+  (`MNT-A1m-nomb-in-sum`). The same barrier is the full barrier the
+  walker's store buffering pairing needs on the unmounter's side, which
+  makes the three outer smp_mb() calls redundant. That's "fs: drop the
+  smp_mb()s that mnt_get_count() made redundant".
+- **AArch64, POWER and x86**: every finished cell agrees with LKMM. On
+  x86 the mutations that need store-store or load-load reordering never
+  show up, as they can't, which is why the architectural models are the
+  evidence for arm64 and POWER.
+- **Dartagnan**: under LKMM every cell matches herd7. Where the hardware
+  targets differ from LKMM, the difference is the target's mapping of
+  the barriers, not the code.
+- **CBMC**: no verdict yet. The runs so far hit an artefact of CBMC's
+  thread encoding, [`cbmc/README.md`](cbmc/README.md) has the details
+  and the next step.
+- **Trace validation**: 57 of the 58 mounts of the selftest and all
+  1700 sampled mounts of the stress runs are accepted. The one rejection
+  is a reference that changes owner across fork(), which the model's
+  per-task references can't express.
+
+The tests the kernel can carry went into a patch for
+Documentation/litmus-tests/fs/, generated by `litmus/upstream/gen.sh`.

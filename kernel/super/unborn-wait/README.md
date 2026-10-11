@@ -1,4 +1,7 @@
-# Models of work.super.fixes.core.claims
+# The device table with the unborn-wait cursor
+
+Status: not merged. The version of the fix that counts the claims was
+kept and is on work.super.fixes.core.
 
 | method | directory |
 |---|---|

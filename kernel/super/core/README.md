@@ -1,5 +1,9 @@
 # Models of fs/super.c
 
+Status: mainline, modelled at fc1c25014ff8. The fixes are on
+work.super.fixes.core, .7.3 and .fs and on work.fs.sb_rdonly, not
+applied yet.
+
 | method | directory |
 |---|---|
 | TLA+ models of the superblock lifecycle and the device table (`SuperLife`, `SuperDevTable`) | [`tla/`](tla/README.md) |
