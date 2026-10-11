@@ -248,8 +248,8 @@ SendThread(t, sig) ==
     /\ budget[sig] > 0
     /\ Alive(t)
     /\ budget' = [budget EXCEPT ![sig] = @ - 1]
-    /\ IF ~Accepts(sig) \/ sig \in pending[t]
-       THEN UNCHANGED <<pending, sigpending, group, hist>>
+    /\ IF ~Accepts(sig) \/ sig \in pending[t] \/ "EXITING" \in flags[t]
+       THEN UNCHANGED <<pending, sigpending, group, hist>>   \* task_can_queue_signal()
        ELSE LET pend == [pending EXCEPT ![t] = @ \cup {sig}]
             IN IF Wants(sig, t)
                THEN CompleteSignal(sig, t, pend)
@@ -646,11 +646,12 @@ ExitWorkersDone(t) ==
 ExitSignals(t) ==
     /\ pc[t] = "exit_signals"
     /\ flags' = [flags EXCEPT ![t] = @ \cup {"EXITING"}]
+    /\ pending' = [pending EXCEPT ![t] = {}]       \* sigqueue_dequeue_pending()
     /\ IF GroupEmpty(t) \/ group.exit \/ ~sigpending[t]
        THEN sigpending' = sigpending
        ELSE RetargetWake(t, Signals \ blocked[t])
     /\ pc' = [pc EXCEPT ![t] = "exit_notify"]
-    /\ UNCHANGED <<pending, shared, notify, group, freed>>
+    /\ UNCHANGED <<shared, notify, group, freed>>
     /\ UnchangedMask /\ UnchangedCore /\ UnchangedWq /\ UnchangedEnv
 
 \* exit_notify() and release_task(): a leader with live siblings stays a
@@ -1101,8 +1102,8 @@ AllDead == \A t \in Threads : pc[t] \in {"none", "dead"}
 
 \* A SIGKILL that complete_signal() fanned out tears the group down,
 \* whatever state it is in.  (A tgkill() to a thread that is already
-\* PF_EXITING is not fanned out: wants_signal() refuses it and the group
-\* lives on.  That is how the kernel behaves and not what this checks.)
+\* PF_EXITING is dropped by task_can_queue_signal() and the group lives
+\* on.  That is how the kernel behaves and not what this checks.)
 KillTerminates == [](hist.kill => <>AllDead)
 
 \* a dump that started ends (no rendezvous deadlock)
