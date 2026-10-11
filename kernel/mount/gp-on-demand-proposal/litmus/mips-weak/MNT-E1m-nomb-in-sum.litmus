@@ -1,0 +1,70 @@
+MIPS MNT-E1m-nomb-in-sum
+(* LKMM result: Sometimes; translation of litmus/MNT-E1m-nomb-in-sum.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:$10=seq;
+0:$11=gets_w;
+0:$12=mlock;
+0:$13=flags;
+0:$14=puts_w;
+1:$10=mlock;
+1:$11=seq;
+1:$12=mnt_ns;
+1:$13=flags;
+1:$14=puts_u;
+1:$15=puts_w;
+1:$16=gets_w;
+1:$17=gets_u;
+1:$18=freed;
+}
+ P0                  | P1                  ;
+ lw $20,0($10)       | ori $9,$0,1         ;
+ lw $21,0($10)       | ll $20,0($10)       ;
+ bne $21,$0,Lend0    | bne $20,$0,Lfail11  ;
+ ori $9,$0,1         | sc $9,0($10)        ;
+ sw $9,0($11)        | beq $9,$0,Lfail11   ;
+ sync                | sync                ;
+ lw $22,0($10)       | b Lok11             ;
+ beq $22,$0,Lend0    | Lfail11:            ;
+ ori $9,$0,1         | ori $20,$0,1        ;
+ ll $23,0($12)       | Lok11:              ;
+ bne $23,$0,Lfail01  | ori $9,$0,1         ;
+ sc $9,0($12)        | sw $9,0($11)        ;
+ beq $9,$0,Lfail01   | sw $0,0($12)        ;
+ sync                | ori $9,$0,1         ;
+ b Lok01             | sw $9,0($13)        ;
+ Lfail01:            | ori $9,$0,2         ;
+ ori $23,$0,1        | sw $9,0($11)        ;
+ Lok01:              | sync                ;
+ lw $24,0($13)       | sw $0,0($10)        ;
+ beq $24,$0,Lskip0   | ori $9,$0,1         ;
+ ori $9,$0,1         | ll $21,0($10)       ;
+ sw $9,0($14)        | bne $21,$0,Lfail12  ;
+ Lskip0:             | sc $9,0($10)        ;
+ sync                | beq $9,$0,Lfail12   ;
+ sw $0,0($12)        | sync                ;
+ Lend0:              | b Lok12             ;
+                     | Lfail12:            ;
+                     | ori $21,$0,1        ;
+                     | Lok12:              ;
+                     | ori $9,$0,3         ;
+                     | sw $9,0($11)        ;
+                     | ori $9,$0,1         ;
+                     | sw $9,0($14)        ;
+                     | lw $22,0($15)       ;
+                     | lw $23,0($14)       ;
+                     | lw $24,0($16)       ;
+                     | lw $25,0($17)       ;
+                     | bne $24,$22,L11     ;
+                     | ori $9,$0,3         ;
+                     | sw $9,0($13)        ;
+                     | ori $9,$0,1         ;
+                     | sw $9,0($18)        ;
+                     | L11:                ;
+                     | ori $9,$0,4         ;
+                     | sw $9,0($11)        ;
+                     | sync                ;
+                     | sw $0,0($10)        ;
+filter (0:$23=0 /\ 1:$20=0 /\ 1:$21=0 /\ 0:$20=0)
+exists (0:$21=0 /\ 0:$22=0 /\ freed=1)

@@ -1,0 +1,53 @@
+MIPS MNT-E2m-nomb-in-sum
+(* LKMM result: Sometimes; translation of litmus/MNT-E2m-nomb-in-sum.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:$10=seq;
+0:$11=gets_w;
+0:$12=mlock;
+0:$13=flags;
+0:$14=puts_w;
+1:$10=mlock;
+1:$11=seq;
+1:$12=puts_w;
+1:$13=puts_u;
+1:$14=gets_w;
+1:$15=gets_u;
+1:$16=mnt_ns;
+1:$17=flags;
+1:$18=freed;
+}
+ P0                  | P1                  ;
+ lw $20,0($10)       | sync                ;
+ sync                | ori $9,$0,1         ;
+ sync                | ll $20,0($10)       ;
+ lw $21,0($10)       | bne $20,$0,Lfail11  ;
+ bne $21,$0,Lend0    | sc $9,0($10)        ;
+ ori $9,$0,1         | beq $9,$0,Lfail11   ;
+ sw $9,0($11)        | sync                ;
+ sync                | b Lok11             ;
+ sync                | Lfail11:            ;
+ lw $22,0($10)       | ori $20,$0,1        ;
+ beq $22,$0,Lend0    | Lok11:              ;
+ sync                | ori $9,$0,1         ;
+ ori $9,$0,1         | sw $9,0($11)        ;
+ ll $23,0($12)       | sync                ;
+ bne $23,$0,Lfail01  | lw $21,0($12)       ;
+ sc $9,0($12)        | lw $22,0($13)       ;
+ beq $9,$0,Lfail01   | lw $23,0($14)       ;
+ sync                | lw $24,0($15)       ;
+ b Lok01             | bne $23,$21,L11     ;
+ Lfail01:            | sw $0,0($16)        ;
+ ori $23,$0,1        | ori $9,$0,1         ;
+ Lok01:              | sw $9,0($17)        ;
+ lw $24,0($13)       | ori $9,$0,1         ;
+ beq $24,$0,Lskip0   | sw $9,0($18)        ;
+ ori $9,$0,1         | L11:                ;
+ sw $9,0($14)        | sync                ;
+ Lskip0:             | ori $9,$0,2         ;
+ sync                | sw $9,0($11)        ;
+ sw $0,0($12)        | sync                ;
+ Lend0:              | sw $0,0($10)        ;
+filter (0:$23=0 /\ 1:$20=0 /\ 0:$20=0)
+exists (0:$21=0 /\ 0:$22=0 /\ freed=1)

@@ -1,0 +1,14 @@
+Test MNT-E1m-nomb-in-sum Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:x21=0 /\ 0:x22=0 /\ [freed]=1)
+Observation MNT-E1m-nomb-in-sum Never 0 0
+Time MNT-E1m-nomb-in-sum 106.39
+Hash=219f97a8fd86ded7444a640d1bb4d658
+
+
+real	1m46.397s
+user	1m46.394s
+sys	0m0.000s

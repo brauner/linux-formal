@@ -1,0 +1,16 @@
+Test m4 Allowed
+States 6
+1:$20=0; 1:$21=0;
+1:$20=0; 1:$21=1;
+1:$20=0; 1:$21=2;
+1:$20=1; 1:$21=1;
+1:$20=1; 1:$21=2;
+1:$20=2; 1:$21=2;
+No
+Witnesses
+Positive: 0 Negative: 9
+Condition exists (1:$20=2 /\ 1:$21=0)
+Observation m4 Never 0 9
+Time m4 0.01
+Hash=97a0b8802eb054fc1a94c072667ea286
+

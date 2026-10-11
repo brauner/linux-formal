@@ -1,0 +1,58 @@
+RISCV MNT-E1m-nomb-in-sum
+(* LKMM result: Sometimes; translation of litmus/MNT-E1m-nomb-in-sum.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:x10=seq;
+0:x11=gets_w;
+0:x12=mlock;
+0:x13=flags;
+0:x14=puts_w;
+1:x10=mlock;
+1:x11=seq;
+1:x12=mnt_ns;
+1:x13=flags;
+1:x14=puts_u;
+1:x15=puts_w;
+1:x16=gets_w;
+1:x17=gets_u;
+1:x18=freed;
+}
+ P0                         | P1                         ;
+ lw x20,0(x10)              | ori x9,x0,1                ;
+ fence r,r                  | amoswap.w.aq x20,x9,(x10)  ;
+ fence r,r                  | ori x9,x0,1                ;
+ lw x21,0(x10)              | sw x9,0(x11)               ;
+ bne x21,x0,Lend0           | fence w,w                  ;
+ ori x9,x0,1                | sw x0,0(x12)               ;
+ sw x9,0(x11)               | ori x9,x0,1                ;
+ fence rw,rw                | sw x9,0(x13)               ;
+ fence r,r                  | fence w,w                  ;
+ lw x22,0(x10)              | ori x9,x0,2                ;
+ beq x22,x0,Lend0           | sw x9,0(x11)               ;
+ ori x9,x0,1                | fence rw,w                 ;
+ amoswap.w.aq x23,x9,(x12)  | sw x0,0(x10)               ;
+ lw x24,0(x13)              | ori x9,x0,1                ;
+ beq x24,x0,Lskip0          | amoswap.w.aq x21,x9,(x10)  ;
+ ori x9,x0,1                | ori x9,x0,3                ;
+ sw x9,0(x14)               | sw x9,0(x11)               ;
+ Lskip0:                    | fence w,w                  ;
+ fence rw,w                 | ori x9,x0,1                ;
+ sw x0,0(x12)               | sw x9,0(x14)               ;
+ Lend0:                     | lw x22,0(x15)              ;
+                            | lw x23,0(x14)              ;
+                            | lw x24,0(x16)              ;
+                            | lw x25,0(x17)              ;
+                            | bne x24,x22,L11            ;
+                            | ori x9,x0,3                ;
+                            | sw x9,0(x13)               ;
+                            | ori x9,x0,1                ;
+                            | sw x9,0(x18)               ;
+                            | L11:                       ;
+                            | fence w,w                  ;
+                            | ori x9,x0,4                ;
+                            | sw x9,0(x11)               ;
+                            | fence rw,w                 ;
+                            | sw x0,0(x10)               ;
+filter (0:x23=0 /\ 1:x20=0 /\ 1:x21=0 /\ 0:x20=0)
+exists (0:x21=0 /\ 0:x22=0 /\ freed=1)

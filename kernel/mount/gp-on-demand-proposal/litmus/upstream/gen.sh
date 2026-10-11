@@ -199,7 +199,7 @@ mk MNT-C2-kern-unmount-gp-fallback mnt-kern-unmount-gp-sees-fastpath-put <<'EOF'
  * plain mntput() that follows sees its put.
 EOF
 
-mk MNT-E1-slowpath-no-outer-mb mnt-slowpath-sum-no-outer-mb <<'EOF'
+mk MNT-E1u-slowpath-after-umount-tree mnt-slowpath-sum-no-outer-mb <<'EOF'
  * Result: Never
  *
  * mntput_no_expire_slowpath() against a walker in __legitimize_mnt():
@@ -212,7 +212,9 @@ mk MNT-E1-slowpath-no-outer-mb mnt-slowpath-sum-no-outer-mb <<'EOF'
  * walker's smp_mb() needs.  Not both the walker keeping its reference
  * (0:r1=0, 0:r2=0) and the slow path freeing the mount (freed=1).  The
  * own decrement ahead of the sum is a store of the running CPU, read
- * back in program order.
+ * back in program order.  The initial state is the mount after
+ * umount_tree().  A walker that started before that never meets the
+ * final put, the grace period in namespace_unlock() sees to it.
 EOF
 
 mk MNT-E2-busycheck-no-outer-mb mnt-umount-busy-sum-no-outer-mb <<'EOF'

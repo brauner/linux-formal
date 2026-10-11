@@ -1,0 +1,15 @@
+Test arm-lock-nofilter Allowed
+States 4
+0:R6=0; 1:R6=0;
+0:R6=0; 1:R6=1;
+0:R6=1; 1:R6=0;
+0:R6=1; 1:R6=1;
+Ok
+Witnesses
+Positive: 14 Negative: 38
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:R6=0 /\ 1:R6=0)
+Observation arm-lock-nofilter Sometimes 14 38
+Time arm-lock-nofilter 3.22
+Hash=67a431fc6b9dfad9057370f383c17bae
+

@@ -1,0 +1,12 @@
+Test arm-lock Allowed
+States 2
+0:R6=0; 1:R6=1;
+0:R6=1; 1:R6=0;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (0:R6=0 /\ 1:R6=0)
+Observation arm-lock Never 0 2
+Time arm-lock 0.08
+Hash=67a431fc6b9dfad9057370f383c17bae
+

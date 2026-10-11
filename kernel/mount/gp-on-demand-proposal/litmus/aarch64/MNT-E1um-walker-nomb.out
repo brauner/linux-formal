@@ -1,0 +1,16 @@
+Test MNT-E1um-walker-nomb Allowed
+States 1
+0:X11=0; 0:X12=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-E1um-walker-nomb Always 1 0
+Time MNT-E1um-walker-nomb 2.51
+Hash=a8fcc8585c9fa6b60857842e1bd6bfc1
+
+
+real	0m2.516s
+user	0m2.516s
+sys	0m0.000s

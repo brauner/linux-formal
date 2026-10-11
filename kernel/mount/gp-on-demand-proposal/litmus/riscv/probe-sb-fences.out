@@ -1,0 +1,13 @@
+Test rv-sb Allowed
+States 3
+0:x8=0; 1:x8=1;
+0:x8=1; 1:x8=0;
+0:x8=1; 1:x8=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x8=0 /\ 1:x8=0)
+Observation rv-sb Never 0 3
+Time rv-sb 0.00
+Hash=ab56186942ccc7b5c81804aa3cfe8c03
+

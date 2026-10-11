@@ -16,6 +16,10 @@ Mapping (what the kernel emits):
                                                 or failed stwcx. marks the register
                                                 and is filtered out
   spin_unlock()         -> STLR WZR           | lwsync; stw (PPC_RELEASE_BARRIER)
+
+The RISC-V, MIPS and ARM backends further down carry their own mapping in a
+comment.  They are generated for the E family only, into riscv/, riscv-lrsc/,
+mips/, mips-weak/ and arm/ (arm/ is run under both arm.cat and aarch32.cat).
 """
 import sys, os
 
@@ -85,6 +89,14 @@ def e1_slowpath():
             ('brne_reg','r3','r1','L1'), ('st','flags',3), ('st','freed',1), ('label','L1'),
             ('wmb',), ('st','seq',4), ('unlock','mlock')]
 
+def e1u_slowpath_after_umount_tree():
+    # the in-tree mnt-slowpath-sum-no-outer-mb.litmus after the fixup: the initial state is the mount
+    # after umount_tree() (flags=1, seqcount 0), P1() is only the slow path's critical section
+    return [('lock','mlock','q1'), ('st','seq',1), ('wmb',), ('st','puts_u',1),
+            ('ld','r1','puts_w'), ('ld','r2','puts_u'), ('mb',), ('ld','r3','gets_w'), ('ld','r4','gets_u'),
+            ('brne_reg','r3','r1','L1'), ('st','flags',3), ('st','freed',1), ('label','L1'),
+            ('wmb',), ('st','seq',2), ('unlock','mlock')]
+
 def e2_busycheck():
     # do_umount() without its explicit smp_mb(): lock_mount_hash() (seqcount write), the busy check's
     # sum (puts pass, inner smp_mb(), gets pass); count == 1 -> the unmount proceeds
@@ -117,6 +129,7 @@ TESTS = {
  'MNT-B1m-peek-no-outer-mb': (B_INIT, [walker(), unmounter_sections(flags_sync=True, decide=True, outer_mb=False, gets='gets_w', puts='puts_w')], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
  'MNT-B2-walker-bail-sees-doomed-lazy': (B_INIT, [walker(), unmounter_sections(decide=True, gets='gets_w', puts='puts_w')], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ freed=1', 'Never'),
  'MNT-E1-slowpath-no-outer-mb': (B_INIT, [walker(), e1_slowpath()], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
+ 'MNT-E1u-slowpath-after-umount-tree': ({'gets_u':1, 'flags':1}, [walker(), e1u_slowpath_after_umount_tree()], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
  'MNT-E2-busycheck-no-outer-mb': (B_INIT, [walker(), e2_busycheck()], '0:r1=0 /\\ 0:r2=0 /\\ freed=1', 'Never'),
  'MNT-B2r-walker-bail-reduced': ({}, [walker(), unmounter_b2_reduced()], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ flags=3', 'Never'),
  'MNT-B2m-walker-flags-unlocked': (B_INIT, [walker(locked=False), unmounter_sections(decide=True, gets='gets_w', puts='puts_w')], '0:r1=0 /\\ ~(0:r2=0) /\\ 0:r3=0 /\\ freed=1', 'Sometimes'),
@@ -247,6 +260,190 @@ def emit(backend, name, init, threads, exists, expect):
     conds += ['exists (' + exists + ')']
     return '\n'.join(text) + '\n' + xl('\n'.join(conds)) + '\n'
 
+
+# ---------------------------------------------------------------- mutations of the E tests
+def nomb(ops):
+    # drop the sum's inner smp_mb(); the walker's smp_mb() lives in walker()
+    assert ops.count(('mb',)) == 1
+    return [op for op in ops if op != ('mb',)]
+
+E_COND = '0:r1=0 /\\ 0:r2=0 /\\ freed=1'
+E1U_INIT = {'gets_u':1, 'flags':1}
+TESTS.update({
+ 'MNT-E1m-nomb-in-sum':   (B_INIT,   [walker(),         nomb(e1_slowpath())], E_COND, 'Sometimes'),
+ 'MNT-E1m-walker-nomb':   (B_INIT,   [walker(mb=False), e1_slowpath()],       E_COND, 'Sometimes'),
+ 'MNT-E1um-nomb-in-sum':  (E1U_INIT, [walker(),         nomb(e1u_slowpath_after_umount_tree())], E_COND, 'Sometimes'),
+ 'MNT-E1um-walker-nomb':  (E1U_INIT, [walker(mb=False), e1u_slowpath_after_umount_tree()],       E_COND, 'Sometimes'),
+ 'MNT-E2m-nomb-in-sum':   (B_INIT,   [walker(),         nomb(e2_busycheck())], E_COND, 'Sometimes'),
+ 'MNT-E2m-walker-nomb':   (B_INIT,   [walker(mb=False), e2_busycheck()],       E_COND, 'Sometimes'),
+})
+WALKER_TESTS = {k for k in TESTS if '-B' in k or '-E' in k}
+
+# ---------------------------------------------------------------- more backends
+# Mapping (what the kernel emits), same conventions as above:
+#   RISC-V: READ_ONCE/WRITE_ONCE -> lw/sw; smp_mb -> fence rw,rw; smp_wmb -> fence w,w; smp_rmb -> fence r,r;
+#           spin_lock -> amoswap.w.aq (acquire RMW: qspinlock's cmpxchg_acquire ends in fence r,rw, the ticket
+#           lock's fetch_add is .aqrl; the acquire AMO is the weaker stand-in); spin_unlock -> fence rw,w; sw
+#           (smp_store_release()).  Registers x10.. hold addresses, x20.. the values, x9 is scratch.
+#   MIPS:   lw/sw; smp_mb/smp_wmb/smp_rmb -> sync (the herd7 model knows only the full sync; that is exact for
+#           pre-R6 kernels, where __SYNC_rmb/__SYNC_wmb are full, and stronger than R6's sync 0x4 wmb);
+#           spin_lock -> qspinlock's arch_cmpxchg(): smp_mb__before_llsc() (sync), ll/sc with a branch on the
+#           loaded value, smp_llsc_mb() (sync); a failed sc marks the register and is filtered out;
+#           spin_unlock -> smp_store_release() = sync; sw.  Registers $10.. addresses, $20.. values, $9 scratch.
+#   ARM:    ldr/str; smp_mb -> dmb ish; smp_rmb -> dmb ish (arm has no load-only variant); smp_wmb -> dmb ishst;
+#           spin_lock -> ldrex/strex (ticket lock shape) then dmb ish (arch_spin_lock() ends in smp_mb());
+#           spin_unlock -> dmb ish; str (arch_spin_unlock() starts with smp_mb()).  Only R0-R12, LR and SP
+#           exist, so when a thread needs more the two own-counter loads r2 and r4, whose values nothing
+#           reads, share one register.
+
+class RISCV:
+    name = 'RISCV'; model = 'riscv.cat'
+    def __init__(self, ops, tid):
+        self.ops, self.tid = ops, tid
+        self.addr = {v: 10 + i for i, v in enumerate(vars_of(ops))}
+        self.reg = {r: 20 + i for i, r in enumerate(regs_of(ops))}
+        assert len(self.addr) <= 9 and len(self.reg) <= 12
+    def init(self):
+        return ['%d:x%d=%s;' % (self.tid, i, v) for v, i in self.addr.items()]
+    def regname(self, r): return 'x%d' % self.reg[r]
+    def lines(self):
+        out = []
+        for op in self.ops:
+            k = op[0]
+            if k == 'st':
+                if op[2] == 0: out += ['sw x0,0(x%d)' % self.addr[op[1]]]
+                else: out += ['ori x9,x0,%d' % op[2], 'sw x9,0(x%d)' % self.addr[op[1]]]
+            elif k == 'ld': out += ['lw x%d,0(x%d)' % (self.reg[op[1]], self.addr[op[2]])]
+            elif k == 'wmb': out += ['fence w,w']
+            elif k == 'rmb': out += ['fence r,r']
+            elif k == 'mb':  out += ['fence rw,rw']
+            elif k == 'lock': out += ['ori x9,x0,1', 'amoswap.w.aq x%d,x9,(x%d)' % (self.reg[op[2]], self.addr[op[1]])]
+            elif k == 'unlock': out += ['fence rw,w', 'sw x0,0(x%d)' % self.addr[op[1]]]
+            elif k == 'brz':  out += ['beq x%d,x0,%s%d' % (self.reg[op[1]], op[2], self.tid)]
+            elif k == 'brnz': out += ['bne x%d,x0,%s%d' % (self.reg[op[1]], op[2], self.tid)]
+            elif k == 'brne': out += ['ori x9,x0,%d' % op[2], 'bne x%d,x9,%s%d' % (self.reg[op[1]], op[3], self.tid)]
+            elif k == 'brne_reg': out += ['bne x%d,x%d,%s%d' % (self.reg[op[1]], self.reg[op[2]], op[3], self.tid)]
+            elif k == 'label': out += ['%s%d:' % (op[1], self.tid)]
+        return out
+
+class MIPS:
+    name = 'MIPS'; model = 'mips.cat'
+    def __init__(self, ops, tid):
+        self.ops, self.tid = ops, tid
+        self.addr = {v: 10 + i for i, v in enumerate(vars_of(ops))}
+        self.reg = {r: 20 + i for i, r in enumerate(regs_of(ops))}
+        self.nlock = 0
+        assert len(self.addr) <= 9 and len(self.reg) <= 12
+    def init(self):
+        return ['%d:$%d=%s;' % (self.tid, i, v) for v, i in self.addr.items()]
+    def regname(self, r): return '$%d' % self.reg[r]
+    def lines(self):
+        out = []
+        for op in self.ops:
+            k = op[0]
+            if k == 'st':
+                if op[2] == 0: out += ['sw $0,0($%d)' % self.addr[op[1]]]
+                else: out += ['ori $9,$0,%d' % op[2], 'sw $9,0($%d)' % self.addr[op[1]]]
+            elif k == 'ld': out += ['lw $%d,0($%d)' % (self.reg[op[1]], self.addr[op[2]])]
+            elif k in ('wmb', 'rmb', 'mb'): out += ['sync']
+            elif k == 'lock':
+                self.nlock += 1; ok = 'Lok%d%d' % (self.tid, self.nlock); fail = 'Lfail%d%d' % (self.tid, self.nlock)
+                a, r = self.addr[op[1]], self.reg[op[2]]
+                out += ['sync', 'ori $9,$0,1', 'll $%d,0($%d)' % (r, a), 'bne $%d,$0,%s' % (r, fail),
+                        'sc $9,0($%d)' % a, 'beq $9,$0,%s' % fail, 'sync', 'b %s' % ok,
+                        '%s:' % fail, 'ori $%d,$0,1' % r, '%s:' % ok]
+            elif k == 'unlock': out += ['sync', 'sw $0,0($%d)' % self.addr[op[1]]]
+            elif k == 'brz':  out += ['beq $%d,$0,%s%d' % (self.reg[op[1]], op[2], self.tid)]
+            elif k == 'brnz': out += ['bne $%d,$0,%s%d' % (self.reg[op[1]], op[2], self.tid)]
+            elif k == 'brne': out += ['ori $9,$0,%d' % op[2], 'bne $%d,$9,%s%d' % (self.reg[op[1]], op[3], self.tid)]
+            elif k == 'brne_reg': out += ['bne $%d,$%d,%s%d' % (self.reg[op[1]], self.reg[op[2]], op[3], self.tid)]
+            elif k == 'label': out += ['%s%d:' % (op[1], self.tid)]
+        return out
+
+ARM_PHYS = ['R%d' % i for i in range(13)] + ['LR', 'SP']
+
+class ARM:
+    name = 'ARM'; model = 'arm.cat'
+    def __init__(self, ops, tid):
+        self.ops, self.tid = ops, tid
+        vs, rs = vars_of(ops), regs_of(ops)
+        # addresses first, then the registers that conditions may name (q*, r0, r1, r3), then r2/r4, scratch last
+        order = [r for r in rs if r.startswith('q')] + [r for r in rs if r in ('r0', 'r1', 'r3')] + \
+                [r for r in rs if r in ('r2', 'r4')]
+        assert sorted(order) == sorted(rs)
+        alias = len(vs) + len(rs) + 1 > len(ARM_PHYS) and 'r2' in rs and 'r4' in rs
+        if alias:
+            order.remove('r4')
+        assert len(vs) + len(order) + 1 <= len(ARM_PHYS), (vs, rs)
+        self.addr = {v: ARM_PHYS[i] for i, v in enumerate(vs)}
+        self.reg = {r: ARM_PHYS[len(vs) + i] for i, r in enumerate(order)}
+        if alias:
+            self.reg['r4'] = self.reg['r2']
+        self.scratch = ARM_PHYS[len(vs) + len(order)]
+        self.nlock = 0
+    def init(self):
+        return ['%d:%s=%s;' % (self.tid, p, v) for v, p in self.addr.items()]
+    def regname(self, r): return self.reg[r]
+    def lines(self):
+        out = []; s = self.scratch
+        for op in self.ops:
+            k = op[0]
+            if k == 'st':   out += ['MOV %s,#%d' % (s, op[2]), 'STR %s,[%s]' % (s, self.addr[op[1]])]
+            elif k == 'ld': out += ['LDR %s,[%s]' % (self.reg[op[1]], self.addr[op[2]])]
+            elif k == 'wmb': out += ['DMB ISHST']
+            elif k in ('rmb', 'mb'): out += ['DMB ISH']
+            elif k == 'lock':
+                self.nlock += 1; ok = 'Lok%d%d' % (self.tid, self.nlock); fail = 'Lfail%d%d' % (self.tid, self.nlock)
+                a, r = self.addr[op[1]], self.reg[op[2]]
+                # r holds the loaded value, then strex's status: 0 at ok means found free and stored
+                out += ['MOV %s,#1' % s, 'LDREX %s,[%s]' % (r, a), 'CMP %s,#0' % r, 'BNE %s' % fail,
+                        'STREX %s,%s,[%s]' % (r, s, a), 'CMP %s,#0' % r, 'BNE %s' % fail, 'DMB ISH', 'B %s' % ok,
+                        '%s:' % fail, 'MOV %s,#1' % r, '%s:' % ok]
+            elif k == 'unlock': out += ['DMB ISH', 'MOV %s,#0' % s, 'STR %s,[%s]' % (s, self.addr[op[1]])]
+            elif k == 'brz':  out += ['CMP %s,#0' % self.reg[op[1]], 'BEQ %s%d' % (op[2], self.tid)]
+            elif k == 'brnz': out += ['CMP %s,#0' % self.reg[op[1]], 'BNE %s%d' % (op[2], self.tid)]
+            elif k == 'brne': out += ['CMP %s,#%d' % (self.reg[op[1]], op[2]), 'BNE %s%d' % (op[3], self.tid)]
+            elif k == 'brne_reg': out += ['CMP %s,%s' % (self.reg[op[1]], self.reg[op[2]]), 'BNE %s%d' % (op[3], self.tid)]
+            elif k == 'label': out += ['%s%d:' % (op[1], self.tid)]
+        return out
+
+
+class MIPSW(MIPS):
+    # sound lower bound for Cavium Octeon, where smp_wmb() is the lighter syncw and smp_rmb() is nothing:
+    # smp_wmb()/smp_rmb() emit no instruction at all (weaker than the kernel's syncw, so a Never here holds),
+    # smp_mb() stays sync, smp_mb__before_llsc() (smp_wmb() on Octeon) is dropped, smp_llsc_mb() stays sync
+    name = 'MIPS'; model = 'mips.cat'
+    def lines(self):
+        saved = self.ops
+        self.ops = [op for op in saved if op[0] not in ('wmb', 'rmb')]
+        out = MIPS.lines(self)
+        self.ops = saved
+        # drop the leading sync of each lock sequence (smp_mb__before_llsc() is smp_wmb() on Octeon)
+        res = []
+        i = 0
+        while i < len(out):
+            if out[i] == 'sync' and i + 2 < len(out) and out[i+1] == 'ori $9,$0,1' and out[i+2].startswith('ll '):
+                i += 1
+                continue
+            res.append(out[i]); i += 1
+        return res
+
+class RISCVLRSC(RISCV):
+    # RISC-V qspinlock shape: arch_cmpxchg_acquire() is lr.w; bne; sc.w; bnez; fence r,rw (RISCV_ACQUIRE_BARRIER);
+    # the branch is on the loaded value, a failed sc marks the register and is filtered out
+    name = 'RISCV'; model = 'riscv.cat'
+    def lines(self):
+        out = []; self.nlock = 0
+        for op in self.ops:
+            if op[0] != 'lock':
+                out += RISCV.lines(RISCV.__new__(RISCV)) if False else RISCV.lines(type('T', (), {'ops': [op], 'tid': self.tid, 'addr': self.addr, 'reg': self.reg})())
+                continue
+            self.nlock += 1; ok = 'Lok%d%d' % (self.tid, self.nlock); fail = 'Lfail%d%d' % (self.tid, self.nlock)
+            a, r = self.addr[op[1]], self.reg[op[2]]
+            out += ['ori x9,x0,1', 'lr.w x%d,(x%d)' % (r, a), 'bne x%d,x0,%s' % (r, fail),
+                    'sc.w x9,x9,(x%d)' % a, 'bne x9,x0,%s' % fail, 'fence r,rw', 'j %s' % ok,
+                    '%s:' % fail, 'ori x%d,x0,1' % r, '%s:' % ok]
+        return out
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
     for backend, sub in ((AArch64, 'aarch64'), (PPC, 'ppc')):
@@ -254,4 +451,11 @@ if __name__ == '__main__':
         for name, (init, threads, exists, expect) in TESTS.items():
             with open(os.path.join(here, sub, name + '.litmus'), 'w') as f:
                 f.write(emit(backend, name, init, threads, exists, expect))
-    print('generated %d tests x 2 archs' % len(TESTS))
+    efam = [n for n in TESTS if n.startswith('MNT-E')]
+    for backend, sub in ((RISCV, 'riscv'), (RISCVLRSC, 'riscv-lrsc'), (MIPS, 'mips'), (MIPSW, 'mips-weak'), (ARM, 'arm')):
+        os.makedirs(os.path.join(here, sub), exist_ok=True)
+        for name in efam:
+            init, threads, exists, expect = TESTS[name]
+            with open(os.path.join(here, sub, name + '.litmus'), 'w') as f:
+                f.write(emit(backend, name, init, threads, exists, expect))
+    print('generated %d tests x 2 archs, %d E tests x 5 more backends' % (len(TESTS), len(efam)))

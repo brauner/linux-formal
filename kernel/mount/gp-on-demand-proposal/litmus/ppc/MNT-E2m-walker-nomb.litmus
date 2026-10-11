@@ -1,0 +1,57 @@
+PPC MNT-E2m-walker-nomb
+(* LKMM result: Sometimes; translation of litmus/MNT-E2m-walker-nomb.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:r20=seq;
+0:r21=gets_w;
+0:r22=mlock;
+0:r23=flags;
+0:r24=puts_w;
+1:r20=mlock;
+1:r21=seq;
+1:r22=puts_w;
+1:r23=puts_u;
+1:r24=gets_w;
+1:r25=gets_u;
+1:r26=mnt_ns;
+1:r27=flags;
+1:r28=freed;
+}
+ P0                 | P1                 ;
+ lwz r1,0(r20)      | li r10,1           ;
+ lwsync             | lwarx r1,r0,r20    ;
+ lwsync             | cmpwi r1,0         ;
+ lwz r2,0(r20)      | bne Lfail11        ;
+ cmpwi r2,0         | stwcx. r10,r0,r20  ;
+ bne Lend0          | bne Lfail11        ;
+ li r10,1           | isync              ;
+ stw r10,0(r21)     | b Lok11            ;
+ lwsync             | Lfail11:           ;
+ lwz r3,0(r20)      | li r1,1            ;
+ cmpwi r3,0         | Lok11:             ;
+ beq Lend0          | li r10,1           ;
+ li r10,1           | stw r10,0(r21)     ;
+ lwarx r4,r0,r22    | lwsync             ;
+ cmpwi r4,0         | lwz r2,0(r22)      ;
+ bne Lfail01        | lwz r3,0(r23)      ;
+ stwcx. r10,r0,r22  | sync               ;
+ bne Lfail01        | lwz r4,0(r24)      ;
+ isync              | lwz r5,0(r25)      ;
+ b Lok01            | cmpw r4,r2         ;
+ Lfail01:           | bne L11            ;
+ li r4,1            | li r10,0           ;
+ Lok01:             | stw r10,0(r26)     ;
+ lwz r5,0(r23)      | li r10,1           ;
+ cmpwi r5,0         | stw r10,0(r27)     ;
+ beq Lskip0         | li r10,1           ;
+ li r10,1           | stw r10,0(r28)     ;
+ stw r10,0(r24)     | L11:               ;
+ Lskip0:            | lwsync             ;
+ lwsync             | li r10,2           ;
+ li r10,0           | stw r10,0(r21)     ;
+ stw r10,0(r22)     | lwsync             ;
+ Lend0:             | li r10,0           ;
+                    | stw r10,0(r20)     ;
+filter (0:r4=0 /\ 1:r1=0 /\ 0:r1=0)
+exists (0:r2=0 /\ 0:r3=0 /\ freed=1)

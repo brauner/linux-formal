@@ -1,0 +1,22 @@
+Test MNT-E2-busycheck-no-outer-mb Allowed
+States 7
+0:X11=0; 0:X12=0; [freed]=0;
+0:X11=0; 0:X12=1; [freed]=0;
+0:X11=0; 0:X12=1; [freed]=1;
+0:X11=0; 0:X12=2; [freed]=0;
+0:X11=0; 0:X12=2; [freed]=1;
+0:X11=1; 0:X12=0; [freed]=1;
+0:X11=2; 0:X12=0; [freed]=1;
+No
+Witnesses
+Positive: 0 Negative: 7
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-E2-busycheck-no-outer-mb Never 0 7
+Time MNT-E2-busycheck-no-outer-mb 22.78
+Hash=276332cc72b1ca24fed8f93166384e75
+
+
+real	0m22.784s
+user	0m22.783s
+sys	0m0.000s

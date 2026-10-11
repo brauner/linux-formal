@@ -1,0 +1,21 @@
+Test MNT-E2-busycheck-no-outer-mb Allowed
+States 7
+0:x21=0; 0:x22=0; [freed]=0;
+0:x21=0; 0:x22=1; [freed]=0;
+0:x21=0; 0:x22=1; [freed]=1;
+0:x21=0; 0:x22=2; [freed]=0;
+0:x21=0; 0:x22=2; [freed]=1;
+0:x21=1; 0:x22=0; [freed]=1;
+0:x21=2; 0:x22=0; [freed]=1;
+No
+Witnesses
+Positive: 0 Negative: 7
+Condition exists (0:x21=0 /\ 0:x22=0 /\ [freed]=1)
+Observation MNT-E2-busycheck-no-outer-mb Never 0 7
+Time MNT-E2-busycheck-no-outer-mb 0.37
+Hash=1923380cccf63219644a9f0f779bbedc
+
+
+real	0m0.378s
+user	0m0.370s
+sys	0m0.008s

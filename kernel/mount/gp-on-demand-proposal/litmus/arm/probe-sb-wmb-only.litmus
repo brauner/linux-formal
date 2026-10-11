@@ -1,0 +1,8 @@
+ARM arm-sb-weak
+{ 0:R0=x; 0:R1=y; 1:R0=y; 1:R1=x; }
+ P0            | P1            ;
+ MOV R2,#1     | MOV R2,#1     ;
+ STR R2,[R0]   | STR R2,[R0]   ;
+ DMB ISH       | DMB ISHST     ;
+ LDR R3,[R1]   | LDR R3,[R1]   ;
+exists (0:R3=0 /\ 1:R3=0)

@@ -43,7 +43,7 @@ the outer one ordered nothing the inner one does not.
 The tests run with herd7 against tools/memory-model:
 
     cd tools/memory-model
-    scripts/checklitmus.sh ../../Documentation/litmus-tests/fs/<test>
+    herd7 -conf linux-kernel.cfg ../../Documentation/litmus-tests/fs/<test>
 
 The memory model is the contract that every architecture's smp_mb(),
 smp_wmb(), READ_ONCE(), WRITE_ONCE(), spinlock and RCU implementation

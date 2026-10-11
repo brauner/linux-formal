@@ -1,0 +1,45 @@
+RISCV MNT-E2m-walker-nomb
+(* LKMM result: Sometimes; translation of litmus/MNT-E2m-walker-nomb.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:x10=seq;
+0:x11=gets_w;
+0:x12=mlock;
+0:x13=flags;
+0:x14=puts_w;
+1:x10=mlock;
+1:x11=seq;
+1:x12=puts_w;
+1:x13=puts_u;
+1:x14=gets_w;
+1:x15=gets_u;
+1:x16=mnt_ns;
+1:x17=flags;
+1:x18=freed;
+}
+ P0                         | P1                         ;
+ lw x20,0(x10)              | ori x9,x0,1                ;
+ fence r,r                  | amoswap.w.aq x20,x9,(x10)  ;
+ fence r,r                  | ori x9,x0,1                ;
+ lw x21,0(x10)              | sw x9,0(x11)               ;
+ bne x21,x0,Lend0           | fence w,w                  ;
+ ori x9,x0,1                | lw x21,0(x12)              ;
+ sw x9,0(x11)               | lw x22,0(x13)              ;
+ fence r,r                  | fence rw,rw                ;
+ lw x22,0(x10)              | lw x23,0(x14)              ;
+ beq x22,x0,Lend0           | lw x24,0(x15)              ;
+ ori x9,x0,1                | bne x23,x21,L11            ;
+ amoswap.w.aq x23,x9,(x12)  | sw x0,0(x16)               ;
+ lw x24,0(x13)              | ori x9,x0,1                ;
+ beq x24,x0,Lskip0          | sw x9,0(x17)               ;
+ ori x9,x0,1                | ori x9,x0,1                ;
+ sw x9,0(x14)               | sw x9,0(x18)               ;
+ Lskip0:                    | L11:                       ;
+ fence rw,w                 | fence w,w                  ;
+ sw x0,0(x12)               | ori x9,x0,2                ;
+ Lend0:                     | sw x9,0(x11)               ;
+                            | fence rw,w                 ;
+                            | sw x0,0(x10)               ;
+filter (0:x23=0 /\ 1:x20=0 /\ 0:x20=0)
+exists (0:x21=0 /\ 0:x22=0 /\ freed=1)

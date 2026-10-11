@@ -1,0 +1,15 @@
+Test MNT-E2m-walker-nomb Allowed
+States 1
+0:x21=0; 0:x22=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Condition exists (0:x21=0 /\ 0:x22=0 /\ [freed]=1)
+Observation MNT-E2m-walker-nomb Always 1 0
+Time MNT-E2m-walker-nomb 0.26
+Hash=fba6b0933a64360fabecd84b12094861
+
+
+real	0m0.273s
+user	0m0.263s
+sys	0m0.009s

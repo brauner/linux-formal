@@ -1,0 +1,58 @@
+ARM MNT-E2m-walker-nomb
+(* LKMM result: Sometimes; translation of litmus/MNT-E2m-walker-nomb.litmus, see gen-asm.py for the barrier mapping *)
+{
+mnt_ns=1;
+gets_u=1;
+0:R0=seq;
+0:R1=gets_w;
+0:R2=mlock;
+0:R3=flags;
+0:R4=puts_w;
+1:R0=mlock;
+1:R1=seq;
+1:R2=puts_w;
+1:R3=puts_u;
+1:R4=gets_w;
+1:R5=gets_u;
+1:R6=mnt_ns;
+1:R7=flags;
+1:R8=freed;
+}
+ P0                 | P1                ;
+ LDR R6,[R0]        | MOV SP,#1         ;
+ DMB ISH            | LDREX R9,[R0]     ;
+ DMB ISH            | CMP R9,#0         ;
+ LDR R7,[R0]        | BNE Lfail11       ;
+ CMP R7,#0          | STREX R9,SP,[R0]  ;
+ BNE Lend0          | CMP R9,#0         ;
+ MOV R10,#1         | BNE Lfail11       ;
+ STR R10,[R1]       | DMB ISH           ;
+ DMB ISH            | B Lok11           ;
+ LDR R9,[R0]        | Lfail11:          ;
+ CMP R9,#0          | MOV R9,#1         ;
+ BEQ Lend0          | Lok11:            ;
+ MOV R10,#1         | MOV SP,#1         ;
+ LDREX R5,[R2]      | STR SP,[R1]       ;
+ CMP R5,#0          | DMB ISHST         ;
+ BNE Lfail01        | LDR R10,[R2]      ;
+ STREX R5,R10,[R2]  | LDR R12,[R3]      ;
+ CMP R5,#0          | DMB ISH           ;
+ BNE Lfail01        | LDR R11,[R4]      ;
+ DMB ISH            | LDR LR,[R5]       ;
+ B Lok01            | CMP R11,R10       ;
+ Lfail01:           | BNE L11           ;
+ MOV R5,#1          | MOV SP,#0         ;
+ Lok01:             | STR SP,[R6]       ;
+ LDR R8,[R3]        | MOV SP,#1         ;
+ CMP R8,#0          | STR SP,[R7]       ;
+ BEQ Lskip0         | MOV SP,#1         ;
+ MOV R10,#1         | STR SP,[R8]       ;
+ STR R10,[R4]       | L11:              ;
+ Lskip0:            | DMB ISHST         ;
+ DMB ISH            | MOV SP,#2         ;
+ MOV R10,#0         | STR SP,[R1]       ;
+ STR R10,[R2]       | DMB ISH           ;
+ Lend0:             | MOV SP,#0         ;
+                    | STR SP,[R0]       ;
+filter (0:R5=0 /\ 1:R9=0 /\ 0:R6=0)
+exists (0:R7=0 /\ 0:R9=0 /\ freed=1)

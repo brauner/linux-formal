@@ -1,0 +1,16 @@
+Test MNT-E1um-nomb-in-sum Allowed
+States 1
+0:X11=0; 0:X12=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X11=0 /\ 0:X12=0 /\ [freed]=1)
+Observation MNT-E1um-nomb-in-sum Always 1 0
+Time MNT-E1um-nomb-in-sum 2.54
+Hash=d5ee8fb070c7aed1c964a8faa7a9fc6b
+
+
+real	0m2.544s
+user	0m2.544s
+sys	0m0.000s

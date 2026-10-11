@@ -1,0 +1,18 @@
+Test MNT-E2m-walker-nomb Allowed
+States 8
+0:r1=0; 0:r2=0; [freed]=0;
+0:r1=0; 0:r2=0; [freed]=1;
+0:r1=0; 0:r2=1; [freed]=0;
+0:r1=0; 0:r2=1; [freed]=1;
+0:r1=0; 0:r2=2; [freed]=0;
+0:r1=0; 0:r2=2; [freed]=1;
+0:r1=1; 0:r2=0; [freed]=1;
+0:r1=2; 0:r2=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:r1=0 /\ 0:r2=0 /\ [freed]=1)
+Observation MNT-E2m-walker-nomb Sometimes 1 7
+Time MNT-E2m-walker-nomb 0.06
+Hash=21aacab91bfbaef75fa721e7574613ab
+

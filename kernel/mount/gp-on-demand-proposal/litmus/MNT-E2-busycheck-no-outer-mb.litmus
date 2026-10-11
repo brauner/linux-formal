@@ -46,7 +46,8 @@ P0(spinlock_t *mlock, int *seq, int *gets_w, int *puts_w, int *flags)
 	}
 }
 
-P1(spinlock_t *mlock, int *seq, int *mnt_ns, int *flags, int *gets_w, int *puts_w, int *gets_u, int *puts_u, int *freed)
+P1(spinlock_t *mlock, int *seq, int *mnt_ns, int *flags, int *gets_w,
+   int *puts_w, int *gets_u, int *puts_u, int *freed)
 {
 	int r1;
 	int r2;

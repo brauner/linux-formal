@@ -1,0 +1,14 @@
+Test MNT-E1um-walker-nomb Allowed
+States 0
+No
+Witnesses
+Positive: 0 Negative: 0
+Condition exists (0:$21=0 /\ 0:$22=0 /\ [freed]=1)
+Observation MNT-E1um-walker-nomb Never 0 0
+Time MNT-E1um-walker-nomb 4.99
+Hash=ca0ffddfae7ea374fb530e76c5f3e230
+
+
+real	0m4.997s
+user	0m4.984s
+sys	0m0.012s

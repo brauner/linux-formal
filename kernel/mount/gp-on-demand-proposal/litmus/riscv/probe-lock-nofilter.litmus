@@ -1,0 +1,10 @@
+RISCV rv-lock-nofilter
+{ 0:x5=x; 0:x6=y; 0:x7=lock; 1:x5=y; 1:x6=x; 1:x7=lock; }
+ P0                      | P1                      ;
+ ori x8,x0,1             | ori x8,x0,1             ;
+ amoswap.w.aq x9,x8,(x7) | amoswap.w.aq x9,x8,(x7) ;
+ sw x8,0(x5)             | sw x8,0(x5)             ;
+ lw x10,0(x6)            | lw x10,0(x6)            ;
+ fence rw,w              | fence rw,w              ;
+ sw x0,0(x7)             | sw x0,0(x7)             ;
+exists (0:x10=0 /\ 1:x10=0)

@@ -1,0 +1,57 @@
+ARM MNT-E1u-slowpath-after-umount-tree
+(* LKMM result: Never; translation of litmus/MNT-E1u-slowpath-after-umount-tree.litmus, see gen-asm.py for the barrier mapping *)
+{
+gets_u=1;
+flags=1;
+0:R0=seq;
+0:R1=gets_w;
+0:R2=mlock;
+0:R3=flags;
+0:R4=puts_w;
+1:R0=mlock;
+1:R1=seq;
+1:R2=puts_u;
+1:R3=puts_w;
+1:R4=gets_w;
+1:R5=gets_u;
+1:R6=flags;
+1:R7=freed;
+}
+ P0                 | P1                ;
+ LDR R6,[R0]        | MOV LR,#1         ;
+ DMB ISH            | LDREX R8,[R0]     ;
+ DMB ISH            | CMP R8,#0         ;
+ LDR R7,[R0]        | BNE Lfail11       ;
+ CMP R7,#0          | STREX R8,LR,[R0]  ;
+ BNE Lend0          | CMP R8,#0         ;
+ MOV R10,#1         | BNE Lfail11       ;
+ STR R10,[R1]       | DMB ISH           ;
+ DMB ISH            | B Lok11           ;
+ DMB ISH            | Lfail11:          ;
+ LDR R9,[R0]        | MOV R8,#1         ;
+ CMP R9,#0          | Lok11:            ;
+ BEQ Lend0          | MOV LR,#1         ;
+ MOV R10,#1         | STR LR,[R1]       ;
+ LDREX R5,[R2]      | DMB ISHST         ;
+ CMP R5,#0          | MOV LR,#1         ;
+ BNE Lfail01        | STR LR,[R2]       ;
+ STREX R5,R10,[R2]  | LDR R9,[R3]       ;
+ CMP R5,#0          | LDR R11,[R2]      ;
+ BNE Lfail01        | DMB ISH           ;
+ DMB ISH            | LDR R10,[R4]      ;
+ B Lok01            | LDR R12,[R5]      ;
+ Lfail01:           | CMP R10,R9        ;
+ MOV R5,#1          | BNE L11           ;
+ Lok01:             | MOV LR,#3         ;
+ LDR R8,[R3]        | STR LR,[R6]       ;
+ CMP R8,#0          | MOV LR,#1         ;
+ BEQ Lskip0         | STR LR,[R7]       ;
+ MOV R10,#1         | L11:              ;
+ STR R10,[R4]       | DMB ISHST         ;
+ Lskip0:            | MOV LR,#2         ;
+ DMB ISH            | STR LR,[R1]       ;
+ MOV R10,#0         | DMB ISH           ;
+ STR R10,[R2]       | MOV LR,#0         ;
+ Lend0:             | STR LR,[R0]       ;
+filter (0:R5=0 /\ 1:R8=0 /\ 0:R6=0)
+exists (0:R7=0 /\ 0:R9=0 /\ freed=1)

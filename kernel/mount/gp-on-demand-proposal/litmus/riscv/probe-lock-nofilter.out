@@ -1,0 +1,14 @@
+Test rv-lock-nofilter Allowed
+States 4
+0:x10=0; 1:x10=0;
+0:x10=0; 1:x10=1;
+0:x10=1; 1:x10=0;
+0:x10=1; 1:x10=1;
+Ok
+Witnesses
+Positive: 4 Negative: 14
+Condition exists (0:x10=0 /\ 1:x10=0)
+Observation rv-lock-nofilter Sometimes 4 14
+Time rv-lock-nofilter 0.02
+Hash=fe57326169ccc6e8482a3601e152e762
+

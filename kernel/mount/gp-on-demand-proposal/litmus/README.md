@@ -18,13 +18,23 @@ back.
 | B2 | `MNT-B2-walker-bail-sees-doomed-lazy`, `MNT-B2r-walker-bail-reduced`, `MNT-B2m-walker-flags-unlocked` | a bailing walker sees MNT_DOOMED under mount_lock; `B2r` is a reduced B2 small enough for the hardware models to finish | Never, Never / Sometimes |
 | C | `MNT-C1-kern-unmount-get-before-put`, `MNT-C2-kern-unmount-gp-fallback` | kern_unmount_array(): plain store of mnt_ns, no lock, no seqcount bump | Never |
 | D | `MNT-D1-dekker-fastpath-recheck`, `MNT-D1m-holder-wmb-only` | the Dekker alternative (fast path re-reads mnt_ns after its put, no grace period); exploratory, not the tree | Never / Sometimes |
-| E | `MNT-E1-slowpath-no-outer-mb`, `MNT-E2-busycheck-no-outer-mb` | mntput_no_expire_slowpath() and do_umount()'s busy check without their outer smp_mb() (the shape of the tree after "fs: drop the smp_mb()s that mnt_get_count() made redundant") | Never |
+| E | `MNT-E1-slowpath-no-outer-mb`, `MNT-E1u-slowpath-after-umount-tree`, `MNT-E2-busycheck-no-outer-mb`, `MNT-E{1,1u,2}m-{nomb-in-sum,walker-nomb}` | mntput_no_expire_slowpath() and do_umount()'s busy check without their outer smp_mb() (the shape of the tree after "fs: drop the smp_mb()s that mnt_get_count() made redundant"); E1u is E1 started after umount_tree(); the mutations take out the smp_mb() inside mnt_get_count() or the walker's | Never, Never, Never / Sometimes for the six mutations |
 
 Modelling: LKMM has no seqlock, the tests spell write_seqlock() out as the
 kernel does (lock, seqcount store, smp_wmb(), ..., smp_wmb(), seqcount store,
 unlock) and the reader side as READ_ONCE() plus smp_rmb(); per-CPU counters
 are one variable per CPU and counter with the sum unrolled over two CPUs;
 migration is the same test with the put aimed at the other CPU's variable.
+
+E1 keeps a walker whose seqcount read predates umount_tree(). The grace
+period in namespace_unlock() keeps that walker from ever meeting the
+final put, so the interleaving it models can't happen. E1u starts after
+umount_tree() instead: P1() is only the slow path's critical section,
+and flags=1 with a seqcount of 0 is the initial state. That is the shape
+Documentation/litmus-tests/fs/ carries, `upstream/gen.sh` generates it
+from E1u. Each of E1, E1u and E2 has two mutations, one without the
+smp_mb() inside mnt_get_count() and one without the walker's, and all
+six are Sometimes: both barriers are load-bearing.
 
 ## Under the AArch64 and POWER models
 
@@ -59,6 +69,64 @@ and `ppc/probe-lock-acq-kernel.litmus` show the difference in isolation.
 isync` and every POWER test was rerun. The outputs of the first
 emulation are kept in `ppc/old-emul/`.
 
+## Under the RISC-V, MIPS and ARM models
+
+The E family also went through the three weak models herd7 ships that
+hadn't been used yet. `gen-asm.py` writes them from the same abstract
+programs, with the instructions the kernel emits:
+
+| directory | model | smp_mb() / smp_wmb() / smp_rmb() | spin_lock() / spin_unlock() |
+|---|---|---|---|
+| `riscv/` | `riscv.cat` | `fence rw,rw` / `fence w,w` / `fence r,r` | `amoswap.w.aq` / `fence rw,w; sw` |
+| `riscv-lrsc/` | `riscv.cat` | the same | `lr.w; bne; sc.w; bne; fence r,rw`, the shape of arch_cmpxchg_acquire() behind qspinlock / the same |
+| `mips/` | `mips.cat` | `sync` for all three | `sync; ll; bne; sc; beq; sync`, the shape of arch_cmpxchg() behind qspinlock / `sync; sw` |
+| `mips-weak/` | `mips.cat` | `sync` / nothing / nothing | `ll; bne; sc; beq; sync` / `sync; sw` |
+| `arm/` | `arm.cat` and `aarch32.cat` | `dmb ish` / `dmb ishst` / `dmb ish` | `ldrex; cmp; bne; strex; cmp; bne; dmb ish`, the ticket lock / `dmb ish; str` |
+
+`collect-e.sh` prints the whole family under every model, which is
+`RESULTS-E.txt`. The outputs are `<test>.out` for a `-speedcheck` run
+and `<test>.full.out` for a full one, with the model in the name in
+`arm/`: `<test>.armv7.out`, `<test>.aarch32.full.out`. The
+`probe-*.litmus` files in `riscv/`, `arm/` and `mips/` check the
+emulation: store buffering with the full fence on both sides is Never
+and with a store fence on one side Sometimes, and two critical sections
+can only both read zero with the lock filter in place.
+
+Both tests the kernel carries are Never under every model, and the
+mutations are witnessed wherever the kernel's own barriers don't mask
+them:
+
+- Every non-Octeon MIPS kernel emits the full `sync` for smp_rmb() and
+  smp_wmb() as well (arch/mips/include/asm/sync.h), so under `mips/`
+  the mutations are masked by the kernel's own barriers. `mips-weak/`
+  is the lower bound for Cavium Octeon, where smp_wmb() is the lighter
+  syncw and smp_rmb() is nothing: it emits no instruction for either
+  and keeps only the smp_mb() syncs. Both tests stay Never there and
+  all six mutations are witnessed, so the smp_mb() pairing carries the
+  result on its own.
+- On arm32 smp_rmb() is `dmb ish`. The walker's smp_mb() is redundant
+  with the read_seqretry() barrier right after it, which masks the
+  `-walker-nomb` mutations. The unlock and lock between E1's two
+  critical sections are two `dmb ish` as well and mask
+  `E1m-nomb-in-sum`; E1u has no such pair and its mutation is
+  witnessed. herd7's ARM frontend has R0-R12, LR and SP, so where a
+  thread needs more the own-counter loads r2 and r4, whose values
+  nothing reads, share a register.
+- With the lock emulated as `amoswap.w.aq`, `E1m-nomb-in-sum` is masked
+  on RISC-V: the AMO's store is coherence-after the unlock store of the
+  first critical section and `.aq` orders the AMO before every later
+  load, so the first section's seqcount stores reach the sum's loads
+  through the lock word. Dropping `.aq` unmasks it, dropping the
+  release fence does not. The kernel's qspinlock is lr.w/sc.w with
+  `fence r,rw`, which orders only the lr, and under `riscv-lrsc/` the
+  mutation is witnessed while every Never holds. So an acquire AMO is
+  the right stand-in for CASA on arm64 but stronger than the lock
+  RISC-V actually has.
+
+Alpha has no herd7 model. Its `mb` is a full barrier and READ_ONCE()
+carries one too, and nothing here relies on dependency ordering, so the
+LKMM result is what covers it.
+
 ## On x86 hardware
 
 klitmus7 turns a litmus test into a kernel module that runs the test
@@ -75,12 +143,16 @@ stores, so `MNT-A1m-nowmb` and `MNT-A1m-nomb-in-sum` are Never on x86 no
 matter how long the run is. An x86 run is not evidence for arm64 or
 POWER, the architectural models above are.
 
+`MNT-E1u-slowpath-after-umount-tree` went through the same pipeline
+later, `klitmus/run-E1u.sh` drives one test through it: Never over
+2097130 iterations.
+
 ## For the kernel tree
 
 `upstream/gen.sh <kernel tree>` writes the tests the kernel can carry
 into `Documentation/litmus-tests/fs/` of that tree, renamed and with a
 comment that explains each one. `upstream/commit-msg.txt` is the commit
-message of that patch.
+message of that patch. The slow path test it writes is E1u.
 
 ## Notes
 

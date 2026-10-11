@@ -1,0 +1,12 @@
+Test rv-lock Allowed
+States 2
+0:x10=0; 1:x10=1;
+0:x10=1; 1:x10=0;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (0:x10=0 /\ 1:x10=0)
+Observation rv-lock Never 0 2
+Time rv-lock 0.01
+Hash=fe57326169ccc6e8482a3601e152e762
+

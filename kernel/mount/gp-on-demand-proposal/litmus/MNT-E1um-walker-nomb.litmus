@@ -1,0 +1,84 @@
+C MNT-E1um-walker-nomb
+
+(*
+ * Result: Sometimes
+ *
+ * mntput_no_expire_slowpath() against a walker in __legitimize_mnt():
+ * lock_mount_hash() stores the seqcount, mnt_dec_count() drops the own
+ * reference, mnt_get_count() sums the puts, does smp_mb() and sums the
+ * gets, and a count of zero finishes the mount off.  There is no
+ * smp_mb() between taking the lock and the sum.  The smp_mb() of
+ * mnt_get_count() sits after the seqcount store and before the gets
+ * loads in program order, which is what store buffering against the
+ * walker's smp_mb() needs.  Not both the walker keeping its reference
+ * (0:r1=0, 0:r2=0) and the slow path freeing the mount (freed=1).  The
+ * own decrement ahead of the sum is a store of the running CPU, read
+ * back in program order.  The initial state is the mount after
+ * umount_tree().  A walker that started before that never meets the
+ * final put, the grace period in namespace_unlock() sees to it.
+ *)
+
+{
+	gets_w=0;
+	puts_w=0;
+	gets_u=1;
+	puts_u=0;
+	flags=1;
+	seq=0;
+	freed=0;
+}
+
+P0(spinlock_t *mlock, int *seq, int *gets_w, int *puts_w, int *flags)
+{
+	int r0;
+	int r1;
+	int r2;
+	int r3;
+
+	r0 = READ_ONCE(*seq);
+	smp_rmb();
+	smp_rmb();
+	r1 = READ_ONCE(*seq);
+	if (r1 == 0) {
+		WRITE_ONCE(*gets_w, 1);
+		smp_rmb();
+		r2 = READ_ONCE(*seq);
+		if (r2 != 0) {
+			spin_lock(mlock);
+			r3 = READ_ONCE(*flags);
+			if (r3 != 0) {
+				WRITE_ONCE(*puts_w, 1);
+			}
+			spin_unlock(mlock);
+		}
+	}
+}
+
+P1(spinlock_t *mlock, int *seq, int *flags, int *gets_w, int *puts_w,
+   int *gets_u, int *puts_u, int *freed)
+{
+	int r1;
+	int r2;
+	int r3;
+	int r4;
+
+	spin_lock(mlock);
+	WRITE_ONCE(*seq, 1);
+	smp_wmb();
+	WRITE_ONCE(*puts_u, 1);
+	r1 = READ_ONCE(*puts_w);
+	r2 = READ_ONCE(*puts_u);
+	smp_mb();
+	r3 = READ_ONCE(*gets_w);
+	r4 = READ_ONCE(*gets_u);
+	if (r3 == r1) {
+		WRITE_ONCE(*flags, 3);
+		WRITE_ONCE(*freed, 1);
+	}
+	smp_wmb();
+	WRITE_ONCE(*seq, 2);
+	spin_unlock(mlock);
+}
+
+filter (0:r0=0)
+exists (0:r1=0 /\ 0:r2=0 /\ freed=1)

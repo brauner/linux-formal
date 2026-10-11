@@ -1,0 +1,15 @@
+Test MNT-E1um-nomb-in-sum Allowed
+States 1
+0:x21=0; 0:x22=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Condition exists (0:x21=0 /\ 0:x22=0 /\ [freed]=1)
+Observation MNT-E1um-nomb-in-sum Always 1 0
+Time MNT-E1um-nomb-in-sum 0.77
+Hash=775797dbb37ef2a940bc627a7417eb0a
+
+
+real	0m0.774s
+user	0m0.762s
+sys	0m0.012s

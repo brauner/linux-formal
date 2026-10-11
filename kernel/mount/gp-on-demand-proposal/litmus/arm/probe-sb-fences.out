@@ -1,0 +1,13 @@
+Test arm-sb Allowed
+States 3
+0:R3=0; 1:R3=1;
+0:R3=1; 1:R3=0;
+0:R3=1; 1:R3=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:R3=0 /\ 1:R3=0)
+Observation arm-sb Never 0 3
+Time arm-sb 0.00
+Hash=491a006bd132bedd4746fdfb81c1d34c
+

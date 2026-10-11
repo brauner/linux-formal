@@ -1,0 +1,22 @@
+ARM arm-lock
+{ 0:R0=x; 0:R1=y; 0:R2=lock; 1:R0=y; 1:R1=x; 1:R2=lock; }
+ P0               | P1               ;
+ MOV R9,#1        | MOV R9,#1        ;
+ LDREX R3,[R2]    | LDREX R3,[R2]    ;
+ CMP R3,#0        | CMP R3,#0        ;
+ BNE Lfail0       | BNE Lfail1       ;
+ STREX R4,R9,[R2] | STREX R4,R9,[R2] ;
+ CMP R4,#0        | CMP R4,#0        ;
+ BNE Lfail0       | BNE Lfail1       ;
+ DMB ISH          | DMB ISH          ;
+ B Lok0           | B Lok1           ;
+ Lfail0:          | Lfail1:          ;
+ MOV R3,#1        | MOV R3,#1        ;
+ Lok0:            | Lok1:            ;
+ STR R9,[R0]      | STR R9,[R0]      ;
+ LDR R6,[R1]      | LDR R6,[R1]      ;
+ DMB ISH          | DMB ISH          ;
+ MOV R8,#0        | MOV R8,#0        ;
+ STR R8,[R2]      | STR R8,[R2]      ;
+filter (0:R3=0 /\ 1:R3=0)
+exists (0:R6=0 /\ 1:R6=0)

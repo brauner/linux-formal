@@ -1,0 +1,15 @@
+Test arm-sb-weak Allowed
+States 4
+0:R3=0; 1:R3=0;
+0:R3=0; 1:R3=1;
+0:R3=1; 1:R3=0;
+0:R3=1; 1:R3=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:R3=0 /\ 1:R3=0)
+Observation arm-sb-weak Sometimes 1 3
+Time arm-sb-weak 0.01
+Hash=dd5b20d96520f95952ffee9fb90d005b
+

@@ -12,3 +12,4 @@ Observation MNT-D1-dekker-fastpath-recheck Never 0 4000000
 Observation MNT-D1m-holder-wmb-only Sometimes 4252 3995748
 Observation MNT-E1-slowpath-no-outer-mb Never 0 2096720
 Observation MNT-E2-busycheck-no-outer-mb Never 0 2123015
+Observation MNT-E1u-slowpath-after-umount-tree Never 0 2097130

@@ -1,0 +1,21 @@
+Test MNT-E1u-slowpath-after-umount-tree Allowed
+States 7
+0:$21=0; 0:$22=0; [freed]=0;
+0:$21=0; 0:$22=1; [freed]=0;
+0:$21=0; 0:$22=1; [freed]=1;
+0:$21=0; 0:$22=2; [freed]=0;
+0:$21=0; 0:$22=2; [freed]=1;
+0:$21=1; 0:$22=0; [freed]=1;
+0:$21=2; 0:$22=0; [freed]=1;
+No
+Witnesses
+Positive: 0 Negative: 7
+Condition exists (0:$21=0 /\ 0:$22=0 /\ [freed]=1)
+Observation MNT-E1u-slowpath-after-umount-tree Never 0 7
+Time MNT-E1u-slowpath-after-umount-tree 6.85
+Hash=cedb3f2ff3e3ffdb4d58575402863424
+
+
+real	0m6.860s
+user	0m6.860s
+sys	0m0.000s

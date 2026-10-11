@@ -1,0 +1,18 @@
+Test MNT-E1um-nomb-in-sum Allowed
+States 8
+0:r1=0; 0:r2=0; [freed]=0;
+0:r1=0; 0:r2=0; [freed]=1;
+0:r1=0; 0:r2=1; [freed]=0;
+0:r1=0; 0:r2=1; [freed]=1;
+0:r1=0; 0:r2=2; [freed]=0;
+0:r1=0; 0:r2=2; [freed]=1;
+0:r1=1; 0:r2=0; [freed]=1;
+0:r1=2; 0:r2=0; [freed]=1;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:r1=0 /\ 0:r2=0 /\ [freed]=1)
+Observation MNT-E1um-nomb-in-sum Sometimes 1 7
+Time MNT-E1um-nomb-in-sum 0.10
+Hash=e26e009ad4ffc3cc4f74d713546379c0
+
