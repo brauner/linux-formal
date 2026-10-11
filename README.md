@@ -7,7 +7,8 @@ memory model as well, run with herd7 under the kernel's model and the
 AArch64 and POWER architectural models, and with klitmus7 on hardware.
 The C functions of fs/super.c and of one mount series went through
 CBMC, that series also through Dartagnan, and its TLA+ model was
-validated against real kernel traces.
+validated against real kernel traces. The bitmap code of close_range()
+ran as C on every table up to a small size.
 
 The code covered here is concurrent and mostly lockless: reference
 counts dropped on several CPUs at once, RCU path walks racing mount and
@@ -31,11 +32,12 @@ it. A model of a series may carry its own copy of a module of another
 model with the series applied, and says so. Inside a model every method
 has a directory of its own:
 
-    tla/       TLA+ models, their TLC configurations, traces and results
-    litmus/    litmus tests for the Linux kernel memory model
-    cbmc/      CBMC harnesses of the C functions
-    dat3m/     Dartagnan harnesses of the C functions
-    trace/     validation of kernel traces against a TLA+ model
+    tla/         TLA+ models, their TLC configurations, traces and results
+    litmus/      litmus tests for the Linux kernel memory model
+    cbmc/        CBMC harnesses of the C functions
+    dat3m/       Dartagnan harnesses of the C functions
+    trace/       validation of kernel traces against a TLA+ model
+    exhaustive/  the C functions run on every input up to a small size
 
 The README.md of a subsystem lists its models. The README.md of a model
 is where to start: it says where the code stands, what the code does
@@ -70,13 +72,13 @@ File descriptor tables, [`kernel/files/`](kernel/files/):
 | Model | What it models | Methods | Status |
 |---|---|---|---|
 | [`sync-close/`](kernel/files/sync-close/) | the order in which a dying descriptor table closes its files, against exit, exec and fork | TLA+ | queued for v7.4 |
-| [`close-range/`](kernel/files/close-range/) | close_range() with CLOSE_RANGE_EXCEPT and CLOSE_RANGE_CLOEXEC_ONLY, and the clone dup_fd() makes for it | TLA+ | queued for v7.4, revised since |
+| [`close-range/`](kernel/files/close-range/) | close_range() with CLOSE_RANGE_EXCEPT and CLOSE_RANGE_CLOEXEC_ONLY, and the clone dup_fd() makes for it | TLA+, exhaustive C | queued for v7.4 |
 
 Coredumps, [`kernel/coredump/`](kernel/coredump/):
 
 | Model | What it models | Methods | Status |
 |---|---|---|---|
-| [`rendezvous/`](kernel/coredump/rendezvous/) | the coredump rendezvous and the signal, exit, fork, exec and io-wq code around it | TLA+ | queued for v7.4, revised since |
+| [`rendezvous/`](kernel/coredump/rendezvous/) | the coredump rendezvous and the signal, exit, fork, exec and io-wq code around it | TLA+ | queued for v7.4 |
 
 Mounts, [`kernel/mount/`](kernel/mount/):
 
@@ -137,9 +139,12 @@ finding. In short:
   [`kernel/super/core/`](kernel/super/core/)
 - **Coredumps**: the trace each patch of "coredump & signals: an
   impossible affair" fixes, among them a deadlock between an SQPOLL
-  thread and its io-wq worker and a use-after-free in coredump_finish(),
-  and one way io_uring still cuts a core dump short that the series
-  doesn't cover.
+  thread and its io-wq worker and a use-after-free in coredump_finish().
+  As queued, io_uring can't cut a core dump short anymore. But a
+  coredump signal forced onto an io-wq worker still brings the SQPOLL
+  deadlock back, and with CAP_SYS_ADMIN IORING_OP_MADVISE with
+  MADV_HWPOISON does exactly that. That path was followed through the
+  code but hasn't been run.
   [`kernel/coredump/rendezvous/`](kernel/coredump/rendezvous/)
 - **Closing files**: closing a dying descriptor table synchronously in
   ascending order hangs where the old order didn't, a failed fork can
