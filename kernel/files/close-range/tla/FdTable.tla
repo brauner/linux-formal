@@ -3,8 +3,10 @@
 (* Descriptor tables and the close_range()/dup_fd() logic of the series   *)
 (* "files,close_range: add CLOSE_RANGE_{CLOEXEC_ONLY,EXCEPT}".             *)
 (*                                                                         *)
-(* Tree: work.file.close_range_except at e0bfe9dbba49 on top of            *)
-(* 5dd1818b15d9.                                                           *)
+(* Tree: vfs-7.4.sync_close at 02de8d0c3512, which is vfs-7.4.close_range  *)
+(* (c73c0e243836) with the synchronous closing of files on top; "fs: close *)
+(* files from the highest descriptor down" turned the walk of              *)
+(* __range_close() around.                                                 *)
 (*                                                                         *)
 (* A table is a function from descriptor numbers to slots.  A slot is the  *)
 (* open_fds bit, whether a struct file is installed and the close_on_exec  *)
@@ -13,11 +15,13 @@
 (* leaves close_on_exec behind, so the bit can be set on a closed slot.    *)
 (*                                                                         *)
 (* The operators follow fs/file.c: fd_range_word(), dup_fd_dropped_word(), *)
-(* dup_fd_drops(), sane_fdtable_size(), the copy loop of dup_fd(),         *)
-(* __range_cloexec(), next_open_fd(), next_fd_to_close(), __range_close()  *)
-(* and sys_close_range().  DROP_IN_DUP_FD = FALSE is the code before the   *)
-(* series: the punch_hole sizing, every descriptor the size covers copied  *)
-(* and referenced, the range closed from the clone afterwards.             *)
+(* sane_fdtable_size(), the copy loop of dup_fd(), __range_cloexec(),      *)
+(* last_fd_to_close(), __range_close() and sys_close_range().              *)
+(* DROP_IN_DUP_FD = FALSE is the code before the series: the punch_hole    *)
+(* sizing, every descriptor the size covers copied and referenced, the     *)
+(* range closed from the clone afterwards.  MUTATION names one change to   *)
+(* the code that a configuration expects the properties to catch, "none"   *)
+(* is the code as it is.                                                   *)
 (*                                                                         *)
 (* Meaning() says what the flags mean.  The models check that the code    *)
 (* refines it, that the clone's bitmaps are consistent, that dup_fd() is   *)
@@ -29,9 +33,19 @@ EXTENDS Naturals, FiniteSets, TLC
 CONSTANTS
     W,               \* BITS_PER_LONG, which is also NR_OPEN_DEFAULT
     INF,             \* stands for ~0U: above every table
-    DROP_IN_DUP_FD   \* TRUE: the series; FALSE: the code before it
+    DROP_IN_DUP_FD,  \* TRUE: the series; FALSE: the code before it
+    MUTATION         \* "none" or one of Mutations
+
+Mutations == {"none",
+              "no_last_word_mask",    \* last_fd_to_close() without BITMAP_LAST_WORD_MASK(n)
+              "skip_off_by_one",      \* the empty-stretch skip resumes one word too low
+              "hop_off_by_one",       \* the hop resumes one word too low
+              "hop_partial",          \* the hop also takes words that stick out above the window
+              "no_range_mask",        \* last_fd_to_close() without dup_fd_dropped_word()
+              "size_no_except_clamp"} \* sane_fdtable_size() keeps the last descriptor above an EXCEPT range
 
 ASSUME W \in Nat /\ W >= 1
+ASSUME MUTATION \in Mutations
 
 NR_OPEN_DEFAULT == W
 WordBits == 0..(W - 1)
@@ -78,18 +92,37 @@ DupFdDroppedWord(t, i, r, f) ==
              d1 == IF f.except THEN WordBits \ base ELSE base
          IN IF f.cloexec_only THEN {b \in d1 : t[i * W + b].cloexec} ELSE d1
 
-(* dup_fd_drops() *)
+(* the bit of descriptor d in dup_fd_dropped_word() *)
 DupFdDrops(t, d, r, f) == (d % W) \in DupFdDroppedWord(t, d \div W, r, f)
-
-(* sane_fdtable_size() of the series: reach the last open descriptor that is carried over *)
-SaneFdtableSizeNew(t, r, f) ==
-    LET kept == {i \in Words(t) : OpenBits(t, i) \ DupFdDroppedWord(t, i, r, f) # {}}
-    IN IF kept = {} THEN NR_OPEN_DEFAULT ELSE (SetMax(kept) + 1) * W
 
 (* find_last_bit(open_fds, size): the last open descriptor below size, or size *)
 FindLastBit(t, size) ==
     LET open == {d \in 0..(size - 1) : t[d].open}
     IN IF open = {} THEN size ELSE SetMax(open)
+
+(* sane_fdtable_size() of the series: reach the last open descriptor that is carried over *)
+SaneFdtableSizeNew(t, r, f) ==
+    LET last == FindLastBit(t, MaxFds(t))
+    IN IF last = MaxFds(t) THEN NR_OPEN_DEFAULT
+       ELSE IF r.null THEN Align(last + 1)
+       ELSE IF f.cloexec_only
+       THEN \* the close-on-exec bits decide what is dropped, walk the words
+            LET kept == {i \in 0..(last \div W) : OpenBits(t, i) \ DupFdDroppedWord(t, i, r, f) # {}}
+            IN IF kept = {} THEN NR_OPEN_DEFAULT ELSE (SetMax(kept) + 1) * W
+       ELSE IF f.except
+       THEN \* only the range is carried over
+            IF last > r.to /\ MUTATION # "size_no_except_clamp"
+            THEN LET l1 == FindLastBit(t, r.to + 1)
+                 IN IF l1 > r.to THEN NR_OPEN_DEFAULT
+                    ELSE IF l1 < r.from THEN NR_OPEN_DEFAULT
+                    ELSE Align(l1 + 1)
+            ELSE IF last < r.from THEN NR_OPEN_DEFAULT
+            ELSE Align(last + 1)
+       ELSE IF last >= r.from /\ last <= r.to
+       THEN \* the last open descriptor goes, the kept ones sit below the range
+            LET l2 == FindLastBit(t, r.from)
+            IN IF l2 = r.from THEN NR_OPEN_DEFAULT ELSE Align(l2 + 1)
+       ELSE Align(last + 1)
 
 (* sane_fdtable_size() before the series: the punch_hole special case *)
 SaneFdtableSizeOld(t, r) ==
@@ -103,7 +136,8 @@ SaneFdtableSizeOld(t, r) ==
 SaneFdtableSize(t, r, f) ==
     IF DROP_IN_DUP_FD THEN SaneFdtableSizeNew(t, r, f) ELSE SaneFdtableSizeOld(t, r)
 
-(* the copy loop of dup_fd(): a file is carried over unless it is dropped *)
+(* the copy loop of dup_fd(): a file is carried over unless it is dropped; the loop
+   reads dup_fd_dropped_word() once per word, which under file_lock is the same *)
 Keeps(t, d, r, f) == t[d].file /\ (DROP_IN_DUP_FD => ~DupFdDrops(t, d, r, f))
 
 (* what sane_fdtable_size() has to reach: open and not dropped *)
@@ -134,31 +168,55 @@ RangeCloexec(t, r, f) ==
                        \cup (IF r.to < last THEN (r.to + 1)..last ELSE {})
     IN [d \in DOMAIN t |-> IF d \in marked THEN [t[d] EXCEPT !.cloexec = TRUE] ELSE t[d]]
 
-(* next_open_fd(): find_next_bit() or find_next_and_bit() over [fd, max_fd] *)
-NextOpenFd(t, fd, max_fd, f) ==
-    LET c == {d \in fd..max_fd : t[d].open /\ (f.cloexec_only => t[d].cloexec)}
-    IN IF c = {} THEN max_fd + 1 ELSE SetMin(c)
+(* last_fd_to_close(): the highest open descriptor below n that the range selects,
+   or n.  The loop is "for (i = n ? (n - 1) / BITS_PER_LONG + 1 : 0; i-- > lo; )",
+   LtcLoop gets i before the decrement and j is the word an iteration looks at. *)
+RECURSIVE LtcLoop(_, _, _, _, _, _)
+LtcLoop(t, n, r, f, i, lo) ==
+    IF ~(i > lo) THEN n
+    ELSE LET j == i - 1
+             set == OpenBits(t, j)
+         IN IF set = {}
+            THEN \* skip the empty stretch at find_last_bit() speed
+                 LET last == FindLastBit(t, j * W)
+                 IN IF last >= j * W THEN n
+                    ELSE LtcLoop(t, n, r, f,
+                                 IF MUTATION = "skip_off_by_one" THEN last \div W
+                                 ELSE last \div W + 1, lo)
+            ELSE IF /\ f.except
+                    /\ j * W >= r.from
+                    /\ (MUTATION = "hop_partial" \/ j * W + W - 1 <= r.to)
+                 THEN \* hop below the kept window in one step
+                      IF r.from = 0 THEN n
+                      ELSE LtcLoop(t, n, r, f,
+                                   IF MUTATION = "hop_off_by_one" THEN (r.from - 1) \div W
+                                   ELSE (r.from - 1) \div W + 1, lo)
+                 ELSE LET s1 == IF MUTATION = "no_range_mask" THEN set
+                                ELSE set \cap DupFdDroppedWord(t, j, r, f)
+                          s2 == IF j = (n - 1) \div W /\ MUTATION # "no_last_word_mask"
+                                THEN {b \in s1 : j * W + b < n}    \* BITMAP_LAST_WORD_MASK(n)
+                                ELSE s1
+                      IN IF s2 # {} THEN j * W + SetMax(s2)        \* __fls()
+                         ELSE LtcLoop(t, n, r, f, j, lo)
 
-(* next_fd_to_close(): hop over the window CLOSE_RANGE_EXCEPT keeps, at most once *)
-NextFdToClose(t, fd0, max_fd, r, f) ==
-    LET fd == NextOpenFd(t, fd0, max_fd, f)
-    IN IF f.except /\ InRange(r, fd)
-       THEN IF r.to >= max_fd THEN max_fd + 1 ELSE NextOpenFd(t, r.to + 1, max_fd, f)
-       ELSE fd
+LastFdToClose(t, n, r, f) ==
+    LtcLoop(t, n, r, f, IF n = 0 THEN 0 ELSE (n - 1) \div W + 1,
+            IF f.except THEN 0 ELSE r.from \div W)
 
-CloseSlot(t, d) == [t EXCEPT ![d] = Closed(t[d])]
+(* where __range_close() starts: one past the last descriptor it may close *)
+WalkStart(t, r, f) == IF f.except THEN MaxFds(t) ELSE Min(r.to, LastFd(t)) + 1
 
-(* __range_close() with nothing running next to it *)
-RECURSIVE RangeCloseLoop(_, _, _, _, _)
-RangeCloseLoop(t, fd0, max_fd, r, f) ==
-    LET fd == NextFdToClose(t, fd0, max_fd, r, f)
-    IN IF fd > max_fd THEN t
-       ELSE RangeCloseLoop(IF t[fd].file THEN CloseSlot(t, fd) ELSE t,
-                           fd + 1, max_fd, r, f)
+CloseSlot(t, d) == [t EXCEPT ![d] = Closed(t[d])]   \* file_close_fd_locked()
 
-RangeClose(t, r, f) ==
-    IF f.except THEN RangeCloseLoop(t, 0, LastFd(t), r, f)
-    ELSE RangeCloseLoop(t, r.from, Min(r.to, LastFd(t)), r, f)
+(* __range_close() with nothing running next to it: highest descriptor first, the
+   bound comes down to each descriptor the walk finds, a claimed slot stays open *)
+RECURSIVE RangeCloseLoop(_, _, _, _)
+RangeCloseLoop(t, n, r, f) ==
+    LET fd == LastFdToClose(t, n, r, f)
+    IN IF fd >= n THEN t
+       ELSE RangeCloseLoop(IF t[fd].file THEN CloseSlot(t, fd) ELSE t, fd, r, f)
+
+RangeClose(t, r, f) == RangeCloseLoop(t, WalkStart(t, r, f), r, f)
 
 NoClone == [max |-> 0, slots |-> <<>>, full |-> <<>>, refs |-> {}]
 

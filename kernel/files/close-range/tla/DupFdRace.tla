@@ -4,14 +4,15 @@
 (* copy runs under file_lock, but fd_install() is lockless and can put a   *)
 (* file into a claimed slot at any time, and the lock is dropped to        *)
 (* allocate a bigger table, during which the other threads can do          *)
-(* anything.  DROP_IN_DUP_FD = FALSE is the code before the series.        *)
+(* anything.  The copy loop reads dup_fd_dropped_word() at the first slot  *)
+(* of every word.  DROP_IN_DUP_FD = FALSE is the code before the series.   *)
 (***************************************************************************)
 EXTENDS FdTable
 
 CONSTANTS NWords, FlagSet
 
-VARIABLES table, range, flags, pc, cap, open_files, snap, i, clone, full, refs
-vars == <<table, range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+VARIABLES table, range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped
+vars == <<table, range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 
 UnshareFlagsDef == {f \in ValidFlags : f.unshare}
 OldUnshareFlagsDef == {f \in OldFlags : f.unshare}
@@ -23,7 +24,7 @@ Init ==
     /\ range \in Ranges
     /\ flags \in FlagSet
     /\ pc = "size" /\ cap = NR_OPEN_DEFAULT /\ open_files = 0 /\ snap = table
-    /\ i = 0 /\ clone = <<>> /\ full = <<>> /\ refs = {}
+    /\ i = 0 /\ clone = <<>> /\ full = <<>> /\ refs = {} /\ dropped = {}
 
 (* under the lock: size the copy; a table bigger than what we have means dropping the lock *)
 Size ==
@@ -31,29 +32,34 @@ Size ==
     /\ LET n == SaneFdtableSize(table, Drop, flags) IN
        /\ open_files' = n
        /\ IF n > cap
-          THEN pc' = "alloc" /\ UNCHANGED <<snap, clone, full, i, refs>>
+          THEN pc' = "alloc" /\ UNCHANGED <<snap, clone, full, i, refs, dropped>>
           ELSE /\ pc' = "copy"
                /\ snap' = table
                /\ clone' = [d \in 0..(n - 1) |->             \* copy_fd_bitmaps()
                                [open |-> table[d].open, file |-> FALSE, cloexec |-> table[d].cloexec]]
                /\ full' = [w \in 0..(n \div W - 1) |-> OpenBits(table, w) = WordBits]
-               /\ i' = 0 /\ refs' = {}
+               /\ i' = 0 /\ refs' = {} /\ dropped' = {}
     /\ UNCHANGED <<table, range, flags, cap>>
 
 (* alloc_fdtable() without the lock; then the sizing starts over *)
 Alloc ==
     /\ pc = "alloc"
     /\ cap' = open_files /\ pc' = "size"
-    /\ UNCHANGED <<table, range, flags, open_files, snap, i, clone, full, refs>>
+    /\ UNCHANGED <<table, range, flags, open_files, snap, i, clone, full, refs, dropped>>
 
-(* one slot of the copy loop, under the lock: the file pointer is read now *)
+(* one slot of the copy loop, under the lock: the file pointer is read now, the
+   word of descriptors to leave behind at the first slot of every word *)
 Copy ==
     /\ pc = "copy"
     /\ IF i = open_files
-       THEN pc' = "finish" /\ UNCHANGED <<clone, full, refs, i>>
-       ELSE /\ i' = i + 1
+       THEN pc' = "finish" /\ UNCHANGED <<clone, full, refs, i, dropped>>
+       ELSE LET dr == IF i % W = 0 THEN DupFdDroppedWord(table, i \div W, Drop, flags)
+                      ELSE dropped
+            IN
+            /\ dropped' = dr
+            /\ i' = i + 1
             /\ pc' = "copy"
-            /\ IF table[i].file /\ (DROP_IN_DUP_FD => ~DupFdDrops(table, i, Drop, flags))
+            /\ IF table[i].file /\ (DROP_IN_DUP_FD => (i % W) \notin dr)
                THEN /\ clone' = [clone EXCEPT ![i] = [open |-> TRUE, file |-> TRUE, cloexec |-> table[i].cloexec]]
                     /\ refs' = refs \cup {i}
                     /\ UNCHANGED full
@@ -62,7 +68,12 @@ Copy ==
                     /\ UNCHANGED refs
     /\ UNCHANGED <<table, range, flags, cap, open_files, snap>>
 
-(* back in sys_close_range(): mark the clone, close from it (before the series), or nothing *)
+(* back in sys_close_range(): mark the clone, close from it (before the series), or
+   nothing.  Before the series the walk closed every installed descriptor of the
+   range from the private clone, which is Meaning() of the clone, and refine_old
+   checks the walk against Meaning() on every table.  Spelling the walk out here
+   makes TLC evaluate it over and over whenever ENABLED looks at Finish for the
+   fairness. *)
 Finish ==
     /\ pc = "finish"
     /\ pc' = "done"
@@ -70,38 +81,38 @@ Finish ==
        THEN clone' = RangeCloexec(clone, range, flags) /\ UNCHANGED full
        ELSE IF DROP_IN_DUP_FD
             THEN UNCHANGED <<clone, full>>
-            ELSE LET c == RangeClose(clone, range, flags) IN
+            ELSE LET c == Meaning(clone, range, flags, FALSE) IN  \* see above
                  /\ clone' = c
                  /\ full' = [w \in DOMAIN full |-> full[w] /\ \A b \in WordBits : c[w * W + b].open]
-    /\ UNCHANGED <<table, range, flags, cap, open_files, snap, i, refs>>
+    /\ UNCHANGED <<table, range, flags, cap, open_files, snap, i, refs, dropped>>
 
 (* the rest of the process: fd_install() is lockless, everything else needs the lock *)
 Unlocked == pc = "alloc"
 Grow ==
     /\ Unlocked /\ MaxFds(table) < W * NWords
     /\ table' = [d \in 0..(MaxFds(table) + W - 1) |-> IF d \in DOMAIN table THEN table[d] ELSE Free]
-    /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+    /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 Open ==
     \E b \in BOOLEAN :
         LET free == {d \in DOMAIN table : ~table[d].open} IN
         /\ Unlocked /\ free # {}
         /\ table' = [table EXCEPT ![SetMin(free)] = [open |-> TRUE, file |-> FALSE, cloexec |-> b]]
-        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 Install ==
     \E d \in DOMAIN table :
         /\ pc # "done" /\ table[d].open /\ ~table[d].file
         /\ table' = [table EXCEPT ![d].file = TRUE]
-        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 Close ==
     \E d \in DOMAIN table :
         /\ Unlocked /\ table[d].file
         /\ table' = CloseSlot(table, d)
-        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 SetFd ==
     \E d \in DOMAIN table :
         /\ Unlocked /\ table[d].file
         /\ table' = [table EXCEPT ![d].cloexec = ~table[d].cloexec]
-        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs>>
+        /\ UNCHANGED <<range, flags, pc, cap, open_files, snap, i, clone, full, refs, dropped>>
 
 Next == Size \/ Alloc \/ Copy \/ Finish \/ Grow \/ Open \/ Install \/ Close \/ SetFd
 Spec == Init /\ [][Next]_vars /\ WF_vars(Size) /\ WF_vars(Alloc) /\ WF_vars(Copy) /\ WF_vars(Finish)

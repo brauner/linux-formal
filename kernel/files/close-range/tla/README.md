@@ -1,8 +1,14 @@
 # TLA+ model of close_range() and the clone dup_fd() makes for it
 
-Tree: `work.file.close_range_except` at e0bfe9dbba49 on top of
-5dd1818b15d9, the series "files,close_range: add
-CLOSE_RANGE_{CLOEXEC_ONLY,EXCEPT}".
+Tree: vfs-7.4.sync_close at 02de8d0c3512, which is vfs-7.4.close_range
+(c73c0e243836, the series "files,close_range: add
+CLOSE_RANGE_{CLOEXEC_ONLY,EXCEPT}") with "files: make closing files
+synchronous for close_range(), exec, exit" and its fixes on top.  The
+models were first written against e0bfe9dbba49, the series before it was
+applied; the queued version sizes the clone differently and "fs: close
+files from the highest descriptor down" turned the walk of
+`__range_close()` around, so they were brought up to 02de8d0c3512 and
+rerun.
 
 The series makes `dup_fd()` leave the descriptors `close_range()` is
 about to close behind instead of copying them and closing them again
@@ -10,10 +16,10 @@ from the clone, and adds CLOSE_RANGE_EXCEPT (act on everything outside
 of the range) and CLOSE_RANGE_CLOEXEC_ONLY (act only on close-on-exec
 descriptors).  What the series adds is bitmap arithmetic: which bits of
 a word a range covers, the inversion and the close_on_exec mask on top
-of it, the sizing of the clone, and a walk over the table that hops over
-the window it keeps.  `FdTable.tla` writes that code down operator by
-operator, next to what the flags are supposed to mean.  Three models use
-it.
+of it, the sizing of the clone, and a walk over the table that goes
+from the highest descriptor down and hops below the window it keeps.
+`FdTable.tla` writes that code down operator by operator, next to what
+the flags are supposed to mean.  Three models use it.
 
 ## Files
 
@@ -26,6 +32,7 @@ it.
 | `*.cfg` | TLC configurations; the header says what to expect |
 | `check.sh`, `check-all.sh`, `run-parallel.sh`, `summarize.sh` | run one, all, or all at once; results land in `logs/` |
 | `extract-trace.sh`, `traces/` | the counterexamples of the configurations that are expected to fail |
+| `fill-results.py`, `RESULTS.txt` | the results table below, from `logs/summary.txt` |
 
 ## Running it
 
@@ -36,11 +43,11 @@ version 2.19 was used).  Java 17 or newer.
     ./check.sh refine_new 16          # one configuration
     ./check-all.sh                    # every configuration, summary in logs/summary.txt
 
-Everything but `race_fixed` and `refine_new_w4` finishes in minutes on a
-laptop.  `race_fixed` explores the interleavings of the walk with liveness
-over three-bit words and wants a big machine (`run-parallel.sh`,
-`TLC_WORKERS`, `TLC_HEAP`); `race_fixed_w2` is the same walk over two-bit
-words.
+The mutations finish in seconds, `refine_new`, `refine_new_3w`,
+`race_fixed_w2` and the `dupfd_*` runs in a few minutes.
+`refine_new_w4` (1.7M initial tables, `TLC_OPTS="-maxSetSize 2000000"`)
+and `race_fixed`, the walk with liveness over three-bit words, want a big
+machine (`run-parallel.sh`, `TLC_WORKERS`, `TLC_HEAP`).
 
 ## What is in the model
 
@@ -60,12 +67,14 @@ models start from every one-word table and let the table grow.
 | Operator | Kernel |
 |----------|--------|
 | `FdRangeWord` | `fd_range_word()`: the GENMASK() of a range's bits in one word |
-| `DupFdDroppedWord`, `DupFdDrops` | `dup_fd_dropped_word()`, `dup_fd_drops()`: the inversion for FD_RANGE_EXCEPT, the close_on_exec mask for FD_RANGE_CLOEXEC_ONLY |
-| `SaneFdtableSizeNew`, `SaneFdtableSizeOld` | `sane_fdtable_size()` after and before the series |
+| `DupFdDroppedWord`, `DupFdDrops` | `dup_fd_dropped_word()`: the inversion for FD_RANGE_EXCEPT, the close_on_exec mask for FD_RANGE_CLOEXEC_ONLY; `DupFdDrops` is the bit of one descriptor in it |
+| `FindLastBit` | `find_last_bit()` on open_fds |
+| `SaneFdtableSizeNew`, `SaneFdtableSizeOld` | `sane_fdtable_size()` of the series and before it: the series walks the words for FD_RANGE_CLOEXEC_ONLY, clamps to the range for FD_RANGE_EXCEPT and otherwise looks below the range when the last open descriptor falls into it, which is the punch_hole case of before |
 | `DupFd` | `dup_fd()`: the size, `copy_fd_bitmaps()`, the copy loop with `get_file()` and `__clear_open_fd()`, full_fds_bits |
 | `RangeCloexec` | `__range_cloexec()`: one or two `bitmap_set()` |
-| `NextOpenFd`, `NextFdToClose` | `next_open_fd()`, `next_fd_to_close()` |
-| `RangeClose` | `__range_close()` with nothing running next to it |
+| `LastFdToClose` | `last_fd_to_close()`: the loop over words from the top, the skip of an empty stretch with `find_last_bit()`, the hop below a word that lies inside the kept window, `dup_fd_dropped_word()`, `BITMAP_LAST_WORD_MASK()` and `__fls()` |
+| `WalkStart` | where `__range_close()` starts: max_fds for FD_RANGE_EXCEPT, one past `min(to, last_fd())` otherwise |
+| `RangeClose` | `__range_close()` with nothing running next to it: the bound comes down to each descriptor `last_fd_to_close()` finds, a claimed slot stays |
 | `CloseRange` | `sys_close_range()`: the unshare, `drop = NULL` for CLOSE_RANGE_CLOEXEC, the close that is skipped after an unshare |
 | `Selected`, `Meaning` | what the flags mean: the descriptors the call acts on, the table the caller ends up with |
 
@@ -73,13 +82,13 @@ models start from every one-word table and let the table grow.
 
 | Action | Kernel |
 |--------|--------|
-| `Start` | `__range_close()`: the bounds, computed once under file_lock |
-| `Scan` | one iteration under file_lock: `next_fd_to_close()`, `file_close_fd_locked()` |
-| `FilpClose` | `filp_close()` with the lock dropped |
+| `Start` | `__range_close()`: the bound, computed once under file_lock |
+| `Scan` | one iteration under file_lock: `last_fd_to_close()` below the bound, the bound brought down to what it found, `file_close_fd_locked()` |
+| `FilpClose` | `filp_close_sync()` with the lock dropped |
 | `Size` | `dup_fd()`: `sane_fdtable_size()` and `copy_fd_bitmaps()` under file_lock |
 | `Alloc` | `alloc_fdtable()` with the lock dropped; the size is computed again afterwards |
-| `Copy` | one slot of the copy loop: the pointer read, then `get_file()` or `__clear_open_fd()` |
-| `Finish` | back in `sys_close_range()`: `__range_cloexec()` on the clone, or, before the series, `__range_close()` on it |
+| `Copy` | one slot of the copy loop: `dup_fd_dropped_word()` at the first slot of a word, the pointer read, then `get_file()` or `__clear_open_fd()` |
+| `Finish` | back in `sys_close_range()`: `__range_cloexec()` on the clone, or, before the series, `__range_close()` on it, as the closed form `Meaning()` |
 | `Open`, `Install`, `Close`, `SetFd`, `Grow` | the other threads: `alloc_fd()`, `fd_install()`, `close()`, `fcntl(F_SETFD)`, `expand_fdtable()` |
 
 ### Switches
@@ -87,7 +96,7 @@ models start from every one-word table and let the table grow.
 | Constant | Meaning |
 |----------|---------|
 | `DROP_IN_DUP_FD` | TRUE is the series.  FALSE is the code before it: the punch_hole sizing, every descriptor the size covers copied and referenced, the range closed from the clone afterwards |
-| `FIX_HOP` (`RangeCloseRace`) | FALSE takes the hop out of `next_fd_to_close()` |
+| `MUTATION` | `"none"` is the code as it is.  The others each change one thing a configuration expects the properties to catch: `"no_last_word_mask"` drops `BITMAP_LAST_WORD_MASK(n)` from `last_fd_to_close()`, `"skip_off_by_one"` resumes the skip of an empty stretch one word too low, `"hop_off_by_one"` resumes the hop one word too low, `"hop_partial"` also hops a word that sticks out above the window, `"no_range_mask"` drops `dup_fd_dropped_word()` from `last_fd_to_close()`, `"size_no_except_clamp"` keeps the last open descriptor above a FD_RANGE_EXCEPT range in `sane_fdtable_size()` |
 
 ### Properties
 
@@ -113,8 +122,11 @@ models start from every one-word table and let the table grow.
   size the copy needs; what it rounds up to is free slots either way.
 - No reference counts.  `refs` records the descriptors `get_file()` was
   called on.
-- `->flush()`, dnotify and POSIX locks are not modelled.  The series only
-  changes whether a clone ever holds the file at all.
+- `->flush()`, `->release()`, dnotify and POSIX locks are not modelled,
+  and neither is what `filp_close_sync()` does beyond running without
+  the lock.  The series only changes whether a clone ever holds the file
+  at all; the order of the releases is `kernel/files/sync-close/`'s
+  business.
 - In `RangeCloseRace` the other threads may run between any two
   iterations of the walk, which is more than the kernel allows: it keeps
   the lock across an iteration that finds nothing to close and does not
