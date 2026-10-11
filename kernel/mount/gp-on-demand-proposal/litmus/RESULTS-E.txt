@@ -1,9 +1,9 @@
 test                                 LKMM               AArch64          POWER            RISC-V           RISC-V-lrsc      MIPS             MIPS-weak        ARMv7            AArch32          x86-klitmus
-MNT-E1-slowpath-no-outer-mb          Never 0 13         Never            Never            Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) -                Never 0/2096720
+MNT-E1-slowpath-no-outer-mb          Never 0 13         Never            Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) Never 0 13 (full) -                Never 0/2096720
 MNT-E1u-slowpath-after-umount-tree   Never 0 7          Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0/2097130
 MNT-E2-busycheck-no-outer-mb         Never 0 7          Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0 7 (full) Never 0/2123015
-MNT-E1m-nomb-in-sum                  Sometimes 1 15     -                -                Never            witnessed        Never            Never            Never            Never            
-MNT-E1m-walker-nomb                  Sometimes 1 15     -                -                witnessed        witnessed        Never            witnessed        Never            Never            
+MNT-E1m-nomb-in-sum                  Sometimes 1 15     Never            witnessed        Never            witnessed        Never            Never            Never            Never            
+MNT-E1m-walker-nomb                  Sometimes 1 15     witnessed        witnessed        witnessed        witnessed        Never            witnessed        Never            Never            
 MNT-E1um-nomb-in-sum                 Sometimes 1 7      witnessed        witnessed        witnessed        witnessed        Never            witnessed        witnessed        witnessed        
 MNT-E1um-walker-nomb                 Sometimes 1 7      witnessed        witnessed        witnessed        witnessed        Never            witnessed        Never            Never            
 MNT-E2m-nomb-in-sum                  Sometimes 1 7      witnessed        witnessed        witnessed        witnessed        Never            witnessed        witnessed        witnessed        
