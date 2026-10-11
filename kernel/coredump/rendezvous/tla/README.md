@@ -1,8 +1,14 @@
 # TLA+ model of the coredump rendezvous and the signal code around it
 
-Tree: `work.coredump.close_files.fixes` at 938c2dd45269 on top of
-c7b1fa3db4a1 (vfs-7.4.coredump), the series "coredump & signals: an
-impossible affair" v3.
+Tree: vfs.all at 548491e998e1.  It carries "coredump & signals: an
+impossible affair" as queued for v7.4 in kernel-7.4.signal (merge
+ed14a591175b), which is built on vfs-7.4.signal and its
+TIF_NOTIFY_SIGNAL guard for coredumps, and "coredump: parse a snapshot
+of core_pattern" in vfs-7.4.coredump.  The series was first modelled as
+v3, `work.coredump.close_files.fixes` at 938c2dd45269 on top of
+c7b1fa3db4a1 (vfs-7.4.coredump).  `SIGPENDING_V3` and
+`FIX_WORKER_NODUMP` on and `FIX_NO_NOTIFY_SIGNAL` off switch the model
+back to what v3 did.
 
 The model is one thread group.  Threads receive signals, dequeue them in
 `get_signal()`, dump core, exit, exec, and create io-wq workers from task
@@ -25,6 +31,8 @@ over every interleaving of the configured thread layout.
 | `IoWqExitBit.tla` | io-wq: order the exit bit against worker creation task work (needs a store buffer, so it is its own module) |
 | `CorePattern.tla`, `MC_CorePattern.tla` | coredump: parse a snapshot of core_pattern (a torn read) |
 | `check.sh`, `check-all.sh` | run one or all configurations; results land in `logs/` |
+| `RESULTS.txt` | the summary of the last run of every configuration |
+| `traces/` | the counterexample of every configuration that expects one, cut down by `extract-trace.sh` |
 
 ## Running it
 
@@ -37,11 +45,13 @@ version 2.19 was used).  Java 17 or newer.
 
 `TLC_WORKERS`, `TLC_HEAP` and `TLC_METADIR` tune the run; `run-parallel.sh`
 starts every configuration at once on a big machine and `summarize.sh`
-collects the results.  The state spaces are tens of millions of states:
-the green proofs with liveness take from a quarter of an hour to about
-an hour each with 32 workers and 24G of heap, the bug configurations stop
-at their counterexample much sooner (see the table below).  The io-wq and
-core_pattern modules finish in a second.
+collects the results.  The state spaces have from three million to
+over four hundred million states.  With 8 to 40 workers each on a big
+machine the green configurations took from six minutes to an hour and
+a quarter, see the table below.  The bug configurations stop at their
+counterexample in seconds to minutes, `plain_no_exec_cancel` takes
+longest with a trace 23 states deep.  The io-wq and core_pattern
+modules finish in a second.
 
     java -cp $TLA2TOOLS tlc2.TLC -workers 2 -deadlock -config IoWqExitBit_nobarrier.cfg IoWqExitBit.tla
     java -cp $TLA2TOOLS tlc2.TLC -workers 2 -deadlock -config CorePattern_torn.cfg MC_CorePattern.tla
@@ -63,23 +73,24 @@ notify_count, quick_threads, the shared pending set and core_state.
 
 | Action | Kernel |
 |--------|--------|
-| `SendGroup`, `SendThread`, `CompleteSignal` | `__send_signal_locked()`, `prepare_signal()`, `legacy_queue()`, `complete_signal()`, `wants_signal()`; the fatal fan-out of SIGKILL/SIGTERM |
+| `SendGroup`, `SendThread`, `CompleteSignal` | `__send_signal_locked()` with `task_can_queue_signal()`, `prepare_signal()`, `legacy_queue()`, `complete_signal()`, `wants_signal()`; the fatal fan-out of SIGKILL/SIGTERM |
 | `GetSignal` | one pass of `get_signal()`: the SIGNAL_GROUP_EXIT/group_exec_task short cut, `dequeue_signal()` private then shared, `recalc_sigpending()`; runs only once `HandleNotify` and `CreateWorker` drained what `clear_notify_signal()`/`task_work_run()` drain at its entry |
-| `Fatal`, `VfsCoredump`, `DoGroupExit` | the `fatal:` label: PF_SIGNALED, the PF_USER_WORKER `goto out`, `vfs_coredump()` -> `coredump_wait()` -> `zap_threads()`/`zap_process()`, `do_group_exit()` -> `zap_other_threads()` |
+| `Fatal`, `DumpStart`, `VfsCoredump`, `DoGroupExit` | the `fatal:` label: PF_SIGNALED with the siglock dropped, then `vfs_coredump()` -> `coredump_wait()` -> `zap_threads()`/`zap_process()` under the siglock again (`DumpStart`), the PF_USER_WORKER `goto out` after the dump (before it with `FIX_WORKER_NODUMP`), `do_group_exit()` -> `zap_other_threads()` |
 | `WorkerLeave` | a PF_USER_WORKER returning from `get_signal()`: `io_wq_worker()` -> `io_worker_exit()`, `io_sq_thread()` -> `io_uring_cancel_generic(true, sqd)` |
 | `BlockUsr`, `UnblockUsr` | `sigprocmask()` -> `__set_task_blocked()` -> `retarget_shared_pending()` |
 | `SigWaitEnter`, `SigWaitWake` | `do_sigtimedwait()`: the narrowed mask, the restore through `__set_task_blocked()`, the final dequeue |
 | `RetargetWake` | `retarget_shared_pending()` including the SIGNAL_GROUP_EXIT early return of the fix |
 | `TracerClearMask` | `PTRACE_SETSIGMASK` on a user worker |
-| `Freeze` | `freeze_task()` -> `fake_signal_wake_up()` (PM, cgroup v1) and `cgroup_freeze_task()` -> JOBCTL_TRAP_FREEZE (cgroup v2) |
+| `ForceCoreWorker` | `force_sig_info_to_task()` of SIGSEGV or SIGBUS on a user worker: the signal unblocked, queued unless the worker is PF_EXITING, TIF_SIGPENDING set; only with `ForcedBudget` > 0 |
+| `Freeze` | `freeze_task()` -> `fake_signal_wake_up()` (PM, cgroup v1) and `cgroup_freeze_task()` -> JOBCTL_TRAP_FREEZE (cgroup v2), between the dequeue of the coredump signal and the last write |
 | `DumpWaitDone` | `coredump_wait_inactive()`: `wait_var_event_state(TASK_UNINTERRUPTIBLE)` on threads_remaining |
-| `DumpChunk` | `dump_emit()`: `dump_interrupted()`, then a write that may block and then fails on `signal_pending()` like `pipe_write()` |
+| `DumpChunk` | `dump_emit()`: `dump_interrupted()`, then a write that may block and then fails on `signal_pending()` like `pipe_write()`; `signal_pending()` skips TIF_NOTIFY_SIGNAL under the `no_notify_signal` guard `vfs_coredump()` holds for the writes and `coredump_finish()` |
 | `DumpFinish`, `ReleaseClear`, `ReleaseWake`, `ReleaseDone` | `coredump_finish()`: core_state detached under siglock, `guard(rcu)`, `curr->task = NULL`, `wake_up_process(task)` |
 | `ExitSyscall`, `ExitGroupSyscall` | `exit(2)`, `exit_group(2)` |
 | `SyncGroupExit` | `synchronize_group_exit()` and `coredump_task_exit()`: quick_threads, PF_POSTCOREDUMP under siglock with the core_state read, the decrement, the park of a PF_SIGNALED thread |
 | `Unpark` | the `set_current_state(TASK_IDLE); if (!self.task) break;` loop, including spurious wakeups |
 | `ExitCancel`, `ExitCancelWait`, `ExitWorkersDone` | `io_uring_files_cancel()`: `io_wq_exit_start()`, task work in the cancel loop, `io_wq_cancel_tw_create()`, the wait for `wq->worker_done` |
-| `ExitSignals` | `exit_signals()`: PF_EXITING and the retarget |
+| `ExitSignals` | `exit_signals()`: PF_EXITING, `sigqueue_dequeue_pending()` emptying the private queue, the retarget |
 | `ExitNotify` | `exit_notify()`, `release_task()`, `__exit_signal()` dropping notify_count; a leader with live siblings becomes a zombie |
 | `Freed` | an RCU grace period after `release_task()`: `delayed_put_task_struct()` |
 | `WorkerSeesExit`, `WorkerQueuesCreate`, `WorkerExit` | `io_wq_worker()` seeing IO_WQ_BIT_EXIT; `io_wq_worker_sleeping()` -> `io_wq_dec_running()` -> `io_queue_worker_create()` with TWA_SIGNAL; `io_worker_exit()` cancelling its own creation and dropping its wq reference |
@@ -88,14 +99,20 @@ notify_count, quick_threads, the shared pending set and core_state.
 | `RetryFires` | the delayed work of a retry: `io_workqueue_create()` -> `io_queue_worker_create()` queues `create_worker_cont()` with TWA_SIGNAL, or drops its reference when IO_WQ_BIT_EXIT is already set; until it fires it holds a `wq->worker_refs` reference that `io_wq_exit_workers()` waits for |
 | `ExecStart`, `ExecCancelWait`, `ExecWorkersDone`, `DeThread`, `DeThreadDone`, `DeThreadKilled`, `ExecPost`, `ExecLateWait`, `ExecLateDone` | `begin_new_exec()` with `io_uring_task_cancel()` before (fix) or after (bug) `de_thread()`; `de_thread()`: the -EAGAIN check, group_exec_task, `zap_other_threads()`, notify_count, the zombie leader, the `killed:` path |
 
+`SendThread` dropping a signal for a PF_EXITING thread and
+`ExitSignals` emptying the private queue come from "signal: Prevent
+exec() race" (d2710c8d938a), which is in mainline since v7.3-rc4.
+
 ### Fix constants and patches
 
 | Constant | Patch |
 |----------|-------|
 | `FIX_RCU_RELEASE` | coredump: hold RCU while releasing parked threads |
-| `FIX_SIGPENDING_DUMPCORE` | signal: only SIGKILL and the freezers interrupt a coredumping task |
+| `FIX_SIGPENDING_DUMPCORE` | signal: only SIGKILL and the freezers interrupt a coredumping task: `dump_interrupted()` tests `task_sigpending()`.  With `SIGPENDING_V3` the v3 version: `signal_pending()` ignored TIF_SIGPENDING for a PF_DUMPCORE task unless SIGKILL or a freeze was pending, and `dump_interrupted()` tested the cgroup v2 trap |
+| `FIX_FREEZE_BEFORE_DUMP` | the same patch as queued: `zap_threads()` refuses to start a dump while a freeze is pending.  v3 didn't have it |
+| `FIX_NO_NOTIFY_SIGNAL` | coredump: prevent TIF_NOTIFY_SIGNAL from interrupting coredumps, from vfs-7.4.signal, with "signal: allow taks to temporarily block TIF_NOTIFY_SIGNAL" |
 | `FIX_RETARGET_GROUP_EXIT` | signal: don't retarget shared signals in a dying thread group |
-| `FIX_WORKER_NODUMP` | signal: fix coredump deadlock with PF_USER_WORKER |
+| `FIX_WORKER_NODUMP` | signal: fix coredump deadlock with PF_USER_WORKER.  v3 only, dropped from the queued series and off by default |
 | `FIX_PTRACE_MASK` | ptrace: refuse to change the signal mask of a user worker |
 | `FIX_EXEC_CANCEL_FIRST` | exec: cancel io_uring requests before de_thread() |
 | `FIX_GATE_SIGNALED` | fork: move the coredump and exec checks into create_io_thread() |
@@ -103,10 +120,19 @@ notify_count, quick_threads, the shared pending set and core_state.
 | `IoWqExitBit.tla`: `FIX_BARRIER` | io-wq: order the exit bit against worker creation task work |
 | `CorePattern.tla`: `FIX_SNAPSHOT` | coredump: parse a snapshot of core_pattern |
 
-Not modelled, nothing concurrent in them: "fork: release the files of a
-failed fork after sched_cancel_fork()" (lock order), "exit: hang up the
-tty before closing the files" (ordering of two cleanup steps), "fs: close
-files from the highest descriptor down" (walk order).  The selftest
+`ForcedBudget` is not a fix.  It lets the environment force a coredump
+signal onto a user worker, see below.  It is 0 except in the
+`sqpoll_forced*` configurations.
+
+Not modelled, nothing concurrent in them or nothing the model can reach:
+"fork: use SIG_KERNEL_ONLY_MASK for the user worker signal mask" and
+"signal: enforce the user worker signal mask in __set_task_blocked()"
+change no behaviour.  The only way the model changes a worker's mask is
+PTRACE_SETSIGMASK, which the ptrace patch refuses, and the in-kernel
+`sigprocmask()` users put the fork-time mask back.  The three patches of
+v3 that change the order in which files are closed went to
+vfs-7.4.sync_close and are modelled in
+[`kernel/files/sync-close/`](../../../files/sync-close/).  The selftest
 patches are covered by the layouts that reproduce what they test.
 
 ### Properties
@@ -116,18 +142,19 @@ patches are covered by the layouts that reproduce what they test.
 | `RemainingNonNegative`, `CountConsistent`, `OnlyCountedDecrement`, `ReleasedAfterAllParked` | threads_remaining counts exactly the threads `zap_process()` counted, nobody else decrements it, and the dumper leaves `coredump_wait_inactive()` only after every counted thread went through `coredump_task_exit()` |
 | `NoUseAfterFree` | `coredump_finish()` never calls `wake_up_process()` on a freed task_struct |
 | `SingleThreadedExec` | after `de_thread()` returns the exec'ing thread is alone and stays alone |
-| `WorkerNeverDumps` | a PF_USER_WORKER never runs `vfs_coredump()` |
+| `WorkerNeverDumps` | a PF_USER_WORKER never runs `vfs_coredump()`.  As queued only the worker's mask is in the way, so it holds only with `ForcedBudget` = 0 |
 | `WorkerMaskIntact` | a user worker keeps the mask `copy_process()` gave it |
 | `TruncationJustified` | a truncated core has one of three causes: a fanned-out SIGKILL, a freezer, or task work landing on the dumper (TIF_NOTIFY_SIGNAL) |
-| `TruncationJustifiedStrict` | the same without the task work escape; expected to fail on this tree, see below |
-| `FreezeAbortsDump` | a freeze that arrives before the last write aborts the dump, for every freezer, file or pipe alike |
+| `TruncationJustifiedStrict` | the same without the task work escape: io_uring never cuts a dump short |
+| `FreezeAbortsDump` | a freeze that arrives between the dequeue of the coredump signal and the last write aborts the dump or keeps it from starting, for every freezer, file or pipe alike |
 | `KillTerminates` (liveness) | a SIGKILL that `complete_signal()` fanned out ends the group whatever it is doing |
 | `DumpEnds` (liveness) | a dump that started ends: no rendezvous deadlock |
 
 Fairness is weak fairness on every step a thread takes on its own.  The
 environment (signals, `sigprocmask()`, `exit(2)`, `execve(2)`, a worker
-blocking in a request, the tracer, the freezers, grace periods) is never
-forced to act, so every property also holds when it stays quiet.
+blocking in a request, the tracer, a forced signal, the freezers, grace
+periods) is never forced to act, so every property also holds when it
+stays quiet.
 
 ### Abstractions
 
@@ -145,9 +172,12 @@ forced to act, so every property also holds when it stays quiet.
   `exit_to_user_mode_loop()` guarantees.
 - The freezers only matter to the dumper: they set TIF_SIGPENDING and the
   trap, they do not stop the model's threads, and they can only arrive
-  while a dump is being written (a thread frozen earlier would not start
-  one, and there is no thaw).  Frozen means "cannot make progress" in the
-  kernel; the properties do not depend on that.
+  between the dequeue of the coredump signal and the last write (a
+  thread frozen before the dequeue would not start a dump, and there is
+  no thaw).  A freeze sets TIF_SIGPENDING once, like the cgroup freezers
+  do.  The PM freezer keeps trying until every task is frozen.  Frozen
+  means "cannot make progress" in the kernel; the properties do not
+  depend on that.
 - `wait_task_inactive()` is not modelled, the leader takeover of a
   non-leader exec is reduced to waiting for the zombie leader, the group
   leader is reaped by the parent when its last sibling dies.
@@ -162,24 +192,29 @@ forced to act, so every property also holds when it stays quiet.
 
 ## Results
 
-| Configuration | Checks | Expected | Result | Distinct states | TLC time (32 workers) |
-|---|---|---|---|---|---|
-| `cdhole_fixed` | every fix on, all properties | pass | pass | 13610181 | 22min57s |
-| `cdhole_no_gate` | FIX_GATE_POSTCOREDUMP off: CountConsistent (the exit(2) thread creates an uncounted worker) | violation | violation | 124556 | 02s |
-| `plain_fixed` | every fix on, all invariants (full budgets) | pass | pass | 344057583 | 19min06s |
-| `plain_live` | every fix on, all invariants and both liveness properties (no USR signal, no retry) | pass | pass | 25767521 | 50min21s |
-| `plain_no_exec_cancel` | FIX_EXEC_CANCEL_FIRST off: SingleThreadedExec (a create_worker_cont() survives de_thread()) | violation | violation | 86021532 | 04min36s |
-| `plain_strict` | every fix on: TruncationJustifiedStrict (TIF_NOTIFY_SIGNAL from a worker creation cuts the dump) | violation | violation | 787886 | 03s |
-| `signals_fixed` | every fix on, all properties | pass | pass | 30849827 | 34min10s |
-| `signals_no_freezer` | FIX_SIGPENDING_DUMPCORE off: FreezeAbortsDump (a cgroup v2 freeze lets a file dump complete) | violation | violation | 499037 | 03s |
-| `signals_no_rcu` | FIX_RCU_RELEASE off: NoUseAfterFree | violation | violation | 10096874 | 39s |
-| `signals_no_retarget` | FIX_RETARGET_GROUP_EXIT and FIX_SIGPENDING_DUMPCORE off: TruncationJustified | violation | violation | 2717607 | 11s |
-| `signals_retarget_only` | only FIX_RETARGET_GROUP_EXIT off: TruncationJustified (the signal_pending() rule covers the retarget) | pass | pass | 31011083 | 01min52s |
-| `signals_sigpending_only` | only FIX_SIGPENDING_DUMPCORE off: TruncationJustified (nothing but the retarget sets TIF_SIGPENDING on the dumper) | pass | pass | 33225155 | 01min58s |
-| `sqpoll_deadlock` | FIX_WORKER_NODUMP and FIX_PTRACE_MASK off: DumpEnds (the io-wq worker of an SQPOLL ring dumps, the SQPOLL thread waits for it) | violation | violation | 1361804 | 01min08s |
-| `sqpoll_fixed` | every fix on, all properties | pass | pass | 3105865 | 05min30s |
-| `sqpoll_mask_only` | only FIX_WORKER_NODUMP off: DumpEnds (the mask keeps the worker from ever dequeuing the signal) | pass | pass | 3105865 | 03min30s |
-| `sqpoll_no_gate_signaled` | FIX_GATE_SIGNALED off: CountConsistent (the SQPOLL thread creates an uncounted worker from its cancel loop) | violation | violation | 30449 | 02s |
+| Configuration | Checks | Expected | Result | Distinct states | TLC time | Workers |
+|---|---|---|---|---|---|---|
+| `cdhole_fixed` | as queued, all properties | pass | pass | 17537577 | 42min44s | 24 |
+| `cdhole_no_gate` | FIX_GATE_POSTCOREDUMP off: CountConsistent (the exit(2) thread creates an uncounted worker) | violation | violation | 236251 | 05s | 4 |
+| `plain_fixed` | as queued, all invariants (full budgets) | pass | pass | 418277988 | 50min24s | 40 |
+| `plain_live` | as queued, all invariants and both liveness properties (no USR signal, no retry) | pass | pass | 32409401 | 01h16min | 32 |
+| `plain_no_exec_cancel` | FIX_EXEC_CANCEL_FIRST off: SingleThreadedExec (a create_worker_cont() survives de_thread()) | violation | violation | 107174373 | 26min13s | 16 |
+| `plain_strict` | as queued: TruncationJustifiedStrict | pass | pass | 418277988 | 50min07s | 40 |
+| `plain_strict_no_guard` | FIX_NO_NOTIFY_SIGNAL off: TruncationJustifiedStrict (TIF_NOTIFY_SIGNAL from a worker creation cuts the dump) | violation | violation | 1523731 | 27s | 4 |
+| `signals_fixed` | as queued, all properties | pass | pass | 27604193 | 53min42s | 40 |
+| `signals_no_freeze_check` | FIX_FREEZE_BEFORE_DUMP off: FreezeAbortsDump (zap_threads() clears the TIF_SIGPENDING of a freeze that came first) | violation | violation | 1657138 | 26s | 4 |
+| `signals_no_freezer` | FIX_SIGPENDING_DUMPCORE off: FreezeAbortsDump (a cgroup v2 freeze lets a file dump complete) | violation | violation | 1663382 | 24s | 4 |
+| `signals_no_rcu` | FIX_RCU_RELEASE off: NoUseAfterFree | violation | violation | 13240467 | 03min41s | 4 |
+| `signals_no_retarget` | FIX_RETARGET_GROUP_EXIT and FIX_SIGPENDING_DUMPCORE off: TruncationJustified | violation | violation | 6003584 | 01min29s | 4 |
+| `signals_retarget_only` | only FIX_RETARGET_GROUP_EXIT off: TruncationJustified (nothing filters the retargeted signal anymore) | violation | violation | 6054083 | 01min34s | 4 |
+| `signals_retarget_only_v3` | v3, FIX_RETARGET_GROUP_EXIT off: TruncationJustified (the signal_pending() filter of v3 covers the retarget) | pass | pass | 28876113 | 05min55s | 8 |
+| `signals_sigpending_only` | only FIX_SIGPENDING_DUMPCORE off: TruncationJustified (nothing but the retarget sets TIF_SIGPENDING on the dumper) | pass | pass | 30486793 | 08min20s | 8 |
+| `sqpoll_deadlock` | FIX_PTRACE_MASK off: DumpEnds (the io-wq worker of an SQPOLL ring dumps, the SQPOLL thread waits for it) | violation | violation | 662306 | 01min04s | 4 |
+| `sqpoll_fixed` | as queued, all properties | pass | pass | 3315339 | 10min49s | 16 |
+| `sqpoll_forced` | as queued, a coredump signal forced onto a user worker: DumpEnds | violation | violation | 714214 | 01min04s | 4 |
+| `sqpoll_forced_nodump` | the same with FIX_WORKER_NODUMP on: DumpEnds | pass | pass | 29505146 | 50min24s | 8 |
+| `sqpoll_nodump_only` | FIX_PTRACE_MASK off, FIX_WORKER_NODUMP on: DumpEnds (the dropped v3 patch was enough on its own) | pass | pass | 14016982 | 25min11s | 8 |
+| `sqpoll_no_gate_signaled` | FIX_GATE_SIGNALED off: CountConsistent (the SQPOLL thread creates an uncounted worker from its cancel loop) | violation | violation | 37909 | 02s | 4 |
 
 `IoWqExitBit_fixed` passes and `IoWqExitBit_nobarrier` violates
 `NoStrandedCreate` with the store buffering trace (set_bit() buffered,
@@ -188,33 +223,65 @@ after its add, the store lands).  `CorePattern_fixed` passes and
 `CorePattern_torn` violates `ConsistentParse` with the file mode of the
 new pattern combined with the helper path of the old one.
 
-
 ## What the model says beyond the series
 
-- `TruncationJustifiedStrict` fails with every fix on (`plain_strict`):
-  a zapped io-wq worker of the dumper's own ring that is still inside a
-  request blocks with more work queued, `io_wq_dec_running()` queues
-  `create_worker_cb()` on the dumper with TWA_SIGNAL, and
-  `signal_pending()` reports TIF_NOTIFY_SIGNAL before it ever looks at
-  PF_DUMPCORE.  The next write that has to wait for room fails and the
-  core is cut short.  "signal: only SIGKILL and the freezers interrupt a
-  coredumping task" does not cover this because TIF_NOTIFY_SIGNAL is
-  tested first in `signal_pending()`.  The trace is in
-  `logs/plain_strict.log`.  A second path needs no live worker at all: a
-  creation that ran from `get_signal()`'s task work while the crash signal
-  was already pending fails in `copy_process()` with -ERESTARTNOINTR,
-  `io_should_retry_thread()` retries it because SIGSEGV is not
-  `fatal_signal_pending()`, and the delayed work fires during the dump
-  and queues `create_worker_cont()` on the dumper with TWA_SIGNAL.
+- `TruncationJustifiedStrict` holds as queued (`plain_strict`).  It
+  failed on v3: a zapped io-wq worker of the dumper's own ring that
+  blocks with more work queued makes `io_wq_dec_running()` queue
+  `create_worker_cb()` on the dumper with TWA_SIGNAL, `signal_pending()`
+  reported TIF_NOTIFY_SIGNAL before it looked at PF_DUMPCORE, and the
+  next write that had to wait for room failed.  A creation that failed
+  with -ERESTARTNOINTR and was retried from the delayed work did the
+  same without a live worker.  Both only set TIF_NOTIFY_SIGNAL, and
+  under the `no_notify_signal` guard `signal_pending()` doesn't look at
+  it.  `plain_strict_no_guard` takes the guard away and TLC finds the
+  first one again, this time with the task work landing between the
+  dequeue of SIGSEGV and `zap_threads()`.
+- As queued, "signal: only SIGKILL and the freezers interrupt a
+  coredumping task" depends on "signal: don't retarget shared signals in
+  a dying thread group".  `dump_interrupted()` is `task_sigpending()`
+  and `signal_pending()` doesn't filter TIF_SIGPENDING for a PF_DUMPCORE
+  task anymore.  So a sigtimedwait() sleeper that the zap wakes restores
+  its mask, retargets a shared signal onto the dumper and the core is
+  cut short (`signals_retarget_only`).  In v3 the filter covered that
+  and each of the two patches covered the other
+  (`signals_retarget_only_v3`).  The queued commit message says as much
+  ("the dying threads don't retarget shared signals to the dumper"), and
+  the retarget fix comes first in the series.
+- `zap_threads()` clears TIF_SIGPENDING.  Without the freeze check of
+  the queued patch a freeze that lands between the dequeue of the
+  coredump signal and `zap_threads()` is lost and the dump completes
+  (`signals_no_freeze_check`).  The trace uses the PM freezer, which in
+  the kernel tries again and would catch the dump at a later write.  The
+  cgroup freezers wake a task once.
+- "signal: fix coredump deadlock with PF_USER_WORKER" was dropped, so a
+  user worker's mask is all that keeps it out of `vfs_coredump()`.  That
+  is enough for every signal the model sends, the tracer included
+  (`sqpoll_fixed`).  But `force_sig_info_to_task()` unblocks the signal
+  it forces, and "signal: enforce the user worker signal mask in
+  __set_task_blocked()" leaves that alone on purpose.  A coredump signal
+  forced onto the io-wq worker of an SQPOLL ring brings the deadlock of
+  `sqpoll_deadlock` back (`sqpoll_forced`), and the dropped patch
+  prevents it (`sqpoll_forced_nodump`).  The kernel has such a path for
+  CAP_SYS_ADMIN: IORING_OP_MADVISE always runs in an io-wq worker, and
+  with MADV_HWPOISON `madvise_inject_error()` calls `memory_failure()`
+  with MF_ACTION_REQUIRED.  `collect_procs()` picks `current` for the
+  process that shares its mm, an anonymous page the process wrote to is
+  dirty, and `kill_proc()` calls `force_sig_mceerr(BUS_MCEERR_AR)` on
+  the worker.  The worker dequeues SIGBUS and dumps.  With
+  CONFIG_MEMORY_FAILURE and an SQPOLL ring, that hangs the thread group
+  in D state.  We followed that path through the code of 548491e998e1
+  but haven't run it.
 - A `tgkill()` with SIGKILL to a thread that is already PF_EXITING is
-  queued and never fanned out: `wants_signal()` refuses it and
-  `complete_signal()` returns for PIDTYPE_PID.  The group survives.  That
-  is the kernel's behaviour, so `KillTerminates` only counts SIGKILLs that
-  `complete_signal()` fanned out.
+  dropped by `task_can_queue_signal()` since "signal: Prevent exec()
+  race", and the group survives.  Before that it was queued and never
+  fanned out, with the same result.  That is the kernel's behaviour, so
+  `KillTerminates` only counts SIGKILLs that `complete_signal()` fanned
+  out.
 - Without "fork: move the coredump and exec checks into
-  create_io_thread()" the SQPOLL thread, which dequeued the zap's SIGKILL
-  and therefore has no fatal signal pending any more, creates a worker
-  from the task work `io_uring_cancel_generic()` runs.  That worker is
-  invisible to the dump and still decrements threads_remaining
+  create_io_thread()" the SQPOLL thread, which dequeued the zap's
+  SIGKILL and therefore has no fatal signal pending any more, creates a
+  worker from the task work `io_uring_cancel_generic()` runs.  That
+  worker is invisible to the dump and still decrements threads_remaining
   (`sqpoll_no_gate_signaled`).  The PF_POSTCOREDUMP gate alone does not
   close that one, the PF_SIGNALED gate does.
