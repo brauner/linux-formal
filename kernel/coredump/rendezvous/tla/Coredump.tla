@@ -57,6 +57,8 @@
 (*   io_uring/cancel.c io_uring_cancel_generic (exit, exec and SQPOLL)     *)
 (*   io_uring/sqpoll.c io_sq_thread (exit path)                            *)
 (*   kernel/ptrace.c   PTRACE_SETSIGMASK                                   *)
+(*   kernel/signal.c   force_sig_info_to_task() on a user worker, only     *)
+(*                     with ForcedBudget > 0                               *)
 (*   kernel/freezer.c, kernel/cgroup/freezer.c  freeze wakeups            *)
 (*                                                                         *)
 (* Abstractions:                                                           *)
@@ -92,6 +94,7 @@ CONSTANTS
     Chunks,         \* writes that make a complete core
     BudgetKILL, BudgetCORE, BudgetTERM, BudgetUSR,   \* signals the environment may send
     ExecBudget, TracerBudget, RetryBudget,
+    ForcedBudget,   \* coredump signals forced onto a user worker
     FIX_RCU_RELEASE, FIX_SIGPENDING_DUMPCORE, SIGPENDING_V3,
     FIX_FREEZE_BEFORE_DUMP, FIX_NO_NOTIFY_SIGNAL, FIX_RETARGET_GROUP_EXIT,
     FIX_WORKER_NODUMP, FIX_PTRACE_MASK, FIX_EXEC_CANCEL_FIRST,
@@ -506,6 +509,24 @@ TracerClearMask(w) ==
     /\ blocked' = [blocked EXCEPT ![w] = {}]
     /\ sigpending' = [sigpending EXCEPT ![w] = @ \/ Recalc(pending[w], shared, {})]
     /\ UNCHANGED <<pc, flags, pending, shared, realblocked, notify, group, freed,
+                   freeze, hist>>
+    /\ UnchangedCore /\ UnchangedWq
+
+\* force_sig_info_to_task(SIGSEGV or SIGBUS) on a user worker: the forced
+\* signal is unblocked and its handler reset, then queued PIDTYPE_PID, and
+\* the target is woken whether it was queued or not.  Nothing in the
+\* series stops it.  The model only does it with ForcedBudget > 0.
+ForceCoreWorker(w) ==
+    /\ IsWorker(w)
+    /\ Alive(w)
+    /\ budget.forced > 0
+    /\ budget' = [budget EXCEPT !.forced = @ - 1]
+    /\ blocked' = [blocked EXCEPT ![w] = @ \ {"CORE"}]
+    /\ IF ~Accepts("CORE") \/ "EXITING" \in flags[w]
+       THEN UNCHANGED pending
+       ELSE pending' = [pending EXCEPT ![w] = @ \cup {"CORE"}]
+    /\ sigpending' = [sigpending EXCEPT ![w] = TRUE]
+    /\ UNCHANGED <<pc, flags, shared, realblocked, notify, group, freed,
                    freeze, hist>>
     /\ UnchangedCore /\ UnchangedWq
 
@@ -1010,7 +1031,7 @@ Init ==
     /\ budget = [KILL |-> BudgetKILL, CORE |-> BudgetCORE,
                  TERM |-> BudgetTERM, USR |-> BudgetUSR,
                  exec |-> ExecBudget, tracer |-> TracerBudget,
-                 retry |-> RetryBudget]
+                 retry |-> RetryBudget, forced |-> ForcedBudget]
 
 \* Steps a thread takes on its own once it can; each of them is fair
 ThreadStep(t) ==
@@ -1049,6 +1070,7 @@ EnvStep ==
                           \/ TracerClearMask(t) \/ ExitSyscall(t)
                           \/ ExitGroupSyscall(t) \/ ExecStart(t)
                           \/ WorkerQueuesCreate(t) \/ Freed(t)
+                          \/ ForceCoreWorker(t)
     \/ \E k \in {"pm", "cg2"} : Freeze(k)
 
 Next == EnvStep \/ \E t \in Threads : ThreadStep(t)
