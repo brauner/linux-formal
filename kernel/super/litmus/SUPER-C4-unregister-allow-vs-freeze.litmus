@@ -1,0 +1,95 @@
+C SUPER-C4-unregister-allow-vs-freeze
+
+(*
+ * Expected: Sometimes
+ *
+ * Question: the inverse of SUPER-C3.  btrfs drops a claim taken under a
+ * freeze deny with fs_bdev_unregister() and only then re-allows freezes
+ * ("Unregister before re-allowing (strand-safe)").  Can a bdev_freeze()
+ * that succeeds after the allow still pin the dropped claim, freeze the
+ * superblock through it and strand that freeze (the pin's own put unlinks
+ * the claim, so the matching bdev_thaw() walk no longer finds it)?
+ *
+ * Code (fs/btrfs/volumes.c, HEAD fc1c25014ff8):
+ *   1137        /* Unregister before re-allowing (strand-safe); file still open (UAF-safe). */
+ *   1138        fs_bdev_unregister(bdev_file, sb);
+ *   1139        bdev_allow_freeze(file_bdev(bdev_file));
+ * fs/super.c:
+ *   1764        sb_dev = super_dev_lookup(dev, sb);   (fs_bdev_unregister())
+ *   1766        super_dev_put(sb_dev);
+ *   469         if (fsd && refcount_dec_and_test(&fsd->sd_ref)) {
+ *   470                 rhltable_remove(&super_dev_table, &fsd->sd_node, super_dev_params);
+ *   515                 if (refcount_inc_not_zero(&sb_dev->sd_ref))   (super_dev_get())
+ * block/bdev.c:
+ *   408         WARN_ON_ONCE(atomic_read(&bdev->bd_fsfreeze_count) >= 0);
+ *   409         atomic_inc(&bdev->bd_fsfreeze_count);
+ * include/linux/refcount.h __refcount_sub_and_test():
+ *           int old = atomic_fetch_sub_release(i, &r->refs);
+ *           if (old > 0 && old == i) {
+ *                   smp_acquire__after_ctrl_dep();
+ *                   return true;
+ *
+ * Encoding: count starts at -1 (the remover's deny), sdref at 1 (the
+ * claim), head at 1 (linked).  refcount_dec_and_test() is
+ * atomic_fetch_sub_release() plus smp_rmb() on success,
+ * refcount_inc_not_zero() a relaxed cmpxchg from 1 to 2.  Bad outcome:
+ * the freezer's count increment read the allow (r2=0, so it ran after
+ * it) and yet its pin of the claim succeeded (r5=1), i.e. the pin is
+ * ordered before the remover's put in sd_ref's coherence order while the
+ * allow, which follows the put in program order, is ordered before it.
+ *
+ * Result: LKMM allows it.  Nothing orders the put's load of sd_ref before
+ * the store of the relaxed atomic_inc(): the release orders only what
+ * precedes the put, the acquire exists only on the success path, and a
+ * control dependency does not extend past the end of the if (herd7 and
+ * memory-barriers.txt agree).  Real CPUs do not perform the store before
+ * the branches on the put's result resolve, so this is a gap in what the
+ * code guarantees under the kernel's memory model rather than an
+ * observable bug.  SUPER-C4f makes bdev_allow_freeze() fully ordered,
+ * which closes it and matches the full ordering of bdev_deny_freeze().
+ *)
+
+{
+	count=-1;
+	sdref=1;
+	head=1;
+}
+
+P0(int *head, atomic_t *count, atomic_t *sdref, spinlock_t *bucket)
+{
+	int r0;
+	int r1;
+
+	r0 = atomic_fetch_sub_release(1, sdref);
+	if (r0 == 1) {
+		smp_rmb();
+		spin_lock(bucket);
+		rcu_assign_pointer(*head, 0);
+		spin_unlock(bucket);
+	}
+	r1 = atomic_read(count);
+	atomic_inc(count);
+}
+
+P1(int *head, atomic_t *count, atomic_t *sdref, spinlock_t *holder)
+{
+	int r2;
+	int r3;
+	int r4;
+	int r5;
+
+	r2 = atomic_cmpxchg(count, 0, 1);
+	if (r2 == 0) {
+		r3 = atomic_read(count);
+		spin_lock(holder);
+		spin_unlock(holder);
+		rcu_read_lock();
+		r4 = rcu_dereference(*head);
+		if (r4 == 1) {
+			r5 = atomic_cmpxchg_relaxed(sdref, 1, 2);
+		}
+		rcu_read_unlock();
+	}
+}
+
+exists (1:r2=0 /\ 1:r4=1 /\ 1:r5=1)

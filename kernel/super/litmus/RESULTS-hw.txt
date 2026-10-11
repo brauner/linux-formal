@@ -1,0 +1,7 @@
+test                                         LKMM         architecture model
+aarch64/C4m-no-branch                        -            Sometimes (6 of 19)
+aarch64/C4-unregister-allow-vs-freeze        Sometimes    Never (0 of 16)
+aarch64/F3f-fserror-wake-after-mb            Never        Never (0 of 3)
+aarch64/F3-fserror-unmount-lost-wakeup       Sometimes    Sometimes (1 of 4)
+ppc/F3f-fserror-wake-after-mb                Never        Never (0 of 4)
+ppc/F3-fserror-unmount-lost-wakeup           Sometimes    Sometimes (1 of 5)

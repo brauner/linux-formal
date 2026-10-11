@@ -1,0 +1,40 @@
+freeze_nested_ret -- BeliefOK violated -- the bug fixed by fe967191e585 (mutation FIX_NESTED_THAW_RET off)
+
+Layout: u does FIFREEZE/FITHAW, b freezes through a block device.
+
+ 2-12  u  FIFREEZE: a full freeze_super(), freeze_ucount 1 (L2289-2335).
+ 13-15 b  fs_super_freeze(): SB_FREEZE_COMPLETE, may_freeze() lets
+          FREEZE_MAY_NEST nest (L2136-2138): freeze_ucount 2, deactivate_locked_super()
+          L2265 drops b's temporary reference.
+ 16-18 u  FITHAW: thaw_super_locked() drops u's hold, freeze_ucount 2 -> 1; before
+          fe967191e585 it then returned -EINVAL (today L2361-2364 return 0).
+
+u is told its thaw failed although its hold is gone.  For a block device that
+-EINVAL keeps bd_fsfreeze_count elevated (holder_one_nested_ret).
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_nested_ret.log)
+
+# Invariant BeliefOK is violated.
+  1 Initial predicate
+      pc = [u=f_lock, b=f_gas, U=u_go]
+      pv = [u=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FLock: pc.u=f_check; pv.u.tmp=1; sb.active=2; sb.um=u
+  3 FCheck: pc.u=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  4 FSw: pc.u=f_sw1w; sb.wpend.1=T
+  5 FSw1w: pc.u=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  6 FRelock: pc.u=f_sw2; sb.frozen=2; sb.fvis=2; sb.um=u
+  7 FSw: pc.u=f_sw2w; sb.wpend.2=T
+  8 FSwWait: pc.u=f_sync; sb.wpend.2=F; sb.wheld.2=T
+  9 FSync: pc.u=f_sw3; sb.frozen=3; sb.fvis=3
+ 10 FSw: pc.u=f_sw3w; sb.wpend.3=T
+ 11 FSwWait: pc.u=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 12 FFreezeFs: pc.u=f_hold; pv.u.granted=T; pv.u.tmp=0; sb.frozen=4; sb.fvis=4; sb.ucount=1; sb.sharedRef=1; sb.um=none
+ 13 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=3
+ 14 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=4; sb.um=b
+ 15 FCheck: pc.b=f_put; pv.b.granted=T; pv.b.tmp=1; sb.ucount=2; sb.active=3; sb.um=none
+ 16 FHold: pc.u=t_lock; pv.u.belief=T
+ 17 TLock: pc.u=t_done; pv.u.ret=EINVAL; pv.u.granted=F; sb.ucount=1
+ 18 TDone: pc.u=done

@@ -1,0 +1,62 @@
+holder_one_sync -- FinalOK violated -- real (F1): a sync_blockdev() failure in fs_bdev_freeze() leaves the filesystem frozen
+
+Layout: s1 on d1; dm1 suspends and resumes the dm device d1; u1 unmounts.  Lines are
+fs/super.c (block/bdev.c, drivers/md/dm.c where named) at fc1c25014ff8.
+
+ 2-6   m1  sget_dev() publishes (d1, s1), setup_bdev_super() claims d1 (bd_holder_ops
+           set, block/bdev.c L693-696), the frozen check passes (L1810-1811),
+           SB_BORN.
+ 7     dm1 lock_fs() (dm.c L2996, L2942) -> bdev_freeze() (block/bdev.c L300):
+           bd_fsfreeze_mutex, bd_fsfreeze_count 0 -> 1 (L307).
+ 8-12  dm1 holder ops -> fs_bdev_freeze() L1549: get_active_super(s1) L1561,
+           fs_super_freeze() L1563: s1 frozen (freeze_ucount 1, the shared active
+           reference kept), deactivate_super() L1566, count = 1.
+ 14    u1  umount: drops the mount's reference (s1 lives on: the freeze holds one).
+ 15    dm1 error == 0 -> error = sync_blockdev(bdev) (L1578-1579): -EIO, e.g. a stale
+           AS_EIO on bd_mapping from an earlier failed buffered write -- freeze_super()'s
+           read-only shortcut (L2279-2287) skips sync_filesystem() and for a device
+           that is not s_bdev sync_filesystem() never looks at it.
+ 16    dm1 bdev_freeze(): atomic_dec() on error (block/bdev.c L325-326): count 0,
+           returns -EIO.
+ 17    dm1 lock_fs() failed: DMF_FROZEN not set, the suspend fails (dm.c L2997-3000);
+           unlock_fs() will never run.
+
+s1 is frozen with freeze_ucount 1 and nobody holds that freeze: writers hang,
+reconfigure_super() returns -EBUSY (L1077-1078), and after the umount the
+superblock lingers frozen with d1 still claimed.  Only FITHAW (needs a mount) or
+sysrq-j undoes it.  The shutdown ioctls are the same: ext4_force_shutdown()
+returns the error without shutting down (fs/ext4/ioctl.c L826-828),
+xfs_fs_goingdown() returns 0 without shutting down (fs/xfs/xfs_fsops.c L457).
+Since v6.8: fbcb8f39e96d surfaced the sync_blockdev() error, 49ef8832fb1a moved it
+behind the holder's freeze; 7a7ef107b449 kept "a sync_blockdev() failure is
+always reported".  holder_one_sync_rollback (thaw what the walk froze) passes.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_sync.log)
+
+# Invariant FinalOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm1=d_start]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm1=[ret=ok, dv=d1, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  5 MCheck: pc.m1=m_born
+  6 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+  7 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+  8 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+  9 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+ 10 Gas: pc.dm1=bf_frz; sbs.s1.act=2
+ 11 BfFrz: pc.dm1=bf_put; pv.dm1.n=1; pv.dm1.froze={s1}; sbs.s1.act=3; sbs.s1.frz=T; sbs.s1.uc=1
+ 12 Put: pc.dm1=bf_walk; sbs.s1.act=2
+ 13 Walk: pc.dm1=bf_sync
+ 14 Umount: pc.u1=done; sbs.s1.act=1; sbs.s1.mnt=F
+ 15 BfSync: pc.dm1=bf_end; pv.dm1.e=EIO
+ 16 BfEnd: pc.dm1=d_frzret; pv.dm1.ret=EIO; dev.d1.cnt=0; dev.d1.fm=none; gc.d1=0
+ 17 DFrzRet: pc.dm1=done

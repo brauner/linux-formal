@@ -1,0 +1,53 @@
+C SUPER-H2-dio-wq-racing-init
+
+(*
+ * Expected: Never
+ *
+ * Question: two direct I/O submitters race through sb_init_dio_done_wq().
+ * Exactly one try_cmpxchg() may succeed (the loser destroys its own,
+ * never published, workqueue), and a reader must never find the loser's
+ * workqueue or an uninitialised one.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   2447        if (!try_cmpxchg(&sb->s_dio_done_wq, &old, wq)) {
+ *   2448                /* Someone created workqueue before us? Free ours... */
+ *   2449                destroy_workqueue(wq);
+ *
+ * Encoding: as SUPER-H1 with two initialisers (wq0, wq1) and a reader.
+ * Bad outcomes: both cmpxchg() calls succeed, or the reader sees a
+ * workqueue uninitialised, or sees the loser's.
+ *)
+
+{
+	p=z;
+	z=0;
+	wq0=0;
+	wq1=0;
+}
+
+P0(int **p, int *wq0, int *z)
+{
+	int *r0;
+
+	WRITE_ONCE(*wq0, 1);
+	r0 = cmpxchg(p, z, wq0);
+}
+
+P1(int **p, int *wq1, int *z)
+{
+	int *r1;
+
+	WRITE_ONCE(*wq1, 1);
+	r1 = cmpxchg(p, z, wq1);
+}
+
+P2(int **p)
+{
+	int *r2;
+	int r3;
+
+	r2 = READ_ONCE(*p);
+	r3 = READ_ONCE(*r2);
+}
+
+exists ((0:r0=z /\ 1:r1=z) \/ (2:r2=wq0 /\ 2:r3=0) \/ (2:r2=wq1 /\ 2:r3=0) \/ (0:r0=z /\ 2:r2=wq1) \/ (1:r1=z /\ 2:r2=wq0))

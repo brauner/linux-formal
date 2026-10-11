@@ -1,0 +1,62 @@
+C SUPER-G3-vfs-sflags-writers-serialised
+
+(*
+ * Expected: Never
+ *
+ * Question: are the VFS's own non-atomic s_flags read-modify-writes safe
+ * against each other?  super_wake(SB_BORN) (vfs_get_tree()),
+ * super_wake(SB_DYING) and &= ~SB_ACTIVE (generic_shutdown_super()),
+ * |= SB_ACTIVE (vfs_get_super(), get_tree_bdev_flags()) and
+ * reconfigure_super() all run with s_umount held exclusively;
+ * reconfigure_super() additionally holds an active reference
+ * (alloc_fs_context() FS_CONTEXT_FOR_RECONFIGURE: atomic_inc(&s_active))
+ * so it never overlaps shutdown.  super_wake(SB_DEAD) in
+ * kill_super_notify() runs with only sb_lock, after
+ * generic_shutdown_super() dropped s_umount; every s_umount taker after
+ * that point sees SB_DYING and backs off without writing s_flags, and
+ * the filesystem's threads and notifiers are gone by then (FUSE waits
+ * for an in-flight INIT reply in fuse_chan_wait_aborted(), efivarfs
+ * unregisters its notifier before kill_anon_super()).
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   787         super_wake(sb, SB_DYING);             (s_umount held)
+ *   788         super_unlock_excl(sb);
+ *   1138        WRITE_ONCE(sb->s_flags, ...);         (s_umount held, active ref)
+ *   1955        super_wake(sb, SB_BORN);              (s_umount held)
+ *
+ * Encoding: two s_umount-holding writers, e.g. a reusing mount's
+ * super_wake(SB_BORN) and a remount setting SB_SYNCHRONOUS (16), with
+ * s_umount as a spinlock.  No update can be lost.
+ *)
+
+{
+	flags=2;
+}
+
+P0(int *flags, spinlock_t *umount)
+{
+	int r0;
+	int r1;
+
+	spin_lock(umount);
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 16;
+	WRITE_ONCE(*flags, r1);
+	spin_unlock(umount);
+}
+
+P1(int *flags, spinlock_t *umount)
+{
+	int r4;
+	int r5;
+
+	spin_lock(umount);
+	r4 = READ_ONCE(*flags);
+	r5 = r4 | 2;
+	smp_store_release(flags, r5);
+	smp_mb();
+	spin_unlock(umount);
+}
+
+locations [flags;]
+exists (~flags=18)

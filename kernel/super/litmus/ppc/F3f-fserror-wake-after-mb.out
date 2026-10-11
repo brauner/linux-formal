@@ -1,0 +1,14 @@
+Test F3f-fserror-wake-after-mb Allowed
+States 4
+0:r1=1; 0:r4=0; 1:r3=0;
+0:r1=1; 0:r4=1; 1:r3=0;
+0:r1=1; 0:r4=1; 1:r3=1;
+0:r1=9; 0:r4=0; 1:r3=1;
+No
+Witnesses
+Positive: 0 Negative: 4
+Condition exists (0:r1=1 /\ 0:r4=0 /\ 1:r3=1)
+Observation F3f-fserror-wake-after-mb Never 0 4
+Time F3f-fserror-wake-after-mb 0.01
+Hash=4d6b1853227ba762a2edb121202496f1
+

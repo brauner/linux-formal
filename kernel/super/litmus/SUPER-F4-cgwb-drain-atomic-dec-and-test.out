@@ -1,0 +1,14 @@
+Test SUPER-F4-cgwb-drain-atomic-dec-and-test Allowed
+States 4
+0:r1=0; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r1=1; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r1=1; 0:r2=0; 1:r3=1; 1:r4=1;
+0:r1=1; 0:r2=1; 1:r3=1; 1:r4=1;
+No
+Witnesses
+Positive: 0 Negative: 4
+Condition exists (0:r1=1 /\ 0:r2=1 /\ 1:r3=1 /\ 1:r4=0)
+Observation SUPER-F4-cgwb-drain-atomic-dec-and-test Never 0 4
+Time SUPER-F4-cgwb-drain-atomic-dec-and-test 0.01
+Hash=c1e9e4a31052b084f77b60cb849eeb9e
+

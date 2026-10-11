@@ -1,0 +1,80 @@
+C SUPER-G2-rdonly-lost-to-reconfigure-or-reuse
+
+(*
+ * Expected: Sometimes
+ *
+ * Question: on a live superblock, filesystem error handlers force it
+ * read-only with a plain sb->s_flags |= SB_RDONLY from whatever context
+ * hit the error, without s_umount (affs_error(), __exfat_fs_error(),
+ * ext2_error(), __fat_fs_error(), do_withdraw() in gfs2, hpfs_error(),
+ * jfs_handle_error(), __nilfs_error(), ntfs_handle_error(),
+ * ocfs2_handle_error(), ubifs_ro_mode(), zonefs's I/O error paths,
+ * hfs_mdb_commit(), btrfs_set_sb_rdonly() after SB_BORN, and the
+ * efivarfs ops notifier toggling SB_RDONLY both ways).  Two VFS writers
+ * run concurrently with that on a live superblock, both under s_umount
+ * but that does not help against a lockless writer:
+ *  - reconfigure_super()'s WRITE_ONCE() of the recomputed s_flags
+ *    (any remount, e.g. mount -o remount,sync), and
+ *  - vfs_get_tree()'s super_wake(sb, SB_BORN), which a mount that reuses
+ *    the existing superblock (same block device, get_tree_single(),
+ *    get_tree_keyed()) performs again on the live superblock.
+ * Can the forced SB_RDONLY be lost?
+ *
+ * Code (HEAD fc1c25014ff8):
+ * fs/super.c
+ *   1138        WRITE_ONCE(sb->s_flags, ((sb->s_flags & ~fc->sb_flags_mask) |
+ *   1139                                 (fc->sb_flags & fc->sb_flags_mask)));
+ *   1955        super_wake(sb, SB_BORN);
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ * fs/fat/misc.c __fat_fs_error()
+ *   38                  sb->s_flags |= SB_RDONLY;
+ * fs/ext4/super.c (the precedent, d3476f3dad4a):
+ *   743          * We don't set SB_RDONLY because that requires sb->s_umount
+ *   744          * semaphore and setting it without proper remount procedure is
+ *
+ * Encoding: SB_RDONLY=1, SB_BORN=2, SB_SYNCHRONOUS=16; the superblock is
+ * born (flags=2).  P0 is reconfigure_super() setting SB_SYNCHRONOUS with
+ * sb_flags_mask covering it; P2 is a reusing mount's super_wake(SB_BORN);
+ * P1 is the error handler.  Bad outcome: final flags without SB_RDONLY.
+ * Allowed under sequential consistency.  Consequence: the filesystem
+ * reported "remounting read-only" but VFS write paths (mnt_want_write(),
+ * sb_rdonly()) keep accepting writes to the damaged filesystem.
+ *)
+
+{
+	flags=2;
+}
+
+P0(int *flags)
+{
+	int r0;
+	int r1;
+
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 16;
+	WRITE_ONCE(*flags, r1);
+}
+
+P1(int *flags)
+{
+	int r2;
+	int r3;
+
+	r2 = READ_ONCE(*flags);
+	r3 = r2 | 1;
+	WRITE_ONCE(*flags, r3);
+}
+
+P2(int *flags)
+{
+	int r4;
+	int r5;
+
+	r4 = READ_ONCE(*flags);
+	r5 = r4 | 2;
+	smp_store_release(flags, r5);
+	smp_mb();
+}
+
+locations [flags;]
+exists (flags=2 \/ flags=18)

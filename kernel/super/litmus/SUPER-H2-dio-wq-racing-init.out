@@ -1,0 +1,14 @@
+Test SUPER-H2-dio-wq-racing-init Allowed
+States 4
+0:r0=wq1; 1:r1=z; 2:r2=wq1; 2:r3=1;
+0:r0=wq1; 1:r1=z; 2:r2=z; 2:r3=0;
+0:r0=z; 1:r1=wq0; 2:r2=wq0; 2:r3=1;
+0:r0=z; 1:r1=wq0; 2:r2=z; 2:r3=0;
+No
+Witnesses
+Positive: 0 Negative: 4
+Condition exists (0:r0=z /\ 1:r1=z \/ 2:r2=wq0 /\ 2:r3=0 \/ 2:r2=wq1 /\ 2:r3=0 \/ 0:r0=z /\ 2:r2=wq1 \/ 1:r1=z /\ 2:r2=wq0)
+Observation SUPER-H2-dio-wq-racing-init Never 0 4
+Time SUPER-H2-dio-wq-racing-init 0.01
+Hash=7a7d3a580fcfb7c9f501e4accc0b5feb
+

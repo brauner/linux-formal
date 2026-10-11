@@ -1,0 +1,100 @@
+C SUPER-G4-remount-ro-vs-write-access
+
+(*
+ * Expected: Never
+ *
+ * Question: the lockless readers of SB_RDONLY in write paths do not read
+ * s_flags on their own: mnt_get_write_access() checks it through
+ * mnt_is_readonly() inside the s_readonly_remount protocol that
+ * reconfigure_super() runs around its WRITE_ONCE() of s_flags.  For a
+ * read-write to read-only remount: can a writer get write access (sees
+ * neither WRITE_HOLD, nor s_readonly_remount, nor SB_RDONLY) while the
+ * remount saw no writers and completed?
+ *
+ * Code (HEAD fc1c25014ff8):
+ * fs/namespace.c
+ *   471         mnt_inc_writers(mnt);                 (mnt_get_write_access())
+ *   477         smp_mb();
+ *   479         while (__test_write_hold(READ_ONCE(mnt->mnt_pprev_for_sb))) {
+ *   503         smp_rmb();
+ *   504         if (mnt_is_readonly(m)) {
+ *   435         if (READ_ONCE(mnt->mnt_sb->s_readonly_remount))   (mnt_is_readonly())
+ *   445         smp_rmb();
+ *   446         return __mnt_is_readonly(mnt);        (sb_rdonly(): plain load)
+ *   643         set_write_hold(mnt);                  (mnt_hold_writers())
+ *   648         smp_mb();
+ *   666         if (mnt_get_writers(mnt) > 0)
+ *   749                 sb_start_ro_state_change(sb);   (sb_prepare_remount_readonly())
+ *   752                         clear_write_hold(m);
+ * fs/internal.h
+ *   152         WRITE_ONCE(sb->s_readonly_remount, 1);   (sb_start_ro_state_change())
+ *   162         smp_wmb();
+ *   180         smp_wmb();                            (sb_end_ro_state_change())
+ *   181         WRITE_ONCE(sb->s_readonly_remount, 0);
+ * fs/super.c
+ *   1115                retval = sb_prepare_remount_readonly(sb);
+ *   1138        WRITE_ONCE(sb->s_flags, ((sb->s_flags & ~fc->sb_flags_mask) |
+ *   1140        sb_end_ro_state_change(sb);
+ *
+ * Encoding: writers is the mount's writer count (one CPU), hold the
+ * WRITE_HOLD bit, ro s_readonly_remount, flags s_flags (SB_RDONLY=1).
+ * The writer's spin on WRITE_HOLD is one re-read and a filter on the
+ * value it finally saw being clear.  sb_rdonly() is a READ_ONCE() here
+ * (plain in the kernel).  0:r2 starts at -1.
+ *)
+
+{
+	writers=0;
+	hold=0;
+	ro=0;
+	flags=0;
+	0:r2=-1;
+}
+
+P0(int *writers, int *hold, int *ro, int *flags)
+{
+	int r0;
+	int r1;
+	int r2;
+	int r5;
+
+	WRITE_ONCE(*writers, 1);
+	smp_mb();
+	r0 = READ_ONCE(*hold);
+	if (r0 != 0) {
+		r0 = READ_ONCE(*hold);
+	}
+	smp_rmb();
+	r1 = READ_ONCE(*ro);
+	if (r1 == 0) {
+		smp_rmb();
+		r5 = READ_ONCE(*flags);
+		r2 = r5 & 1;
+	}
+}
+
+P1(int *writers, int *hold, int *ro, int *flags)
+{
+	int r3;
+	int r4;
+	int r6;
+
+	WRITE_ONCE(*hold, 1);
+	smp_mb();
+	r3 = READ_ONCE(*writers);
+	if (r3 == 0) {
+		WRITE_ONCE(*ro, 1);
+		smp_wmb();
+		WRITE_ONCE(*hold, 0);
+		r4 = READ_ONCE(*flags);
+		r6 = r4 | 1;
+		WRITE_ONCE(*flags, r6);
+		smp_wmb();
+		WRITE_ONCE(*ro, 0);
+	} else {
+		WRITE_ONCE(*hold, 0);
+	}
+}
+
+filter (0:r0=0)
+exists (0:r1=0 /\ 0:r2=0 /\ 1:r3=0)

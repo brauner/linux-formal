@@ -1,0 +1,14 @@
+Test SUPER-A1-wake-born-no-lost-wakeup Allowed
+States 4
+0:r2=0; 1:r4=0; 1:r6=1;
+0:r2=0; 1:r4=1; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=1;
+No
+Witnesses
+Positive: 0 Negative: 4
+Condition exists (1:r4=0 /\ 1:r6=0 /\ 0:r2=0)
+Observation SUPER-A1-wake-born-no-lost-wakeup Never 0 4
+Time SUPER-A1-wake-born-no-lost-wakeup 0.02
+Hash=33e801eb1454e7da9857f2cb1974be33
+

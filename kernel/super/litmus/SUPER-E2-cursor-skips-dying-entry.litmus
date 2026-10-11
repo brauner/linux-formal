@@ -1,0 +1,63 @@
+C SUPER-E2-cursor-skips-dying-entry
+
+(*
+ * Expected: Never
+ *
+ * Question: within one RCU read-side section super_dev_get() may reach
+ * an entry whose sd_ref already hit zero (between refcount_dec_and_test()
+ * and rhltable_remove(), or just after the unlink), fail the pin and step
+ * to pos->next.  Is the entry guaranteed not to be freed while the cursor
+ * reads it?  Removal comes before kfree_rcu() (RCU-001 order), so the
+ * grace period covers every reader that could still reach it.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   469         if (fsd && refcount_dec_and_test(&fsd->sd_ref)) {
+ *   470                 rhltable_remove(&super_dev_table, &fsd->sd_node, super_dev_params);
+ *   472                 kfree_rcu(fsd, sd_rcu);
+ *   513         for (; pos; pos = rcu_dereference_all(pos->next)) {
+ *   514                 sb_dev = container_of(pos, struct super_dev, sd_node);
+ *   515                 if (refcount_inc_not_zero(&sb_dev->sd_ref))
+ *
+ * Encoding: as SUPER-E1.  P0 reads the slot, tries the pin, and when the
+ * pin fails (r1 != 1) reads E's next pointer (e_freed tells whether E's
+ * memory was freed by then), all in one RCU section.
+ *)
+
+{
+	sdref=1;
+	head=1;
+	e_freed=0;
+	0:r1=-1;
+}
+
+P0(int *head, int *e_freed, atomic_t *sdref)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	rcu_read_lock();
+	r0 = rcu_dereference(*head);
+	if (r0 == 1) {
+		r1 = atomic_cmpxchg_relaxed(sdref, 1, 2);
+		if (r1 == 0) {
+			r2 = READ_ONCE(*e_freed);
+		}
+	}
+	rcu_read_unlock();
+}
+
+P1(int *head, int *e_freed, atomic_t *sdref)
+{
+	int r4;
+
+	r4 = atomic_fetch_sub_release(1, sdref);
+	if (r4 == 1) {
+		smp_rmb();
+		rcu_assign_pointer(*head, 0);
+		synchronize_rcu();
+		WRITE_ONCE(*e_freed, 1);
+	}
+}
+
+exists (0:r0=1 /\ 0:r1=0 /\ 0:r2=1)

@@ -1,0 +1,14 @@
+Test F3f-fserror-wake-after-mb Allowed
+States 3
+0:X10=1; 0:X11=0; 1:X12=0;
+0:X10=1; 0:X11=1; 1:X12=0;
+0:X10=1; 0:X11=1; 1:X12=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Flag Assuming-common-inner-shareable-domain
+Condition exists (0:X10=1 /\ 0:X11=0 /\ 1:X12=1)
+Observation F3f-fserror-wake-after-mb Never 0 3
+Time F3f-fserror-wake-after-mb 0.02
+Hash=79b344eca52cdea11b48b66170554dd0
+

@@ -1,0 +1,77 @@
+lfsingle_no_shrink_first -- NoErr (FIX_SHRINK_FIRST off): "super_cache_count() uses a freed filesystem"
+
+shrinker_free() after ->kill_sb(): super_cache_count() (L238) reads SB_BORN without locks
+(L260) and calls into the filesystem after ->kill_sb() freed it.  shrinker_free() first
+(L585) waits out callbacks in flight and stops new ones.
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoErr is violated
+  1 Initial
+  2 i_lock     it: i_lock -> i_loop
+      rcu={it}
+      sblock=it
+  3 i_loop     it: i_loop -> Done
+      rcu={}
+      sblock=noone
+  4 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+  5 m_scan     m1: m_scan -> m_nomatch
+  6 m_nomatch  m1: m_nomatch -> m_alloc
+      rcu={}
+      sblock=noone
+  7 m_alloc    m1: m_alloc -> m_lock
+      L[m1] s=S1
+      hasact[m1]={S1}
+      own[S1]=1
+      st[S1]=alloc
+      act[S1]=1
+      umx[S1]=m1
+      pass[S1]=1
+  8 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+  9 m_scan     m1: m_scan -> m_nomatch
+ 10 m_nomatch  m1: m_nomatch -> m_set
+ 11 m_set      m1: m_set -> m_shreg
+      rcu={}
+      sblock=noone
+      fsi[S1]=live
+      fsl=<S1>
+      st[S1]=pub
+      ent[S1]={st: linked, ref: 1}
+      pass[S1]=2
+      sbl=<S1>
+ 12 u_pin      ug: u_pin -> u_lock
+      L[ug] s=S1
+      ent[S1]={st: linked, ref: 2}
+ 13 m_shreg    m1: m_shreg -> m_fill
+      shr[S1]=reg
+ 14 h_pick     sh: h_pick -> h_count
+      L[sh] n=1 s=S1
+      shrun[S1]={sh}
+ 15 m_fill     m1: m_fill -> m_unlock
+      born[S1]=True
+ 16 m_unlock   m1: m_unlock -> m_mounted
+      umx[S1]=noone
+ 17 m_mounted  m1: m_mounted -> m_deact
+ 18 m_deact    m1: m_deact -> m_dls
+      umx[S1]=m1
+ 19 m_dls      m1: m_dls -> m_gss
+      hasact[m1]={}
+      act[S1]=0
+ 20 m_gss      m1: m_gss -> m_notify
+      dying[S1]=True
+      umx[S1]=noone
+ 21 m_notify   m1: m_notify -> m_dead
+      ent[S1]={st: linked, ref: 1}
+ 22 m_dead     m1: m_dead -> m_freefsi
+      dead[S1]=True
+ 23 m_freefsi  m1: m_freefsi -> m_put0
+      fsi[S1]=freed
+ 24 h_count    sh: h_count -> h_end
+      err={super_cache_count() uses a freed filesystem}

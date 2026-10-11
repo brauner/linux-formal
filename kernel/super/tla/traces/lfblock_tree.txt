@@ -1,0 +1,75 @@
+lfblock_tree -- NoErr: "test() dereferences a freed s_fs_info"
+(filesystem contract witness; every in-tree custom test() complies, see README)
+
+Layout: a get_tree_single()-style filesystem whose test() dereferences s_fs_info and whose
+->kill_sb() frees s_fs_info before deactivate_locked_super()'s kill_super_notify() (e.g.
+generic_shutdown_super() or kill_block_super() and then kfree(s_fs_info)).
+
+ 2-10  m1  sget_fc(): no match, alloc_super(), set(), publish (L899-901), shrinker.
+ 11-12 m1  fill_super() fails: deactivate_locked_super() (s_umount held), s_active 0 (L584).
+ 13-14 m1  shrinker_free() (L585), ->kill_sb() -> generic_shutdown_super(): SB_DYING (L787),
+           s_umount dropped (L788).
+ 15    m1  ->kill_sb() frees s_fs_info; SB_DEAD is not set yet (kill_super_notify() L588
+           runs after ->kill_sb() returns).
+ 16-18 m2  sget_fc() under sb_lock: S1 is not SB_DEAD (L865), test() (L867) dereferences the
+           freed s_fs_info.
+kill_anon_super() (L1360-1365) runs kill_super_notify() right after
+generic_shutdown_super(), SB_DEAD under sb_lock (L565-567), so a filesystem that frees
+after kill_anon_super() returns is safe (lfsingle_tree).
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoErr is violated
+  1 Initial
+  2 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+  3 m_scan     m1: m_scan -> m_nomatch
+  4 m_nomatch  m1: m_nomatch -> m_alloc
+      rcu={}
+      sblock=noone
+  5 m_alloc    m1: m_alloc -> m_lock
+      L[m1] s=S1
+      hasact[m1]={S1}
+      own[S1]=1
+      st[S1]=alloc
+      act[S1]=1
+      umx[S1]=m1
+      pass[S1]=1
+  6 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+  7 m_scan     m1: m_scan -> m_nomatch
+  8 m_nomatch  m1: m_nomatch -> m_set
+  9 m_set      m1: m_set -> m_shreg
+      rcu={}
+      sblock=noone
+      fsi[S1]=live
+      fsl=<S1>
+      st[S1]=pub
+      ent[S1]={st: linked, ref: 1}
+      pass[S1]=2
+      sbl=<S1>
+ 10 m_shreg    m1: m_shreg -> m_fill
+      shr[S1]=reg
+ 11 m_fill     m1: m_fill -> m_dls
+ 12 m_dls      m1: m_dls -> m_shfree
+      hasact[m1]={}
+      act[S1]=0
+ 13 m_shfree   m1: m_shfree -> m_gss
+      shr[S1]=freed
+ 14 m_gss      m1: m_gss -> m_freefsi
+      dying[S1]=True
+      umx[S1]=noone
+ 15 m_lock     m2: m_lock -> m_scan
+      rcu={m2}
+      sblock=m2
+ 16 m_scan     m2: m_scan -> m_test
+      L[m2] old=S1
+ 17 m_freefsi  m1: m_freefsi -> m_notify
+      fsi[S1]=freed
+ 18 m_test     m2: m_test -> m_grab0
+      err={test() dereferences a freed s_fs_info}

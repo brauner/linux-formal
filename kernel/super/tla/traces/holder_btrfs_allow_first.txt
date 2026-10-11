@@ -1,0 +1,52 @@
+holder_btrfs_allow_first -- FinalOK violated -- mutation FIX_UNREGISTER_FIRST off (why btrfs_release_device_allow_freeze() unregisters before it re-allows)
+
+Layout: s1 with the member d2, x1 removes d2, dm2 suspends d2.
+
+ 10-11 x1  bdev_deny_freeze(d2), then (mutation) bdev_allow_freeze() while (d2, s1) is
+           still registered.
+ 12-18 dm2 bdev_freeze(d2) walks (d2, s1) and freezes s1.
+ 15,17 x1  fs_bdev_unregister(), bdev_fput(): d2 has no holder.
+ 25-27 dm2 bdev_thaw(d2): no holder, no walk: s1 stays frozen.
+
+fs/btrfs/volumes.c L1133-1141 does unregister, allow, fput in that order.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_btrfs_allow_first.log)
+
+# Invariant FinalOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm2=d_start, x1=x_deny]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm2=[ret=ok, dv=d2, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], x1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0, d2=0, d3=0]
+      dev = [d1=[cl={}, cnt=0, fm=none], d2=[cl={}, cnt=0, fm=none], d3=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0, d2=0, d3=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  4 MCheck: pc.m1=m_xclaim
+  5 MXClaim: pc.m1=m_xreg; dev.d2.cl={s1}; sbs.s1.mem={d1,d2}
+  6 MXReg: tab={<d1,s1>,<d2,s1>}; pc.m1=m_xchk
+  7 MXChk: pc.m1=m_born
+  8 DStart: pc.dm2=bf_lock; pv.dm2.k=d_frzret
+  9 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 10 XDeny: pc.x1=x_allow; dn.d2=1; dev.d2.cnt=-1
+ 11 XAllow: pc.x1=x_unreg; dn.d2=0; dev.d2.cnt=0
+ 12 BfLock: pc.dm2=bf_hops; dev.d2.cnt=1; dev.d2.fm=dm2; gc.d2=1
+ 13 BfHops: pc.dm2=bf_walk; pv.dm2.todo={s1}
+ 14 Walk: pc.dm2=bf_gas; pv.dm2.todo={}; pv.dm2.cur=s1
+ 15 XUnreg: tab={<d1,s1>}; pc.x1=x_put
+ 16 Gas: pc.dm2=bf_frz; sbs.s1.act=2
+ 17 XPut: pc.x1=done; dev.d2.cl={}; sbs.s1.mem={d1}
+ 18 BfFrz: pc.dm2=bf_put; pv.dm2.n=1; pv.dm2.froze={s1}; sbs.s1.act=3; sbs.s1.frz=T; sbs.s1.uc=1
+ 19 Put: pc.dm2=bf_walk; sbs.s1.act=2
+ 20 Walk: pc.dm2=bf_sync
+ 21 BfSync: pc.dm2=bf_end
+ 22 BfEnd: pc.dm2=d_frzret; dev.d2.fm=none
+ 23 DFrzRet: pc.dm2=d_hold
+ 24 DHold: pc.dm2=bt_lock; pv.dm2.k=done
+ 25 BtLock: pc.dm2=bt_hops; dev.d2.fm=dm2
+ 26 BtHops: pc.dm2=bt_end; pv.dm2.n=0
+ 27 BtEnd: pc.dm2=done; dev.d2.cnt=0; dev.d2.fm=none; gc.d2=0
+ 28 Umount: pc.u1=done; sbs.s1.act=1; sbs.s1.mnt=F

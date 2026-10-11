@@ -1,0 +1,36 @@
+freeze_ethaw_hold -- HoldsOK violated -- documented: the emergency thaw takes block-device holds
+
+Layout: b freezes through a block device; E is the emergency thaw.
+
+ 2-14  b  a full freeze through fs_super_freeze(): freeze_ucount 1.
+ 6,15  E  do_thaw_all_callback() L1204: get_active_super(), super_lock_excl() +
+          thaw_super_locked(FREEZE_HOLDER_USERSPACE) L1214-1215: takes b's hold and
+          thaws.
+
+That is what sysrq-j is for.  The consequence for the block device (its next
+bdev_thaw() fails and bd_fsfreeze_count stays) is SuperHolder's holder_multi_ethaw
+and holder_one_ethaw.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_ethaw_hold.log)
+
+# Invariant HoldsOK is violated.
+  1 Initial predicate
+      pc = [b=f_gas, x=f_gas, U=u_go, E=e_gas]
+      pv = [b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], x=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], E=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=2
+  3 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=3; sb.um=b
+  4 FCheck: pc.b=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  5 FSw: pc.b=f_sw1w; sb.wpend.1=T
+  6 EGas: pc.E=e_lock; pv.E.tmp=1; sb.active=4
+  7 FSw1w: pc.b=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  8 FRelock: pc.b=f_sw2; sb.frozen=2; sb.fvis=2; sb.um=b
+  9 FSw: pc.b=f_sw2w; sb.wpend.2=T
+ 10 FSwWait: pc.b=f_sync; sb.wpend.2=F; sb.wheld.2=T
+ 11 FSync: pc.b=f_sw3; sb.frozen=3; sb.fvis=3
+ 12 FSw: pc.b=f_sw3w; sb.wpend.3=T
+ 13 FSwWait: pc.b=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 14 FFreezeFs: pc.b=f_put; pv.b.granted=T; pv.b.tmp=1; sb.frozen=4; sb.fvis=4; sb.ucount=1; sb.sharedRef=1; sb.um=none
+ 15 ELock: pc.E=e_put; sb.frozen=0; sb.fvis=0; sb.ucount=0; sb.active=3; sb.sharedRef=0; sb.wheld.1=F; sb.wheld.2=F; sb.wheld.3=F

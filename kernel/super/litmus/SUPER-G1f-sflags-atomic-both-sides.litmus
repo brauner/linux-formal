@@ -1,0 +1,35 @@
+C SUPER-G1f-sflags-atomic-both-sides
+
+(*
+ * Expected: Never
+ *
+ * Question: what it takes to make SUPER-G1 safe without a common lock:
+ * every writer of s_flags must be an atomic read-modify-write (set_bit()
+ * style; atomic_or() here, atomic_fetch_or_release() for super_wake()'s
+ * release).  Making only the VFS side atomic is not enough
+ * (SUPER-G1h): the filesystem's plain read-modify-write can still store
+ * back a value read before the atomic one.
+ *
+ * Encoding: as SUPER-G1 with atomic_t flags.
+ *)
+
+{
+	flags=0;
+}
+
+P0(atomic_t *flags)
+{
+	int r0;
+
+	atomic_or(16, flags);
+	r0 = atomic_fetch_or_release(1, flags);
+	smp_mb();
+}
+
+P1(atomic_t *flags)
+{
+	atomic_or(8, flags);
+}
+
+locations [flags;]
+exists (flags=24 \/ flags=9 \/ flags=8)

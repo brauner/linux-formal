@@ -1,0 +1,18 @@
+Test SUPER-E1m-unlink-at-owner-put Allowed
+States 8
+0:r0=0; 0:r1=0; 0:r2=0; 0:r3=0;
+0:r0=0; 0:r1=0; 0:r2=0; 0:r3=1;
+0:r0=0; 0:r1=0; 0:r2=1; 0:r3=0;
+0:r0=1; 0:r1=0; 0:r2=0; 0:r3=0;
+0:r0=1; 0:r1=0; 0:r2=0; 0:r3=1;
+0:r0=1; 0:r1=0; 0:r2=1; 0:r3=0;
+0:r0=1; 0:r1=1; 0:r2=0; 0:r3=0;
+0:r0=1; 0:r1=1; 0:r2=1; 0:r3=0;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:r0=1 /\ 0:r1=1 /\ (0:r2=0 \/ 0:r3=1))
+Observation SUPER-E1m-unlink-at-owner-put Sometimes 1 7
+Time SUPER-E1m-unlink-at-owner-put 0.02
+Hash=29841a3666e9573b3a9df5a8be0a535c
+

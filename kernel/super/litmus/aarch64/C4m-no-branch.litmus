@@ -1,0 +1,28 @@
+AArch64 C4m-no-branch
+(* Sensitivity check for C4-unregister-allow-vs-freeze under the Arm model:
+   the same test without the conditional branch on the LDADDL result (and
+   hence without the unlink).  With no control dependency the STADD may be
+   performed before the LDADDL, and the outcome LKMM allows in
+   ../SUPER-C4 becomes allowed here too: it is the branch on the put's
+   result, which the compiled code always has, that forbids it on Arm. *)
+{
+count=-1;
+sdref=1;
+head=1;
+0:X0=sdref; 0:X1=count; 0:X2=head;
+1:X0=sdref; 1:X1=count; 1:X2=head;
+}
+ P0                  | P1                  ;
+ MOV W9,#-1          | MOV W13,#0          ;
+ LDADDL W9,W10,[X0]  | MOV W14,#1          ;
+ LDR W11,[X1]        | CASAL W13,W14,[X1]  ;
+ MOV W12,#1          | CMP W13,#0          ;
+ STADD W12,[X1]      | B.NE L1             ;
+                     | LDR W17,[X2]        ;
+                     | CMP W17,#1          ;
+                     | B.NE L1             ;
+                     | MOV W15,#1          ;
+                     | MOV W16,#2          ;
+                     | CAS W15,W16,[X0]    ;
+                     | L1:                 ;
+exists (1:X13=0 /\ 1:X17=1 /\ 1:X15=1)

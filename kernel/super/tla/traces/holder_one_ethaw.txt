@@ -1,0 +1,68 @@
+holder_one_ethaw -- FinalOK violated -- real (F2c): the emergency thaw racing a dm suspend of s_bdev leaves bd_fsfreeze_count at 1
+
+Layout: s1 on d1, dm1 suspend/resume, f1 FIFREEZE (gets -EBUSY here), e the emergency
+thaw, u1 umount.
+
+ 2,5   e   do_thaw_all() -> __iterate_supers() reaches s1.
+ 9     e   do_thaw_all_callback(): get_active_super(s1) (L1206).
+ 10    e   while (sb->s_bdev && !bdev_thaw(sb->s_bdev)) (L1210-1212): d1 is not frozen
+           yet, bdev_thaw() returns -EINVAL at once, the loop ends.
+ 11-20 dm1 dm suspend: bdev_freeze(d1) freezes s1 (freeze_ucount 1).
+ 21-26 dm1 dm resume: bdev_thaw(d1), the walk pins (d1, s1), get_active_super().
+ 27-28 e   super_lock_excl() + thaw_super_locked(FREEZE_HOLDER_USERSPACE) (L1214-1215):
+           takes dm's hold and thaws s1.
+ 29,34 dm1 fs_super_thaw(): -EINVAL; one superblock: returned, the count stays 1.
+
+The emergency thaw is meant to thaw everything, but the device it raced is left
+with bd_fsfreeze_count 1 forever (see holder_one_steal_count for what that means).
+The window is between the bdev_thaw() loop and thaw_super_locked(); a dm freeze
+that lands there (or a resume in flight there) loses.  holder_one_ethaw_fixed
+passes with the proposed fs_bdev_thaw() change.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_ethaw.log)
+
+# Invariant FinalOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm1=d_start, f1=f_frz, e=e_start]
+      pv = [m1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], u1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], dm1=[e=ok, ret=ok, dv=d1, k=done, todo={}, cur=none, n=0, froze={}, it={}], f1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], e=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 EStart: pc.e=e_next; pv.e.it={s1}
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  5 ENext: pc.e=e_gas; pv.e.cur=s1; pv.e.it={}
+  6 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  7 MCheck: pc.m1=m_born
+  8 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+  9 EGas: pc.e=bt_lock; pv.e.dv=d1; pv.e.k=e_btret; sbs.s1.act=2
+ 10 BtLock: pc.e=e_btret; pv.e.ret=EINVAL
+ 11 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+ 12 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+ 13 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+ 14 Gas: pc.dm1=bf_frz; sbs.s1.act=3
+ 15 BfFrz: pc.dm1=bf_put; pv.dm1.n=1; pv.dm1.froze={s1}; sbs.s1.act=4; sbs.s1.frz=T; sbs.s1.uc=1
+ 16 Put: pc.dm1=bf_walk; sbs.s1.act=3
+ 17 Walk: pc.dm1=bf_sync
+ 18 BfSync: pc.dm1=bf_end
+ 19 BfEnd: pc.dm1=d_frzret; dev.d1.fm=none
+ 20 DFrzRet: pc.dm1=d_hold
+ 21 DHold: pc.dm1=bt_lock; pv.dm1.k=done
+ 22 BtLock: pc.dm1=bt_hops; dev.d1.fm=dm1
+ 23 BtHops: pc.dm1=bt_walk; pv.dm1.todo={s1}; pv.dm1.n=0
+ 24 Walk: pc.dm1=bt_gas; pv.dm1.todo={}
+ 25 FFrz: pc.f1=done; pv.f1.ret=EBUSY
+ 26 Gas: pc.dm1=bt_thw; sbs.s1.act=4
+ 27 EBtRet: pc.e=e_lock
+ 28 ELock: pc.e=e_put; sbs.s1.act=3; sbs.s1.frz=F; sbs.s1.uc=0
+ 29 BtThw: pc.dm1=bt_put; pv.dm1.e=EINVAL; pv.dm1.n=1
+ 30 Put: pc.e=e_next; sbs.s1.act=2
+ 31 ENext: pc.e=done
+ 32 Put: pc.dm1=bt_walk; sbs.s1.act=1
+ 33 Walk: pc.dm1=bt_end
+ 34 BtEnd: pc.dm1=done; pv.dm1.ret=EINVAL; dev.d1.fm=none; gc.d1=0
+ 35 Umount: tab={}; pc.u1=done; dev.d1.cl={}; sbs.s1.st=dead; sbs.s1.act=0; sbs.s1.mnt=F; sbs.s1.mem={}

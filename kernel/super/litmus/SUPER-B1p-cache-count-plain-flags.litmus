@@ -1,0 +1,85 @@
+C SUPER-B1p-cache-count-plain-flags
+
+(*
+ * Expected: Sometimes
+ *
+ * Variant of SUPER-B1 with the SB_BORN test as the plain load the kernel
+ * does.  herd7 flags the plain load of s_flags racing with the release
+ * store of super_wake() as a data race (what KCSAN would report), and
+ * LKMM then gives no ordering guarantee for it: the result is Sometimes,
+ * not because the barriers pair badly (SUPER-B1 with READ_ONCE() is
+ * Never) but because a racy plain load may be torn, refetched or fused
+ * by the compiler.  In practice the compiler emits one load and the
+ * code works; super_flags(sb, SB_BORN), i.e. smp_load_acquire(), would
+ * make it race-free and subsume the smp_rmb().
+ *
+ * Question: super_cache_count() runs without s_umount on a superblock
+ * whose shrinker sget_fc() registered before fill_super().  It checks
+ * SB_BORN, issues smp_rmb() and then calls into s_op and the list_lru
+ * counts.  Its comment pairs the barrier with "the one in mount_fs()",
+ * which no longer exists.  Is the pairing still sound against the release
+ * store vfs_get_tree() does in super_wake(SB_BORN)?
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   257         * to avoid this situation, so do the same here. The memory barrier is
+ *   258         * matched with the one in mount_fs() as we don't hold locks here.
+ *   260         if (!(sb->s_flags & SB_BORN))
+ *   261                 return 0;
+ *   262         smp_rmb();
+ *   264         if (sb->s_op && sb->s_op->nr_cached_objects)
+ *   265                 total_objects = sb->s_op->nr_cached_objects(sb, sc);
+ *   267         total_objects += list_lru_shrink_count(&sb->s_dentry_lru, sc);
+ *   903         shrinker_register(s->s_shrink);       (sget_fc(), before fill_super())
+ *   1949        * super_wake() contains a memory barrier which also care of
+ *   1950        * ordering for super_cache_count(). We place it before setting
+ *   1951        * SB_BORN as the data dependency between the two functions is
+ *   1952        * the superblock structure contents that we just set up, not
+ *   1953        * the SB_BORN flag.
+ *   1955        super_wake(sb, SB_BORN);
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ *
+ * Encoding: s_op and lru stand for the fill_super() state the counters
+ * read (plain accesses, as in the kernel).  The SB_BORN load is a
+ * plain load here, as in the kernel.  The
+ * counterpart is the release store of super_wake(), i.e. the shape is
+ * MP+pooncerelease+fencermbonceonce: release on the writer side pairs
+ * with smp_rmb() on the reader side.  The stale mount_fs() reference
+ * should name super_wake()/vfs_get_tree().
+ *)
+
+{
+	flags=0;
+	s_op=0;
+	lru=0;
+}
+
+P0(int *flags, int *s_op, int *lru)
+{
+	int r0;
+	int r1;
+
+	*lru = 1;
+	*s_op = 1;
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 1;
+	smp_store_release(flags, r1);
+	smp_mb();
+}
+
+P1(int *flags, int *s_op, int *lru)
+{
+	int r2;
+	int r3;
+	int r4;
+	int r5;
+
+	r2 = *flags;
+	r3 = r2 & 1;
+	if (r3 == 1) {
+		smp_rmb();
+		r4 = *s_op;
+		r5 = *lru;
+	}
+}
+
+exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0))

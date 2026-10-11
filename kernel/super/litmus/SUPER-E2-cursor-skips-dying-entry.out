@@ -1,0 +1,13 @@
+Test SUPER-E2-cursor-skips-dying-entry Allowed
+States 3
+0:r0=0; 0:r1=-1; 0:r2=0;
+0:r0=1; 0:r1=0; 0:r2=0;
+0:r0=1; 0:r1=1; 0:r2=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:r0=1 /\ 0:r1=0 /\ 0:r2=1)
+Observation SUPER-E2-cursor-skips-dying-entry Never 0 3
+Time SUPER-E2-cursor-skips-dying-entry 0.01
+Hash=6b3d70132fb08c2908d5c66fbfda0c3e
+

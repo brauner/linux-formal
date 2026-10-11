@@ -1,0 +1,41 @@
+holder_one_steal -- FrozenWhileHeld violated -- long-standing semantics of the shared freeze_ucount (F2a): FITHAW thaws under a suspended dm device
+
+Layout: s1 on d1, dm1 suspends d1, r1 calls FITHAW without having frozen.
+
+ 2-12  m1, dm1  s1 mounts; dm1's bdev_freeze() walk waits in get_active_super() for
+           SB_BORN (L118) and freezes s1 (freeze_ucount 1).
+ 15-16 dm1 bdev_freeze() returns 0: the device is suspended with the filesystem frozen.
+ 17    r1  FITHAW: thaw_super(FREEZE_HOLDER_USERSPACE) succeeds (may_unfreeze() L2186-2187
+           only asks freeze_ucount > 0) and thaws s1 -- under the suspended device.
+
+The step after this is holder_one_steal_count.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_steal.log)
+
+# Invariant FrozenWhileHeld is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm1=d_start, r1=r_thaw]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm1=[ret=ok, dv=d1, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], r1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  5 MCheck: pc.m1=m_born
+  6 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+  7 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+  8 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+  9 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 10 Gas: pc.dm1=bf_frz; sbs.s1.act=2
+ 11 BfFrz: pc.dm1=bf_put; pv.dm1.n=1; pv.dm1.froze={s1}; sbs.s1.act=3; sbs.s1.frz=T; sbs.s1.uc=1
+ 12 Put: pc.dm1=bf_walk; sbs.s1.act=2
+ 13 Walk: pc.dm1=bf_sync
+ 14 BfSync: pc.dm1=bf_end
+ 15 BfEnd: pc.dm1=d_frzret; dev.d1.fm=none
+ 16 DFrzRet: pc.dm1=d_hold
+ 17 Rogue: pc.r1=done; sbs.s1.act=1; sbs.s1.frz=F; sbs.s1.uc=0

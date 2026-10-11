@@ -1,0 +1,16 @@
+Test SUPER-F3-fserror-unmount-lost-wakeup Allowed
+States 6
+0:r0=1; 0:r1=0; 0:r2=0; 1:r3=2; 1:r4=0;
+0:r0=2; 0:r1=0; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r0=2; 0:r1=1; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r0=2; 0:r1=1; 0:r2=0; 1:r3=1; 1:r4=1;
+0:r0=2; 0:r1=1; 0:r2=1; 1:r3=1; 1:r4=0;
+0:r0=2; 0:r1=1; 0:r2=1; 1:r3=1; 1:r4=1;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:r0=2 /\ 0:r1=1 /\ 0:r2=1 /\ 1:r3=1 /\ 1:r4=0)
+Observation SUPER-F3-fserror-unmount-lost-wakeup Sometimes 1 5
+Time SUPER-F3-fserror-unmount-lost-wakeup 0.03
+Hash=935179bfb6c7425b6cdd27b1b8947178
+

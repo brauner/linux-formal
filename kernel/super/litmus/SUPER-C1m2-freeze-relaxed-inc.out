@@ -1,0 +1,14 @@
+Test SUPER-C1m2-freeze-relaxed-inc Allowed
+States 4
+0:r0=0; 1:r1=0; 1:r3=0;
+0:r0=0; 1:r1=0; 1:r3=1;
+0:r0=1; 1:r1=0; 1:r3=0;
+0:r0=1; 1:r1=0; 1:r3=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:r0=0 /\ 1:r1=0 /\ 1:r3=0)
+Observation SUPER-C1m2-freeze-relaxed-inc Sometimes 1 3
+Time SUPER-C1m2-freeze-relaxed-inc 0.01
+Hash=c9d193ce8e31e25da9e0d072b2c9b5b0
+

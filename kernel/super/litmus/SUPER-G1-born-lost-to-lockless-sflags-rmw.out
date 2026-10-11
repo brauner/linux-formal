@@ -1,0 +1,15 @@
+Test SUPER-G1-born-lost-to-lockless-sflags-rmw Allowed
+States 5
+[flags]=8;
+[flags]=9;
+[flags]=17;
+[flags]=24;
+[flags]=25;
+Ok
+Witnesses
+Positive: 3 Negative: 6
+Condition exists ([flags]=24 \/ [flags]=9 \/ [flags]=8)
+Observation SUPER-G1-born-lost-to-lockless-sflags-rmw Sometimes 3 6
+Time SUPER-G1-born-lost-to-lockless-sflags-rmw 0.03
+Hash=89fbbfd1f16889f2b86354d3ba21c0b4
+

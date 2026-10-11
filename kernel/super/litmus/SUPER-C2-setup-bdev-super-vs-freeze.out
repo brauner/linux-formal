@@ -1,0 +1,13 @@
+Test SUPER-C2-setup-bdev-super-vs-freeze Allowed
+States 3
+0:r0=0; 1:r1=0; 1:r3=1;
+0:r0=1; 1:r1=0; 1:r3=0;
+0:r0=1; 1:r1=0; 1:r3=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:r0=0 /\ 1:r1=0 /\ 1:r3=0)
+Observation SUPER-C2-setup-bdev-super-vs-freeze Never 0 3
+Time SUPER-C2-setup-bdev-super-vs-freeze 0.03
+Hash=5be2d1f5d2fb3b22a70d750ba4f0f7d7
+

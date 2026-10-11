@@ -1,0 +1,36 @@
+freeze_kern_no_owner -- ExclOK violated -- mutation FIX_EXCL_OWNER off (what may_unfreeze()'s owner check buys)
+
+Layout: x is filesystems_freeze() (FREEZE_EXCL | FREEZE_HOLDER_KERNEL with an owner),
+r a kernel thaw without a freeze of its own.
+
+ 2-13  x  get_active_super(), a full freeze_super(): freeze_kcount 1, freeze_owner = x
+          (L2329-2331).
+ 14    r  thaw_super(FREEZE_HOLDER_KERNEL): without the check at L2180-2182 ("Someone's
+          trying to steal the reference belonging to freeze_owner") the kernel thaw
+          takes x's only kernel hold and thaws the filesystem under x.
+
+With the check (freeze_kern_fixed) the plain kernel thaw is refused while the
+exclusive owner holds the last kernel reference.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_kern_no_owner.log)
+
+# Invariant ExclOK is violated.
+  1 Initial predicate
+      pc = [k=f_lock, x=f_gas, r=r_lock, U=u_go]
+      pv = [k=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], x=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], r=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FGas: pc.x=f_lock; pv.x.tmp=1; sb.active=2
+  3 FLock: pc.x=f_check; pv.x.tmp=2; sb.active=3; sb.um=x
+  4 FCheck: pc.x=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  5 FSw: pc.x=f_sw1w; sb.wpend.1=T
+  6 FSw1w: pc.x=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  7 FRelock: pc.x=f_sw2; sb.frozen=2; sb.fvis=2; sb.um=x
+  8 FSw: pc.x=f_sw2w; sb.wpend.2=T
+  9 FSwWait: pc.x=f_sync; sb.wpend.2=F; sb.wheld.2=T
+ 10 FSync: pc.x=f_sw3; sb.frozen=3; sb.fvis=3
+ 11 FSw: pc.x=f_sw3w; sb.wpend.3=T
+ 12 FSwWait: pc.x=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 13 FFreezeFs: pc.x=f_put; pv.x.granted=T; pv.x.tmp=1; sb.frozen=4; sb.fvis=4; sb.kcount=1; sb.owner=x; sb.sharedRef=1; sb.um=none
+ 14 Rogue: pc.r=done; sb.frozen=0; sb.fvis=0; sb.kcount=0; sb.owner=none; sb.active=2; sb.sharedRef=0; sb.wheld.1=F; sb.wheld.2=F; sb.wheld.3=F

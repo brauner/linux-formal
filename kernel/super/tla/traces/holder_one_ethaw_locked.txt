@@ -1,0 +1,38 @@
+holder_one_ethaw_locked -- Deadlock -- the bug fixed by 749d7aa0377a (mutation FIX_THAW_ALL_UNLOCKED off)
+
+Layout: s1 on d1, dm1 suspend, e the emergency thaw.
+
+ 8-10  dm1 bdev_freeze(d1): bd_fsfreeze_mutex, count 1, the walk pins (d1, s1) and waits
+           in get_active_super() for s1's s_umount.
+ 12    e   before 749d7aa0377a the iterator took s_umount of s1 and held it across
+           bdev_thaw(s1->s_bdev), which needs bd_fsfreeze_mutex (held by dm1);
+           dm1 needs s_umount (held by e): ABBA.  (With the count already 1 the
+           emergency thaw deadlocked on itself through fs_bdev_thaw()'s super_lock().)
+
+The kernel at fc1c25014ff8 takes only an active reference around the loop
+(L1206-1212) and passes.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_ethaw_locked.log)
+
+# Deadlock reached.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, dm1=d_start, e=e_start]
+      pv = [m1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], dm1=[e=ok, ret=ok, dv=d1, k=done, todo={}, cur=none, n=0, froze={}, it={}], e=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 EStart: pc.e=e_next; pv.e.it={s1}
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  5 ENext: pc.e=e_gas; pv.e.cur=s1; pv.e.it={}
+  6 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  7 MCheck: pc.m1=m_born
+  8 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+  9 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+ 10 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+ 11 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 12 EGas: pc.e=bt_lock; pv.e.dv=d1; pv.e.k=e_btret; sbs.s1.um=e; sbs.s1.act=2

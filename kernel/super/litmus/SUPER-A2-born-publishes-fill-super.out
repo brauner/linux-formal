@@ -1,0 +1,12 @@
+Test SUPER-A2-born-publishes-fill-super Allowed
+States 2
+1:r3=0; 1:r4=0; 1:r5=0; 1:r6=0;
+1:r3=1; 1:r4=1; 1:r5=1; 1:r6=1;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0 \/ 1:r6=0))
+Observation SUPER-A2-born-publishes-fill-super Never 0 2
+Time SUPER-A2-born-publishes-fill-super 0.01
+Hash=ad3d024ae635a0a1464709d11702cf96
+

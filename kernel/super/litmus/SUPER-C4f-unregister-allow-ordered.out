@@ -1,0 +1,12 @@
+Test SUPER-C4f-unregister-allow-ordered Allowed
+States 2
+1:r2=-1; 1:r4=0; 1:r5=0;
+1:r2=0; 1:r4=0; 1:r5=0;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (1:r2=0 /\ 1:r4=1 /\ 1:r5=1)
+Observation SUPER-C4f-unregister-allow-ordered Never 0 2
+Time SUPER-C4f-unregister-allow-ordered 0.07
+Hash=39e0f3b382a8f6c3f3a5d9f503eee948
+

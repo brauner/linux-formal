@@ -1,0 +1,3281 @@
+# cbmc freeze.c -DNSTEPS=6 -DCFG_PM=0 -DCFG_MULTIDEV=0 -DCFG_FS_ERROR_RO=1 -DCFG_BDEV=0 -DCFG_MOUNTS=0 --unwind 7 --unwindset freeze_super_co.0:2,freeze_super_co.1:2,bdev_freeze_co.0:2,bdev_thaw_co.0:2 --unwinding-assertions --bounds-check --sat-solver cadical --trace --property check_sb_invariants.assertion.9
+CBMC version 6.6.0 (cbmc-6.6.0) 64-bit x86_64 linux
+Type-checking freeze
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Starting Bounded Model Checking
+loop identifier bdev_freeze_co.0 for non-existent function provided with unwindset
+loop identifier bdev_thaw_co.0 for non-existent function provided with unwindset
+The specified solver, 'cadical', is not available. The default solver will be used instead.
+Passing problem to propositional reduction
+converting SSA
+Running propositional reduction
+SAT checker: instance is SATISFIABLE
+Building error trace
+
+** Results:
+kernel_freeze.h function check_sb_invariants
+[check_sb_invariants.assertion.9] line 1238 sb_writers rwsem write-held while SB_UNFROZEN (leaked by thaw): FAILURE
+
+Trace for check_sb_invariants.assertion.9:
+
+State 15 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_sb[0l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 16 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_sb[1l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 17 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_sb[2l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 19 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_linked[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 20 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_linked[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 21 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV0.sd_linked[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 30 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_sb[0l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 31 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_sb[1l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 32 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_sb[2l]=((struct super_block *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 34 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_linked[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 35 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_linked[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 36 file freeze.c function __CPROVER_initialize line 85 thread 0
+----------------------------------------------------
+  BDEV1.sd_linked[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 70 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR0.w.res[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 71 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR0.w.res[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 72 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR0.w.res[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 106 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR1.w.res[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 107 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR1.w.res[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 108 file freeze.c function __CPROVER_initialize line 126 thread 0
+----------------------------------------------------
+  FR1.w.res[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 120 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[0l]={ .wheld=0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 121 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[0l].wheld=0 (00000000 00000000 00000000 00000000)
+
+State 122 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[1l]={ .wheld=0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 123 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[1l].wheld=0 (00000000 00000000 00000000 00000000)
+
+State 124 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[2l]={ .wheld=0 } ({ 00000000 00000000 00000000 00000000 })
+
+State 125 file freeze.c function __CPROVER_initialize line 80 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[2l].wheld=0 (00000000 00000000 00000000 00000000)
+
+State 133 file freeze.c function __CPROVER_initialize line 99 thread 0
+----------------------------------------------------
+  believers[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 134 file freeze.c function __CPROVER_initialize line 99 thread 0
+----------------------------------------------------
+  believers[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 136 file freeze.c function __CPROVER_initialize line 100 thread 0
+----------------------------------------------------
+  devheld[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 137 file freeze.c function __CPROVER_initialize line 100 thread 0
+----------------------------------------------------
+  devheld[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 143 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 144 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 145 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 146 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[3l]=0 (00000000 00000000 00000000 00000000)
+
+State 147 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[4l]=0 (00000000 00000000 00000000 00000000)
+
+State 148 file freeze.c function __CPROVER_initialize line 107 thread 0
+----------------------------------------------------
+  log_arg[5l]=0 (00000000 00000000 00000000 00000000)
+
+State 150 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 151 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 152 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 153 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[3l]=0 (00000000 00000000 00000000 00000000)
+
+State 154 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[4l]=0 (00000000 00000000 00000000 00000000)
+
+State 155 file freeze.c function __CPROVER_initialize line 106 thread 0
+----------------------------------------------------
+  log_op[5l]=0 (00000000 00000000 00000000 00000000)
+
+State 157 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 158 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 159 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 160 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[3l]=0 (00000000 00000000 00000000 00000000)
+
+State 161 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[4l]=0 (00000000 00000000 00000000 00000000)
+
+State 162 file freeze.c function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  log_ret[5l]=0 (00000000 00000000 00000000 00000000)
+
+State 172 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 173 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 174 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 175 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[3l]=0 (00000000 00000000 00000000 00000000)
+
+State 176 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[4l]=0 (00000000 00000000 00000000 00000000)
+
+State 177 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[5l]=0 (00000000 00000000 00000000 00000000)
+
+State 178 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[6l]=0 (00000000 00000000 00000000 00000000)
+
+State 179 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[7l]=0 (00000000 00000000 00000000 00000000)
+
+State 180 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[8l]=0 (00000000 00000000 00000000 00000000)
+
+State 181 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[9l]=0 (00000000 00000000 00000000 00000000)
+
+State 182 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[10l]=0 (00000000 00000000 00000000 00000000)
+
+State 183 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[11l]=0 (00000000 00000000 00000000 00000000)
+
+State 184 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[12l]=0 (00000000 00000000 00000000 00000000)
+
+State 185 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[13l]=0 (00000000 00000000 00000000 00000000)
+
+State 186 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[14l]=0 (00000000 00000000 00000000 00000000)
+
+State 187 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[15l]=0 (00000000 00000000 00000000 00000000)
+
+State 188 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[16l]=0 (00000000 00000000 00000000 00000000)
+
+State 189 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[17l]=0 (00000000 00000000 00000000 00000000)
+
+State 190 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[18l]=0 (00000000 00000000 00000000 00000000)
+
+State 191 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[19l]=0 (00000000 00000000 00000000 00000000)
+
+State 192 file kernel_freeze.h function __CPROVER_initialize line 108 thread 0
+----------------------------------------------------
+  warned[20l]=0 (00000000 00000000 00000000 00000000)
+
+State 196 file freeze.c function main line 233 thread 0
+----------------------------------------------------
+  step=0 (00000000 00000000 00000000 00000000)
+
+State 197 file freeze.c function main line 233 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 198 file freeze.c function main line 233 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 200 file freeze.c function main line 236 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 201 file freeze.c function main line 236 thread 0
+----------------------------------------------------
+  SB.s_flags=1610612736ul (00000000 00000000 00000000 00000000 01100000 00000000 00000000 00000000)
+
+State 202 file freeze.c function main line 237 thread 0
+----------------------------------------------------
+  SB.s_active=1 (00000000 00000000 00000000 00000001)
+
+State 204 file freeze.c function main line 238 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$0=TRUE (00000001)
+
+State 205 file freeze.c function main line 238 thread 0
+----------------------------------------------------
+  SB.s_op=&ops_freeze_fs (00000111 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 206 file freeze.c function main line 239 thread 0
+----------------------------------------------------
+  SB.m_registered=1 (00000000 00000000 00000000 00000001)
+
+State 207 file freeze.c function main line 240 thread 0
+----------------------------------------------------
+  mounts=1 (00000000 00000000 00000000 00000001)
+
+State 210 file freeze.c function main line 241 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 211 file freeze.c function main line 241 thread 0
+----------------------------------------------------
+  ndev=1 (00000000 00000000 00000000 00000001)
+
+State 212 file freeze.c function main line 242 thread 0
+----------------------------------------------------
+  BDEV0.bd_holder_ops=1 (00000000 00000000 00000000 00000001)
+
+State 213 file freeze.c function main line 243 thread 0
+----------------------------------------------------
+  BDEV0.nsd=1 (00000000 00000000 00000000 00000001)
+
+State 214 file freeze.c function main line 244 thread 0
+----------------------------------------------------
+  BDEV0.sd_sb[0l]=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 215 file freeze.c function main line 245 thread 0
+----------------------------------------------------
+  BDEV0.sd_linked[0l]=1 (00000000 00000000 00000000 00000001)
+
+State 216 file freeze.c function main line 246 thread 0
+----------------------------------------------------
+  BDEV1.bd_holder_ops=1 (00000000 00000000 00000000 00000001)
+
+State 217 file freeze.c function main line 247 thread 0
+----------------------------------------------------
+  BDEV1.nsd=1 (00000000 00000000 00000000 00000001)
+
+State 218 file freeze.c function main line 248 thread 0
+----------------------------------------------------
+  BDEV1.sd_sb[0l]=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 219 file freeze.c function main line 249 thread 0
+----------------------------------------------------
+  BDEV1.sd_linked[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 220 file freeze.c function main line 251 thread 0
+----------------------------------------------------
+  step=0 (00000000 00000000 00000000 00000000)
+
+State 224 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 225 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  op=0 (00000000 00000000 00000000 00000000)
+
+State 228 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=4194316 (00000000 01000000 00000000 00001100)
+
+State 229 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  arg=4194316 (00000000 01000000 00000000 00001100)
+
+State 232 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$2=FALSE (00000000)
+
+State 233 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  killed=FALSE (00000000)
+
+State 235 file freeze.c function main line 255 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 237 file freeze.c function main line 256 thread 0
+----------------------------------------------------
+  run=((struct frame *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 239 file freeze.c function main line 257 thread 0
+----------------------------------------------------
+  new_frame=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 259 function main
+  op >= 0 && op < 15
+
+State 243 file freeze.c function main line 260 thread 0
+----------------------------------------------------
+  log_op[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 253 file freeze.c function main line 269 thread 0
+----------------------------------------------------
+  new_frame=1 (00000000 00000000 00000000 00000001)
+
+State 256 file freeze.c function main line 427 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 260 file freeze.c function main line 428 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 261 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 263 file freeze.c function main line 428 thread 0
+----------------------------------------------------
+  return_value_fr_of$1=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 272 file freeze.c function main line 429 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 273 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 275 file freeze.c function main line 429 thread 0
+----------------------------------------------------
+  run=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 282 file freeze.c function main line 430 thread 0
+----------------------------------------------------
+  FR0.caller=1 (00000000 00000000 00000000 00000001)
+
+State 289 file freeze.c function main line 431 thread 0
+----------------------------------------------------
+  FR0.caller_ref=0 (00000000 00000000 00000000 00000000)
+
+State 296 file freeze.c function main line 432 thread 0
+----------------------------------------------------
+  FR0.f.pc=0 (00000000 00000000 00000000 00000000)
+
+State 303 file freeze.c function main line 433 thread 0
+----------------------------------------------------
+  FR0.f.sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 310 file freeze.c function main line 434 thread 0
+----------------------------------------------------
+  FR0.f.freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 318 file freeze.c function main line 436 thread 0
+----------------------------------------------------
+  FR0.f.who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 321 file freeze.c function main line 452 thread 0
+----------------------------------------------------
+  done=0 (00000000 00000000 00000000 00000000)
+
+State 324 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 325 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  killed=FALSE (00000000)
+
+State 336 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 337 file kernel_freeze.h function snap_holds line 1131 thread 0
+----------------------------------------------------
+  s={ .k=0, .u=0, .owner=NULL, .frozen=0, .$pad4=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 344 file kernel_freeze.h function snap_holds line 1133 thread 0
+----------------------------------------------------
+  s.k=0 (00000000 00000000 00000000 00000000)
+
+State 345 file kernel_freeze.h function snap_holds line 1134 thread 0
+----------------------------------------------------
+  s.u=0 (00000000 00000000 00000000 00000000)
+
+State 346 file kernel_freeze.h function snap_holds line 1135 thread 0
+----------------------------------------------------
+  s.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 347 file kernel_freeze.h function snap_holds line 1136 thread 0
+----------------------------------------------------
+  s.frozen=0 (00000000 00000000)
+
+State 348 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 349 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.u=0 (00000000 00000000 00000000 00000000)
+
+State 350 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 351 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.frozen=0 (00000000 00000000)
+
+State 352 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 354 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 355 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.u=0 (00000000 00000000 00000000 00000000)
+
+State 356 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 357 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.frozen=0 (00000000 00000000)
+
+State 358 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 359 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 360 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.u=0 (00000000 00000000 00000000 00000000)
+
+State 361 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 362 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.frozen=0 (00000000 00000000)
+
+State 363 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 368 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 369 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  killed=FALSE (00000000)
+
+State 377 file kernel_freeze.h function freeze_super_co line 652 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 385 file kernel_freeze.h function freeze_super_co line 653 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 393 file kernel_freeze.h function freeze_super_co line 654 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 394 file kernel_freeze.h function freeze_super_co line 655 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 406 file kernel_freeze.h function freeze_super_co line 662 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 410 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 411 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 420 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 421 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  flags=553648128 (00100001 00000000 00000000 00000000)
+
+State 426 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=TRUE (00000001)
+
+State 428 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  return_value_super_flags=TRUE (00000001)
+
+Assumption:
+  file kernel_freeze.h line 416 function super_lock
+  return_value_super_flags != FALSE
+
+State 433 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 434 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  flags=16777216 (00000001 00000000 00000000 00000000)
+
+State 439 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=FALSE (00000000)
+
+State 441 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  return_value_super_flags$0=FALSE (00000000)
+
+State 445 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 446 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 450 file kernel_freeze.h function __super_lock line 378 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 458 file kernel_freeze.h function down_write line 225 thread 0
+----------------------------------------------------
+  SB.s_umount=1 (00000000 00000000 00000000 00000001)
+
+State 476 file kernel_freeze.h function super_lock line 435 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock=TRUE (00000001)
+
+State 478 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  return_value_super_lock=TRUE (00000001)
+
+State 479 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock_excl=TRUE (00000001)
+
+State 481 file kernel_freeze.h function freeze_super_co line 662 thread 0
+----------------------------------------------------
+  return_value_super_lock_excl=TRUE (00000001)
+
+State 485 file kernel_freeze.h function freeze_super_co line 667 thread 0
+----------------------------------------------------
+  v=&SB.s_active (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001000)
+
+State 493 file kernel_freeze.h function atomic_inc line 260 thread 0
+----------------------------------------------------
+  SB.s_active=2 (00000000 00000000 00000000 00000010)
+
+State 512 file kernel_freeze.h function freeze_super_co line 713 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 519 file kernel_freeze.h function sb_rdonly line 317 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sb_rdonly=FALSE (00000000)
+
+State 521 file kernel_freeze.h function freeze_super_co line 713 thread 0
+----------------------------------------------------
+  return_value_sb_rdonly=FALSE (00000000)
+
+State 529 file kernel_freeze.h function freeze_super_co line 725 thread 0
+----------------------------------------------------
+  SB.s_writers.frozen=1 (00000000 00000001)
+
+State 532 file kernel_freeze.h function freeze_super_co line 727 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 535 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 536 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 540 file kernel_freeze.h function super_unlock line 386 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 548 file kernel_freeze.h function up_write line 231 thread 0
+----------------------------------------------------
+  SB.s_umount=0 (00000000 00000000 00000000 00000000)
+
+State 559 file kernel_freeze.h function freeze_super_co line 728 thread 0
+----------------------------------------------------
+  FR0.f.pc=2 (00000000 00000000 00000000 00000010)
+
+State 560 file kernel_freeze.h function freeze_super_co line 729 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freeze_super_co=0 (00000000 00000000 00000000 00000000)
+
+State 563 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  return_value_freeze_super_co=0 (00000000 00000000 00000000 00000000)
+
+State 564 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  done=0 (00000000 00000000 00000000 00000000)
+
+State 566 file kernel_freeze.h function run_freezer line 1210 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$run_freezer=0 (00000000 00000000 00000000 00000000)
+
+State 568 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  done=0 (00000000 00000000 00000000 00000000)
+
+State 572 file freeze.c function main line 495 thread 0
+----------------------------------------------------
+  log_ret[0l]=0 (00000000 00000000 00000000 00000000)
+
+State 576 file freeze.c function check_invariants line 190 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 579 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 581 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  u=0 (00000000 00000000 00000000 00000000)
+
+State 583 file freeze.c function check_invariants line 192 thread 0
+----------------------------------------------------
+  complete=0 (00000000 00000000 00000000 00000000)
+
+State 584 file freeze.c function check_invariants line 193 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 591 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 592 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 606 file freeze.c function frame_refs line 162 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 622 file freeze.c function frame_refs line 167 thread 0
+----------------------------------------------------
+  n=1 (00000000 00000000 00000000 00000001)
+
+State 623 file freeze.c function frame_refs line 169 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=1 (00000000 00000000 00000000 00000001)
+
+State 625 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs=1 (00000000 00000000 00000000 00000001)
+
+State 629 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR1 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 630 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 638 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 641 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs$0=0 (00000000 00000000 00000000 00000000)
+
+State 644 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inflight_refs=1 (00000000 00000000 00000000 00000001)
+
+State 646 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  return_value_inflight_refs=1 (00000000 00000000 00000000 00000001)
+
+State 651 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 652 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  expected_active=2 (00000000 00000000 00000000 00000010)
+
+State 660 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 662 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  u=0 (00000000 00000000 00000000 00000000)
+
+State 664 file kernel_freeze.h function check_sb_invariants line 1217 thread 0
+----------------------------------------------------
+  frozen=1 (00000000 00000001)
+
+State 671 file kernel_freeze.h function check_sb_invariants line 1218 thread 0
+----------------------------------------------------
+  wheld=0 (00000000 00000000 00000000 00000000)
+
+State 726 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 732 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 733 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 735 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 736 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 741 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 743 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 745 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 760 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 762 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 764 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on$0=0 (00000000 00000000 00000000 00000000)
+
+State 786 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 793 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 794 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 796 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 797 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 801 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=2 (00000000 00000000 00000000 00000010)
+
+State 815 file freeze.c function main line 251 thread 0
+----------------------------------------------------
+  step=1 (00000000 00000000 00000000 00000001)
+
+State 820 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  return_value_nondet_int=14 (00000000 00000000 00000000 00001110)
+
+State 821 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  op=14 (00000000 00000000 00000000 00001110)
+
+State 824 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 825 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  arg=0 (00000000 00000000 00000000 00000000)
+
+State 828 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$2=TRUE (00000001)
+
+State 829 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 831 file freeze.c function main line 255 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 833 file freeze.c function main line 256 thread 0
+----------------------------------------------------
+  run=((struct frame *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 835 file freeze.c function main line 257 thread 0
+----------------------------------------------------
+  new_frame=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 259 function main
+  op >= 0 && op < 15
+
+State 839 file freeze.c function main line 260 thread 0
+----------------------------------------------------
+  log_op[1l]=14 (00000000 00000000 00000000 00001110)
+
+Assumption:
+  file freeze.c line 417 function main
+  arg >= 0 && arg < 2
+
+State 852 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 853 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 855 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  return_value_fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 867 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 868 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 870 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  return_value_fr_of$0=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 874 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 875 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 886 file freeze.c function frame_runnable line 152 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 887 file freeze.c function frame_runnable line 152 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 895 file freeze.c function freezer_runnable line 145 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freezer_runnable=TRUE (00000001)
+
+State 897 file freeze.c function frame_runnable line 152 thread 0
+----------------------------------------------------
+  return_value_freezer_runnable$0=TRUE (00000001)
+
+State 898 file freeze.c function frame_runnable line 152 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_runnable=TRUE (00000001)
+
+State 900 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  return_value_frame_runnable=TRUE (00000001)
+
+State 901 file freeze.c function main line 418 thread 0
+----------------------------------------------------
+  tmp_if_expr$1=TRUE (1)
+
+Assumption:
+  file freeze.c line 418 function main
+  tmp_if_expr$1
+
+State 906 file freeze.c function main line 419 thread 0
+----------------------------------------------------
+  log_arg[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 909 file freeze.c function main line 420 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 910 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 912 file freeze.c function main line 420 thread 0
+----------------------------------------------------
+  run=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 916 file freeze.c function main line 452 thread 0
+----------------------------------------------------
+  done=0 (00000000 00000000 00000000 00000000)
+
+State 919 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 920 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 931 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 932 file kernel_freeze.h function snap_holds line 1131 thread 0
+----------------------------------------------------
+  s={ .k=0, .u=0, .owner=NULL, .frozen=0, .$pad4=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 939 file kernel_freeze.h function snap_holds line 1133 thread 0
+----------------------------------------------------
+  s.k=0 (00000000 00000000 00000000 00000000)
+
+State 940 file kernel_freeze.h function snap_holds line 1134 thread 0
+----------------------------------------------------
+  s.u=0 (00000000 00000000 00000000 00000000)
+
+State 941 file kernel_freeze.h function snap_holds line 1135 thread 0
+----------------------------------------------------
+  s.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 942 file kernel_freeze.h function snap_holds line 1136 thread 0
+----------------------------------------------------
+  s.frozen=1 (00000000 00000001)
+
+State 943 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 944 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.u=0 (00000000 00000000 00000000 00000000)
+
+State 945 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 946 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.frozen=1 (00000000 00000001)
+
+State 947 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 949 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 950 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.u=0 (00000000 00000000 00000000 00000000)
+
+State 951 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 952 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.frozen=1 (00000000 00000001)
+
+State 953 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 954 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 955 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.u=0 (00000000 00000000 00000000 00000000)
+
+State 956 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 957 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.frozen=1 (00000000 00000001)
+
+State 958 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 963 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 964 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 972 file kernel_freeze.h function freeze_super_co line 652 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 980 file kernel_freeze.h function freeze_super_co line 653 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 988 file kernel_freeze.h function freeze_super_co line 654 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 989 file kernel_freeze.h function freeze_super_co line 655 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1004 file kernel_freeze.h function freeze_super_co line 731 thread 0
+----------------------------------------------------
+  FR0.f.pc=0 (00000000 00000000 00000000 00000000)
+
+State 1007 file kernel_freeze.h function freeze_super_co line 732 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1008 file kernel_freeze.h function freeze_super_co line 732 thread 0
+----------------------------------------------------
+  level=1 (00000000 00000000 00000000 00000001)
+
+State 1011 file kernel_freeze.h function sb_wait_write line 473 thread 0
+----------------------------------------------------
+  sem=SB.s_writers.rw_sem (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00101000)
+
+State 1019 file kernel_freeze.h function percpu_down_write line 240 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[0l].wheld=1 (00000000 00000000 00000000 00000001)
+
+State 1024 file kernel_freeze.h function freeze_super_co line 733 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1027 file kernel_freeze.h function __super_lock_excl line 393 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1028 file kernel_freeze.h function __super_lock_excl line 393 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 1032 file kernel_freeze.h function __super_lock line 378 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 1040 file kernel_freeze.h function down_write line 225 thread 0
+----------------------------------------------------
+  SB.s_umount=1 (00000000 00000000 00000000 00000001)
+
+State 1051 file kernel_freeze.h function freeze_super_co line 736 thread 0
+----------------------------------------------------
+  SB.s_writers.frozen=2 (00000000 00000010)
+
+State 1054 file kernel_freeze.h function freeze_super_co line 737 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1055 file kernel_freeze.h function freeze_super_co line 737 thread 0
+----------------------------------------------------
+  level=2 (00000000 00000000 00000000 00000010)
+
+State 1058 file kernel_freeze.h function sb_wait_write line 473 thread 0
+----------------------------------------------------
+  sem=SB.s_writers.rw_sem + 1l (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00101100)
+
+State 1066 file kernel_freeze.h function percpu_down_write line 240 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[1l].wheld=1 (00000000 00000000 00000000 00000001)
+
+State 1071 file kernel_freeze.h function freeze_super_co line 740 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1075 file kernel_freeze.h function sync_filesystem line 324 thread 0
+----------------------------------------------------
+  enabled=1 (00000000 00000000 00000000 00000001)
+
+State 1079 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 1080 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 1082 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inject=FALSE (00000000)
+
+State 1084 file kernel_freeze.h function sync_filesystem line 324 thread 0
+----------------------------------------------------
+  return_value_inject=FALSE (00000000)
+
+State 1085 file kernel_freeze.h function sync_filesystem line 324 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sync_filesystem=0 (00000000 00000000 00000000 00000000)
+
+State 1087 file kernel_freeze.h function freeze_super_co line 740 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1095 file kernel_freeze.h function freeze_super_co line 751 thread 0
+----------------------------------------------------
+  SB.s_writers.frozen=3 (00000000 00000011)
+
+State 1098 file kernel_freeze.h function freeze_super_co line 752 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1099 file kernel_freeze.h function freeze_super_co line 752 thread 0
+----------------------------------------------------
+  level=3 (00000000 00000000 00000000 00000011)
+
+State 1102 file kernel_freeze.h function sb_wait_write line 473 thread 0
+----------------------------------------------------
+  sem=SB.s_writers.rw_sem + 2l (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00110000)
+
+State 1110 file kernel_freeze.h function percpu_down_write line 240 thread 0
+----------------------------------------------------
+  SB.s_writers.rw_sem[2l].wheld=1 (00000000 00000000 00000000 00000001)
+
+State 1136 file kernel_freeze.h function freeze_super_co line 755 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1140 file kernel_freeze.h function model_freeze_fs line 330 thread 0
+----------------------------------------------------
+  enabled=1 (00000000 00000000 00000000 00000001)
+
+State 1144 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  return_value_nondet_bool=FALSE (00000000)
+
+State 1145 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  tmp_if_expr=FALSE (0)
+
+State 1147 file kernel_freeze.h function inject line 79 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inject=FALSE (00000000)
+
+State 1149 file kernel_freeze.h function model_freeze_fs line 330 thread 0
+----------------------------------------------------
+  return_value_inject=FALSE (00000000)
+
+State 1150 file kernel_freeze.h function model_freeze_fs line 330 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$model_freeze_fs=0 (00000000 00000000 00000000 00000000)
+
+State 1152 file kernel_freeze.h function freeze_super_co line 755 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1157 file kernel_freeze.h function freeze_super_co line 771 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1158 file kernel_freeze.h function freeze_super_co line 771 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 1161 file kernel_freeze.h function freeze_inc line 503 thread 0
+----------------------------------------------------
+  site=2 (00000000 00000000 00000000 00000010)
+
+State 1162 file kernel_freeze.h function freeze_inc line 503 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1163 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1173 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=2 (00000000 00000000 00000000 00000010)
+
+State 1174 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1176 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1178 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1183 file kernel_freeze.h function freeze_inc line 504 thread 0
+----------------------------------------------------
+  w=2 (00000000 00000000 00000000 00000010)
+
+State 1185 file kernel_freeze.h function hweight32 line 312 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 1187 file kernel_freeze.h function freeze_inc line 504 thread 0
+----------------------------------------------------
+  return_value_hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 1190 file kernel_freeze.h function freeze_inc line 504 thread 0
+----------------------------------------------------
+  site=3 (00000000 00000000 00000000 00000011)
+
+State 1191 file kernel_freeze.h function freeze_inc line 504 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1192 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1203 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=3 (00000000 00000000 00000000 00000011)
+
+State 1204 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1206 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1208 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1219 file kernel_freeze.h function freeze_inc line 509 thread 0
+----------------------------------------------------
+  SB.s_writers.freeze_ucount=1 (00000000 00000000 00000000 00000001)
+
+State 1227 file kernel_freeze.h function freeze_inc line 510 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freeze_inc=1 (00000000 00000000 00000000 00000001)
+
+State 1229 file kernel_freeze.h function freeze_super_co line 771 thread 0
+----------------------------------------------------
+  return_value_freeze_inc$1=1 (00000000 00000000 00000000 00000001)
+
+State 1232 file kernel_freeze.h function freeze_super_co line 771 thread 0
+----------------------------------------------------
+  site=19 (00000000 00000000 00000000 00010011)
+
+State 1233 file kernel_freeze.h function freeze_super_co line 771 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1234 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1261 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=19 (00000000 00000000 00000000 00010011)
+
+State 1262 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 1264 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1266 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 1274 file kernel_freeze.h function freeze_super_co line 772 thread 0
+----------------------------------------------------
+  SB.s_writers.freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1281 file kernel_freeze.h function freeze_super_co line 773 thread 0
+----------------------------------------------------
+  SB.s_writers.frozen=4 (00000000 00000100)
+
+State 1288 file kernel_freeze.h function freeze_super_co line 774 thread 0
+----------------------------------------------------
+  SB.g_froze_rdonly=0 (00000000 00000000 00000000 00000000)
+
+State 1291 file kernel_freeze.h function freeze_super_co line 776 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1292 file kernel_freeze.h function lockdep_sb_freeze_release line 478 thread 0
+----------------------------------------------------
+  level=0 (00000000 00000000 00000000 00000000)
+
+State 1293 file kernel_freeze.h function lockdep_sb_freeze_release line 480 thread 0
+----------------------------------------------------
+  level=2 (00000000 00000000 00000000 00000010)
+
+State 1296 file kernel_freeze.h function lockdep_sb_freeze_release line 480 thread 0
+----------------------------------------------------
+  level=1 (00000000 00000000 00000000 00000001)
+
+State 1300 file kernel_freeze.h function lockdep_sb_freeze_release line 480 thread 0
+----------------------------------------------------
+  level=0 (00000000 00000000 00000000 00000000)
+
+State 1304 file kernel_freeze.h function lockdep_sb_freeze_release line 480 thread 0
+----------------------------------------------------
+  level=-1 (11111111 11111111 11111111 11111111)
+
+State 1310 file kernel_freeze.h function freeze_super_co line 777 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1313 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1314 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 1318 file kernel_freeze.h function super_unlock line 386 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 1326 file kernel_freeze.h function up_write line 231 thread 0
+----------------------------------------------------
+  SB.s_umount=0 (00000000 00000000 00000000 00000000)
+
+State 1337 file kernel_freeze.h function freeze_super_co line 778 thread 0
+----------------------------------------------------
+  FR0.f.ret=0 (00000000 00000000 00000000 00000000)
+
+State 1338 file kernel_freeze.h function freeze_super_co line 779 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freeze_super_co=1 (00000000 00000000 00000000 00000001)
+
+State 1340 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  return_value_freeze_super_co=1 (00000000 00000000 00000000 00000001)
+
+State 1341 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  done=1 (00000000 00000000 00000000 00000001)
+
+State 1363 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1364 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 1365 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.u=0 (00000000 00000000 00000000 00000000)
+
+State 1366 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1367 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.frozen=1 (00000000 00000001)
+
+State 1368 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1369 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 1370 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1378 file kernel_freeze.h function check_freeze_result line 1144 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1380 file kernel_freeze.h function check_freeze_result line 1144 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 1395 file kernel_freeze.h function run_freezer line 1210 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$run_freezer=1 (00000000 00000000 00000000 00000001)
+
+State 1397 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  done=1 (00000000 00000000 00000000 00000001)
+
+State 1413 file freeze.c function main line 464 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1416 file freeze.c function main line 466 thread 0
+----------------------------------------------------
+  fif_hold=1 (00000000 00000000 00000000 00000001)
+
+State 1424 file freeze.c function main line 492 thread 0
+----------------------------------------------------
+  FR0.caller=0 (00000000 00000000 00000000 00000000)
+
+State 1427 file freeze.c function main line 495 thread 0
+----------------------------------------------------
+  log_ret[1l]=0 (00000000 00000000 00000000 00000000)
+
+State 1431 file freeze.c function check_invariants line 190 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1434 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1436 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 1438 file freeze.c function check_invariants line 192 thread 0
+----------------------------------------------------
+  complete=1 (00000000 00000000 00000000 00000001)
+
+State 1439 file freeze.c function check_invariants line 193 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1446 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1447 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 1455 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1458 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1462 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR1 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1463 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 1471 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1474 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs$0=0 (00000000 00000000 00000000 00000000)
+
+State 1477 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1479 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  return_value_inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1484 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1485 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  expected_active=2 (00000000 00000000 00000000 00000010)
+
+State 1493 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1495 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 1497 file kernel_freeze.h function check_sb_invariants line 1217 thread 0
+----------------------------------------------------
+  frozen=4 (00000000 00000100)
+
+State 1504 file kernel_freeze.h function check_sb_invariants line 1218 thread 0
+----------------------------------------------------
+  wheld=3 (00000000 00000000 00000000 00000011)
+
+State 1566 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1572 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1573 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1575 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1576 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1581 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1583 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1585 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1600 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1602 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1604 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on$0=0 (00000000 00000000 00000000 00000000)
+
+State 1626 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 1633 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 1634 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1636 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1637 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1641 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=2 (00000000 00000000 00000000 00000010)
+
+State 1655 file freeze.c function main line 251 thread 0
+----------------------------------------------------
+  step=2 (00000000 00000000 00000000 00000010)
+
+State 1660 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  return_value_nondet_int=11 (00000000 00000000 00000000 00001011)
+
+State 1661 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  op=11 (00000000 00000000 00000000 00001011)
+
+State 1664 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=32768 (00000000 00000000 10000000 00000000)
+
+State 1665 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  arg=32768 (00000000 00000000 10000000 00000000)
+
+State 1668 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$2=TRUE (00000001)
+
+State 1669 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 1671 file freeze.c function main line 255 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1673 file freeze.c function main line 256 thread 0
+----------------------------------------------------
+  run=((struct frame *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1675 file freeze.c function main line 257 thread 0
+----------------------------------------------------
+  new_frame=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 259 function main
+  op >= 0 && op < 15
+
+State 1679 file freeze.c function main line 260 thread 0
+----------------------------------------------------
+  log_op[2l]=11 (00000000 00000000 00000000 00001011)
+
+Assumption:
+  file freeze.c line 395 function main
+  1 != 0 && !(SB.m_dead != 0)
+
+State 1688 file freeze.c function main line 396 thread 0
+----------------------------------------------------
+  SB.s_flags=1610612737ul (00000000 00000000 00000000 00000000 01100000 00000000 00000000 00000001)
+
+State 1694 file freeze.c function main line 495 thread 0
+----------------------------------------------------
+  log_ret[2l]=0 (00000000 00000000 00000000 00000000)
+
+State 1698 file freeze.c function check_invariants line 190 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1701 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1703 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 1705 file freeze.c function check_invariants line 192 thread 0
+----------------------------------------------------
+  complete=1 (00000000 00000000 00000000 00000001)
+
+State 1706 file freeze.c function check_invariants line 193 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1713 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1714 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 1722 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1725 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1729 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR1 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1730 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 1738 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1741 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs$0=0 (00000000 00000000 00000000 00000000)
+
+State 1744 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1746 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  return_value_inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 1751 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1752 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  expected_active=2 (00000000 00000000 00000000 00000010)
+
+State 1760 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 1762 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 1764 file kernel_freeze.h function check_sb_invariants line 1217 thread 0
+----------------------------------------------------
+  frozen=4 (00000000 00000100)
+
+State 1771 file kernel_freeze.h function check_sb_invariants line 1218 thread 0
+----------------------------------------------------
+  wheld=3 (00000000 00000000 00000000 00000011)
+
+State 1833 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1839 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1840 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1842 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1843 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1848 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1850 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1852 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1867 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 1869 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 1871 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on$0=0 (00000000 00000000 00000000 00000000)
+
+State 1893 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 1900 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 1901 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1903 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1904 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1908 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=2 (00000000 00000000 00000000 00000010)
+
+State 1922 file freeze.c function main line 251 thread 0
+----------------------------------------------------
+  step=3 (00000000 00000000 00000000 00000011)
+
+State 1927 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  return_value_nondet_int=0 (00000000 00000000 00000000 00000000)
+
+State 1928 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  op=0 (00000000 00000000 00000000 00000000)
+
+State 1931 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=0 (00000000 00000000 00000000 00000000)
+
+State 1932 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  arg=0 (00000000 00000000 00000000 00000000)
+
+State 1935 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$2=TRUE (00000001)
+
+State 1936 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 1938 file freeze.c function main line 255 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 1940 file freeze.c function main line 256 thread 0
+----------------------------------------------------
+  run=((struct frame *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1942 file freeze.c function main line 257 thread 0
+----------------------------------------------------
+  new_frame=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 259 function main
+  op >= 0 && op < 15
+
+State 1946 file freeze.c function main line 260 thread 0
+----------------------------------------------------
+  log_op[3l]=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 264 function main
+  mounts > 0 && !(SB.m_dead != 0)
+
+State 1957 file freeze.c function main line 269 thread 0
+----------------------------------------------------
+  new_frame=1 (00000000 00000000 00000000 00000001)
+
+State 1960 file freeze.c function main line 427 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 1964 file freeze.c function main line 428 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 1965 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1967 file freeze.c function main line 428 thread 0
+----------------------------------------------------
+  return_value_fr_of$1=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 428 function main
+  return_value_fr_of$1->caller == 0
+
+State 1977 file freeze.c function main line 429 thread 0
+----------------------------------------------------
+  j=0 (00000000 00000000 00000000 00000000)
+
+State 1978 file freeze.c function fr_of line 130 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$fr_of=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1980 file freeze.c function main line 429 thread 0
+----------------------------------------------------
+  run=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 1987 file freeze.c function main line 430 thread 0
+----------------------------------------------------
+  FR0.caller=1 (00000000 00000000 00000000 00000001)
+
+State 1994 file freeze.c function main line 431 thread 0
+----------------------------------------------------
+  FR0.caller_ref=0 (00000000 00000000 00000000 00000000)
+
+State 2001 file freeze.c function main line 432 thread 0
+----------------------------------------------------
+  FR0.f.pc=0 (00000000 00000000 00000000 00000000)
+
+State 2008 file freeze.c function main line 433 thread 0
+----------------------------------------------------
+  FR0.f.sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2015 file freeze.c function main line 434 thread 0
+----------------------------------------------------
+  FR0.f.freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2023 file freeze.c function main line 436 thread 0
+----------------------------------------------------
+  FR0.f.who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2026 file freeze.c function main line 452 thread 0
+----------------------------------------------------
+  done=0 (00000000 00000000 00000000 00000000)
+
+State 2029 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 2030 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 2041 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2042 file kernel_freeze.h function snap_holds line 1131 thread 0
+----------------------------------------------------
+  s={ .k=0, .u=0, .owner=NULL, .frozen=0, .$pad4=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 2049 file kernel_freeze.h function snap_holds line 1133 thread 0
+----------------------------------------------------
+  s.k=0 (00000000 00000000 00000000 00000000)
+
+State 2050 file kernel_freeze.h function snap_holds line 1134 thread 0
+----------------------------------------------------
+  s.u=1 (00000000 00000000 00000000 00000001)
+
+State 2051 file kernel_freeze.h function snap_holds line 1135 thread 0
+----------------------------------------------------
+  s.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2052 file kernel_freeze.h function snap_holds line 1136 thread 0
+----------------------------------------------------
+  s.frozen=4 (00000000 00000100)
+
+State 2053 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 2054 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.u=1 (00000000 00000000 00000000 00000001)
+
+State 2055 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2056 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.frozen=4 (00000000 00000100)
+
+State 2057 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2059 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 2060 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.u=1 (00000000 00000000 00000000 00000001)
+
+State 2061 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2062 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.frozen=4 (00000000 00000100)
+
+State 2063 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  return_value_snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2064 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 2065 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.u=1 (00000000 00000000 00000000 00000001)
+
+State 2066 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2067 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.frozen=4 (00000000 00000100)
+
+State 2068 file kernel_freeze.h function run_freezer line 1205 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2073 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  f=&FR0.f (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00010000)
+
+State 2074 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 2082 file kernel_freeze.h function freeze_super_co line 652 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2090 file kernel_freeze.h function freeze_super_co line 653 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2098 file kernel_freeze.h function freeze_super_co line 654 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2099 file kernel_freeze.h function freeze_super_co line 655 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 2111 file kernel_freeze.h function freeze_super_co line 662 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2115 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2116 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 2125 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2126 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  flags=553648128 (00100001 00000000 00000000 00000000)
+
+State 2131 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=TRUE (00000001)
+
+State 2133 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  return_value_super_flags=TRUE (00000001)
+
+Assumption:
+  file kernel_freeze.h line 416 function super_lock
+  return_value_super_flags != FALSE
+
+State 2138 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2139 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  flags=16777216 (00000001 00000000 00000000 00000000)
+
+State 2144 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=FALSE (00000000)
+
+State 2146 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  return_value_super_flags$0=FALSE (00000000)
+
+State 2150 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2151 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 2155 file kernel_freeze.h function __super_lock line 378 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 2163 file kernel_freeze.h function down_write line 225 thread 0
+----------------------------------------------------
+  SB.s_umount=1 (00000000 00000000 00000000 00000001)
+
+State 2181 file kernel_freeze.h function super_lock line 435 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock=TRUE (00000001)
+
+State 2183 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  return_value_super_lock=TRUE (00000001)
+
+State 2184 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock_excl=TRUE (00000001)
+
+State 2186 file kernel_freeze.h function freeze_super_co line 662 thread 0
+----------------------------------------------------
+  return_value_super_lock_excl=TRUE (00000001)
+
+State 2190 file kernel_freeze.h function freeze_super_co line 667 thread 0
+----------------------------------------------------
+  v=&SB.s_active (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001000)
+
+State 2198 file kernel_freeze.h function atomic_inc line 260 thread 0
+----------------------------------------------------
+  SB.s_active=3 (00000000 00000000 00000000 00000011)
+
+State 2210 file kernel_freeze.h function freeze_super_co line 671 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2211 file kernel_freeze.h function freeze_super_co line 671 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2212 file kernel_freeze.h function freeze_super_co line 671 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2220 file kernel_freeze.h function may_freeze line 530 thread 0
+----------------------------------------------------
+  site=6 (00000000 00000000 00000000 00000110)
+
+State 2221 file kernel_freeze.h function may_freeze line 530 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2222 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2236 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=6 (00000000 00000000 00000000 00000110)
+
+State 2237 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2239 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2241 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2246 file kernel_freeze.h function may_freeze line 531 thread 0
+----------------------------------------------------
+  w=2 (00000000 00000000 00000000 00000010)
+
+State 2248 file kernel_freeze.h function hweight32 line 312 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2250 file kernel_freeze.h function may_freeze line 531 thread 0
+----------------------------------------------------
+  return_value_hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2253 file kernel_freeze.h function may_freeze line 531 thread 0
+----------------------------------------------------
+  site=7 (00000000 00000000 00000000 00000111)
+
+State 2254 file kernel_freeze.h function may_freeze line 531 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2255 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2270 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=7 (00000000 00000000 00000000 00000111)
+
+State 2271 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2273 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2275 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2286 file kernel_freeze.h function may_freeze line 557 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$may_freeze=FALSE (00000000)
+
+State 2289 file kernel_freeze.h function freeze_super_co line 671 thread 0
+----------------------------------------------------
+  return_value_may_freeze=FALSE (00000000)
+
+State 2291 file kernel_freeze.h function freeze_super_co line 674 thread 0
+----------------------------------------------------
+  ret=-16 (11111111 11111111 11111111 11110000)
+
+State 2294 file kernel_freeze.h function freeze_super_co line 676 thread 0
+----------------------------------------------------
+  s=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2298 file kernel_freeze.h function deactivate_locked_super line 445 thread 0
+----------------------------------------------------
+  v=&SB.s_active (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001000)
+
+State 2308 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  tmp_pre=2 (00000000 00000000 00000000 00000010)
+
+State 2309 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  SB.s_active=2 (00000000 00000000 00000000 00000010)
+
+State 2310 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$atomic_dec_and_test=FALSE (00000000)
+
+State 2312 file kernel_freeze.h function deactivate_locked_super line 445 thread 0
+----------------------------------------------------
+  return_value_atomic_dec_and_test=FALSE (00000000)
+
+State 2316 file kernel_freeze.h function deactivate_locked_super line 448 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2319 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2320 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 2324 file kernel_freeze.h function super_unlock line 386 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 2332 file kernel_freeze.h function up_write line 231 thread 0
+----------------------------------------------------
+  SB.s_umount=0 (00000000 00000000 00000000 00000000)
+
+State 2344 file kernel_freeze.h function freeze_super_co line 677 thread 0
+----------------------------------------------------
+  FR0.f.ret=-16 (11111111 11111111 11111111 11110000)
+
+State 2345 file kernel_freeze.h function freeze_super_co line 678 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freeze_super_co=1 (00000000 00000000 00000000 00000001)
+
+State 2348 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  return_value_freeze_super_co=1 (00000000 00000000 00000000 00000001)
+
+State 2349 file kernel_freeze.h function run_freezer line 1206 thread 0
+----------------------------------------------------
+  done=1 (00000000 00000000 00000000 00000001)
+
+State 2371 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2372 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 2373 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.u=1 (00000000 00000000 00000000 00000001)
+
+State 2374 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2375 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.frozen=4 (00000000 00000100)
+
+State 2376 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2377 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2378 file kernel_freeze.h function run_freezer line 1209 thread 0
+----------------------------------------------------
+  ret=-16 (11111111 11111111 11111111 11110000)
+
+State 2386 file kernel_freeze.h function check_freeze_result line 1144 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 2388 file kernel_freeze.h function check_freeze_result line 1144 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 2399 file kernel_freeze.h function run_freezer line 1210 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$run_freezer=1 (00000000 00000000 00000000 00000001)
+
+State 2401 file freeze.c function main line 459 thread 0
+----------------------------------------------------
+  done=1 (00000000 00000000 00000000 00000001)
+
+State 2417 file freeze.c function main line 464 thread 0
+----------------------------------------------------
+  ret=-16 (11111111 11111111 11111111 11110000)
+
+State 2426 file freeze.c function main line 492 thread 0
+----------------------------------------------------
+  FR0.caller=0 (00000000 00000000 00000000 00000000)
+
+State 2429 file freeze.c function main line 495 thread 0
+----------------------------------------------------
+  log_ret[3l]=-16 (11111111 11111111 11111111 11110000)
+
+State 2433 file freeze.c function check_invariants line 190 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2436 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 2438 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 2440 file freeze.c function check_invariants line 192 thread 0
+----------------------------------------------------
+  complete=1 (00000000 00000000 00000000 00000001)
+
+State 2441 file freeze.c function check_invariants line 193 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 2448 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2449 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2457 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 2460 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 2464 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR1 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2465 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 2473 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 2476 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs$0=0 (00000000 00000000 00000000 00000000)
+
+State 2479 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 2481 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  return_value_inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 2486 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2487 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  expected_active=2 (00000000 00000000 00000000 00000010)
+
+State 2495 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 2497 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  u=1 (00000000 00000000 00000000 00000001)
+
+State 2499 file kernel_freeze.h function check_sb_invariants line 1217 thread 0
+----------------------------------------------------
+  frozen=4 (00000000 00000100)
+
+State 2506 file kernel_freeze.h function check_sb_invariants line 1218 thread 0
+----------------------------------------------------
+  wheld=3 (00000000 00000000 00000000 00000011)
+
+State 2568 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 2574 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 2575 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2577 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2578 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV0 (00001010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2583 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 2585 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 2587 file freeze.c function check_invariants line 212 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 2602 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 2604 file freeze.c function bdev_frame_on line 184 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_frame_on=0 (00000000 00000000 00000000 00000000)
+
+State 2606 file freeze.c function check_invariants line 215 thread 0
+----------------------------------------------------
+  return_value_bdev_frame_on$0=0 (00000000 00000000 00000000 00000000)
+
+State 2628 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 2635 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  d=1 (00000000 00000000 00000000 00000001)
+
+State 2636 file freeze.c function bdev_of line 90 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2638 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  return_value_bdev_of=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2639 file freeze.c function check_invariants line 207 thread 0
+----------------------------------------------------
+  bdev=&BDEV1 (00001011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2643 file freeze.c function check_invariants line 206 thread 0
+----------------------------------------------------
+  d=2 (00000000 00000000 00000000 00000010)
+
+State 2657 file freeze.c function main line 251 thread 0
+----------------------------------------------------
+  step=4 (00000000 00000000 00000000 00000100)
+
+State 2662 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  return_value_nondet_int=1 (00000000 00000000 00000000 00000001)
+
+State 2663 file freeze.c function main line 252 thread 0
+----------------------------------------------------
+  op=1 (00000000 00000000 00000000 00000001)
+
+State 2666 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  return_value_nondet_int$0=-2147483648 (10000000 00000000 00000000 00000000)
+
+State 2667 file freeze.c function main line 253 thread 0
+----------------------------------------------------
+  arg=-2147483648 (10000000 00000000 00000000 00000000)
+
+State 2670 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  return_value_nondet_bool$2=TRUE (00000001)
+
+State 2671 file freeze.c function main line 254 thread 0
+----------------------------------------------------
+  killed=TRUE (00000001)
+
+State 2673 file freeze.c function main line 255 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 2675 file freeze.c function main line 256 thread 0
+----------------------------------------------------
+  run=((struct frame *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2677 file freeze.c function main line 257 thread 0
+----------------------------------------------------
+  new_frame=0 (00000000 00000000 00000000 00000000)
+
+Assumption:
+  file freeze.c line 259 function main
+  op >= 0 && op < 15
+
+State 2681 file freeze.c function main line 260 thread 0
+----------------------------------------------------
+  log_op[4l]=1 (00000000 00000000 00000000 00000001)
+
+State 2686 file freeze.c function main line 272 thread 0
+----------------------------------------------------
+  owned=1 (00000000 00000000 00000000 00000001)
+
+Assumption:
+  file freeze.c line 274 function main
+  mounts > 0 && !(SB.m_dead != 0)
+
+Assumption:
+  file freeze.c line 275 function main
+  owned != 0 || 0 != 0
+
+State 2691 file freeze.c function main line 276 thread 0
+----------------------------------------------------
+  log_arg[4l]=1 (00000000 00000000 00000000 00000001)
+
+State 2694 file freeze.c function main line 277 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2695 file freeze.c function main line 277 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2696 file freeze.c function main line 277 thread 0
+----------------------------------------------------
+  owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2701 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2702 file kernel_freeze.h function snap_holds line 1131 thread 0
+----------------------------------------------------
+  s={ .k=0, .u=0, .owner=NULL, .frozen=0, .$pad4=0 } ({ 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000, 00000000 00000000, 00000000 00000000 00000000 00000000 00000000 00000000 })
+
+State 2709 file kernel_freeze.h function snap_holds line 1133 thread 0
+----------------------------------------------------
+  s.k=0 (00000000 00000000 00000000 00000000)
+
+State 2710 file kernel_freeze.h function snap_holds line 1134 thread 0
+----------------------------------------------------
+  s.u=1 (00000000 00000000 00000000 00000001)
+
+State 2711 file kernel_freeze.h function snap_holds line 1135 thread 0
+----------------------------------------------------
+  s.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2712 file kernel_freeze.h function snap_holds line 1136 thread 0
+----------------------------------------------------
+  s.frozen=4 (00000000 00000100)
+
+State 2713 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 2714 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.u=1 (00000000 00000000 00000000 00000001)
+
+State 2715 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2716 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.frozen=4 (00000000 00000100)
+
+State 2717 file kernel_freeze.h function snap_holds line 1137 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2719 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  return_value_snap_holds.k=0 (00000000 00000000 00000000 00000000)
+
+State 2720 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  return_value_snap_holds.u=1 (00000000 00000000 00000000 00000001)
+
+State 2721 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  return_value_snap_holds.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2722 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  return_value_snap_holds.frozen=4 (00000000 00000100)
+
+State 2723 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  return_value_snap_holds.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2724 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 2725 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  pre.u=1 (00000000 00000000 00000000 00000001)
+
+State 2726 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2727 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  pre.frozen=4 (00000000 00000100)
+
+State 2728 file kernel_freeze.h function checked_thaw_super line 1185 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2733 file kernel_freeze.h function checked_thaw_super line 1186 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2734 file kernel_freeze.h function checked_thaw_super line 1186 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2735 file kernel_freeze.h function checked_thaw_super line 1186 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2739 file kernel_freeze.h function thaw_super line 838 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2743 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2744 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 2753 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2754 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  flags=553648128 (00100001 00000000 00000000 00000000)
+
+State 2759 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=TRUE (00000001)
+
+State 2761 file kernel_freeze.h function super_lock line 416 thread 0
+----------------------------------------------------
+  return_value_super_flags=TRUE (00000001)
+
+Assumption:
+  file kernel_freeze.h line 416 function super_lock
+  return_value_super_flags != FALSE
+
+State 2766 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2767 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  flags=16777216 (00000001 00000000 00000000 00000000)
+
+State 2772 file kernel_freeze.h function super_flags line 407 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_flags=FALSE (00000000)
+
+State 2774 file kernel_freeze.h function super_lock line 419 thread 0
+----------------------------------------------------
+  return_value_super_flags$0=FALSE (00000000)
+
+State 2778 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2779 file kernel_freeze.h function super_lock line 422 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 2783 file kernel_freeze.h function __super_lock line 378 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 2791 file kernel_freeze.h function down_write line 225 thread 0
+----------------------------------------------------
+  SB.s_umount=1 (00000000 00000000 00000000 00000001)
+
+State 2809 file kernel_freeze.h function super_lock line 435 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock=TRUE (00000001)
+
+State 2811 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  return_value_super_lock=TRUE (00000001)
+
+State 2812 file kernel_freeze.h function super_lock_excl line 440 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$super_lock_excl=TRUE (00000001)
+
+State 2814 file kernel_freeze.h function thaw_super line 838 thread 0
+----------------------------------------------------
+  return_value_super_lock_excl=TRUE (00000001)
+
+State 2819 file kernel_freeze.h function thaw_super line 842 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2820 file kernel_freeze.h function thaw_super line 842 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2821 file kernel_freeze.h function thaw_super line 842 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2823 file kernel_freeze.h function thaw_super_locked line 785 thread 0
+----------------------------------------------------
+  error=-22 (11111111 11111111 11111111 11101010)
+
+State 2834 file kernel_freeze.h function thaw_super_locked line 790 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2835 file kernel_freeze.h function thaw_super_locked line 790 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2836 file kernel_freeze.h function thaw_super_locked line 790 thread 0
+----------------------------------------------------
+  freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2844 file kernel_freeze.h function may_unfreeze line 567 thread 0
+----------------------------------------------------
+  site=11 (00000000 00000000 00000000 00001011)
+
+State 2845 file kernel_freeze.h function may_unfreeze line 567 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2846 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2865 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=11 (00000000 00000000 00000000 00001011)
+
+State 2866 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2868 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2870 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2875 file kernel_freeze.h function may_unfreeze line 568 thread 0
+----------------------------------------------------
+  w=2 (00000000 00000000 00000000 00000010)
+
+State 2877 file kernel_freeze.h function hweight32 line 312 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2879 file kernel_freeze.h function may_unfreeze line 568 thread 0
+----------------------------------------------------
+  return_value_hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2882 file kernel_freeze.h function may_unfreeze line 568 thread 0
+----------------------------------------------------
+  site=12 (00000000 00000000 00000000 00001100)
+
+State 2883 file kernel_freeze.h function may_unfreeze line 568 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2884 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2904 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=12 (00000000 00000000 00000000 00001100)
+
+State 2905 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2907 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2909 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2920 file kernel_freeze.h function may_unfreeze line 618 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$may_unfreeze=TRUE (00000001)
+
+State 2923 file kernel_freeze.h function thaw_super_locked line 790 thread 0
+----------------------------------------------------
+  return_value_may_unfreeze=TRUE (00000001)
+
+State 2928 file kernel_freeze.h function thaw_super_locked line 798 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 2929 file kernel_freeze.h function thaw_super_locked line 798 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 2932 file kernel_freeze.h function freeze_dec line 515 thread 0
+----------------------------------------------------
+  site=4 (00000000 00000000 00000000 00000100)
+
+State 2933 file kernel_freeze.h function freeze_dec line 515 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2934 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2946 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=4 (00000000 00000000 00000000 00000100)
+
+State 2947 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2949 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2951 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2956 file kernel_freeze.h function freeze_dec line 516 thread 0
+----------------------------------------------------
+  w=2 (00000000 00000000 00000000 00000010)
+
+State 2958 file kernel_freeze.h function hweight32 line 312 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2960 file kernel_freeze.h function freeze_dec line 516 thread 0
+----------------------------------------------------
+  return_value_hweight32=1 (00000000 00000000 00000000 00000001)
+
+State 2963 file kernel_freeze.h function freeze_dec line 516 thread 0
+----------------------------------------------------
+  site=5 (00000000 00000000 00000000 00000101)
+
+State 2964 file kernel_freeze.h function freeze_dec line 516 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2965 file kernel_freeze.h function warn_check line 150 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2978 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  site=5 (00000000 00000000 00000000 00000101)
+
+State 2979 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  cond=0 (00000000 00000000 00000000 00000000)
+
+State 2981 file kernel_freeze.h function warn_on line 114 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 2983 file kernel_freeze.h function warn_check line 152 thread 0
+----------------------------------------------------
+  return_value_warn_on=0 (00000000 00000000 00000000 00000000)
+
+State 3006 file kernel_freeze.h function freeze_dec line 521 thread 0
+----------------------------------------------------
+  SB.s_writers.freeze_ucount=0 (00000000 00000000 00000000 00000000)
+
+State 3014 file kernel_freeze.h function freeze_dec line 522 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$freeze_dec=0 (00000000 00000000 00000000 00000000)
+
+State 3016 file kernel_freeze.h function thaw_super_locked line 798 thread 0
+----------------------------------------------------
+  return_value_freeze_dec=0 (00000000 00000000 00000000 00000000)
+
+State 3021 file kernel_freeze.h function thaw_super_locked line 803 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3028 file kernel_freeze.h function sb_rdonly line 317 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$sb_rdonly=TRUE (00000001)
+
+State 3030 file kernel_freeze.h function thaw_super_locked line 803 thread 0
+----------------------------------------------------
+  return_value_sb_rdonly=TRUE (00000001)
+
+State 3038 file kernel_freeze.h function thaw_super_locked line 804 thread 0
+----------------------------------------------------
+  SB.s_writers.frozen=0 (00000000 00000000)
+
+State 3045 file kernel_freeze.h function thaw_super_locked line 805 thread 0
+----------------------------------------------------
+  SB.s_writers.freeze_owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3049 file kernel_freeze.h function thaw_super_locked line 827 thread 0
+----------------------------------------------------
+  s=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3053 file kernel_freeze.h function deactivate_locked_super line 445 thread 0
+----------------------------------------------------
+  v=&SB.s_active (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001000)
+
+State 3063 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  tmp_pre=1 (00000000 00000000 00000000 00000001)
+
+State 3064 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  SB.s_active=1 (00000000 00000000 00000000 00000001)
+
+State 3065 file kernel_freeze.h function atomic_dec_and_test line 266 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$atomic_dec_and_test=FALSE (00000000)
+
+State 3067 file kernel_freeze.h function deactivate_locked_super line 445 thread 0
+----------------------------------------------------
+  return_value_atomic_dec_and_test=FALSE (00000000)
+
+State 3071 file kernel_freeze.h function deactivate_locked_super line 448 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3074 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3075 file kernel_freeze.h function super_unlock_excl line 398 thread 0
+----------------------------------------------------
+  excl=TRUE (00000001)
+
+State 3079 file kernel_freeze.h function super_unlock line 386 thread 0
+----------------------------------------------------
+  sem=&SB.s_umount (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00001100)
+
+State 3087 file kernel_freeze.h function up_write line 231 thread 0
+----------------------------------------------------
+  SB.s_umount=0 (00000000 00000000 00000000 00000000)
+
+State 3093 file kernel_freeze.h function thaw_super_locked line 828 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$thaw_super_locked=0 (00000000 00000000 00000000 00000000)
+
+State 3096 file kernel_freeze.h function thaw_super line 842 thread 0
+----------------------------------------------------
+  return_value_thaw_super_locked=0 (00000000 00000000 00000000 00000000)
+
+State 3097 file kernel_freeze.h function thaw_super line 842 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$thaw_super=0 (00000000 00000000 00000000 00000000)
+
+State 3099 file kernel_freeze.h function checked_thaw_super line 1186 thread 0
+----------------------------------------------------
+  return_value_thaw_super=0 (00000000 00000000 00000000 00000000)
+
+State 3100 file kernel_freeze.h function checked_thaw_super line 1186 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 3103 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3104 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  pre.k=0 (00000000 00000000 00000000 00000000)
+
+State 3105 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  pre.u=1 (00000000 00000000 00000000 00000001)
+
+State 3106 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  pre.owner=NULL (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3107 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  pre.frozen=4 (00000000 00000100)
+
+State 3108 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  pre.$pad4=0 (00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3109 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  who=/*enum*/FREEZE_HOLDER_USERSPACE (00000000 00000000 00000000 00000010)
+
+State 3110 file kernel_freeze.h function checked_thaw_super line 1188 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 3118 file kernel_freeze.h function check_thaw_result line 1165 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 3120 file kernel_freeze.h function check_thaw_result line 1165 thread 0
+----------------------------------------------------
+  u=0 (00000000 00000000 00000000 00000000)
+
+State 3128 file kernel_freeze.h function checked_thaw_super line 1189 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$checked_thaw_super=0 (00000000 00000000 00000000 00000000)
+
+State 3130 file freeze.c function main line 277 thread 0
+----------------------------------------------------
+  ret=0 (00000000 00000000 00000000 00000000)
+
+State 3133 file freeze.c function main line 279 thread 0
+----------------------------------------------------
+  fif_hold=0 (00000000 00000000 00000000 00000000)
+
+State 3139 file freeze.c function main line 495 thread 0
+----------------------------------------------------
+  log_ret[4l]=0 (00000000 00000000 00000000 00000000)
+
+State 3143 file freeze.c function check_invariants line 190 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3146 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 3148 file freeze.c function check_invariants line 191 thread 0
+----------------------------------------------------
+  u=0 (00000000 00000000 00000000 00000000)
+
+State 3150 file freeze.c function check_invariants line 192 thread 0
+----------------------------------------------------
+  complete=0 (00000000 00000000 00000000 00000000)
+
+State 3151 file freeze.c function check_invariants line 193 thread 0
+----------------------------------------------------
+  d=0 (00000000 00000000 00000000 00000000)
+
+State 3158 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR0 (00001001 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3159 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3167 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 3170 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 3174 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  fr=&FR1 (00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3175 file freeze.c function frame_refs line 158 thread 0
+----------------------------------------------------
+  n=0 (00000000 00000000 00000000 00000000)
+
+State 3183 file freeze.c function frame_refs line 161 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$frame_refs=0 (00000000 00000000 00000000 00000000)
+
+State 3186 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  return_value_frame_refs$0=0 (00000000 00000000 00000000 00000000)
+
+State 3189 file freeze.c function inflight_refs line 174 thread 0
+----------------------------------------------------
+  goto_symex$$return_value$$inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 3191 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  return_value_inflight_refs=0 (00000000 00000000 00000000 00000000)
+
+State 3196 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  sb=&SB (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 3197 file freeze.c function check_invariants line 195 thread 0
+----------------------------------------------------
+  expected_active=1 (00000000 00000000 00000000 00000001)
+
+State 3205 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  k=0 (00000000 00000000 00000000 00000000)
+
+State 3207 file kernel_freeze.h function check_sb_invariants line 1216 thread 0
+----------------------------------------------------
+  u=0 (00000000 00000000 00000000 00000000)
+
+State 3209 file kernel_freeze.h function check_sb_invariants line 1217 thread 0
+----------------------------------------------------
+  frozen=0 (00000000 00000000)
+
+State 3216 file kernel_freeze.h function check_sb_invariants line 1218 thread 0
+----------------------------------------------------
+  wheld=3 (00000000 00000000 00000000 00000011)
+
+Violated property:
+  file kernel_freeze.h function check_sb_invariants line 1238 thread 0
+  sb_writers rwsem write-held while SB_UNFROZEN (leaked by thaw)
+  wheld == 0
+
+
+
+** 1 of 1 failed (2 iterations)
+VERIFICATION FAILED
+# exit=10 wall=2s

@@ -1,0 +1,12 @@
+Test SUPER-B1-cache-count-born-rmb Allowed
+States 2
+1:r3=0; 1:r4=0; 1:r5=0;
+1:r3=1; 1:r4=1; 1:r5=1;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0))
+Observation SUPER-B1-cache-count-born-rmb Never 0 2
+Time SUPER-B1-cache-count-born-rmb 0.01
+Hash=7952adc480c1e10c29811cd8a98463dc
+

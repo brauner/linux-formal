@@ -1,0 +1,1706 @@
+# cbmc freeze.c -DNSTEPS=5 -DPATCH_9ae90f06a813 -DCFG_FAIL_UNFREEZE_FS=0 --unwind 6 --unwindset freeze_super_co.0:2,freeze_super_co.1:2,bdev_freeze_co.0:2,bdev_thaw_co.0:2 --unwinding-assertions --bounds-check --sat-solver cadical 
+CBMC version 6.6.0 (cbmc-6.6.0) 64-bit x86_64 linux
+Type-checking freeze
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Starting Bounded Model Checking
+The specified solver, 'cadical', is not available. The default solver will be used instead.
+Passing problem to propositional reduction
+converting SSA
+Running propositional reduction
+SAT checker: instance is UNSATISFIABLE
+
+** Results:
+freeze.c function bdev_frame_on
+[bdev_frame_on.overflow.1] line 184 arithmetic overflow on signed + in (signed int)(FR0.caller == 4 && FR0.dev == d) + (signed int)(FR1.caller == 4 && FR1.dev == d): SUCCESS
+
+freeze.c function check_invariants
+[check_invariants.pointer_dereference.1] line 191 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_invariants.overflow.1] line 195 arithmetic overflow on signed + in mounts + (complete != 0 ? 1 : 0): SUCCESS
+[check_invariants.overflow.2] line 195 arithmetic overflow on signed + in mounts + (complete != 0 ? 1 : 0) + return_value_inflight_refs: SUCCESS
+[check_invariants.pointer_dereference.2] line 198 dereference failure: pointer outside object bounds in sb->m_dead: SUCCESS
+[check_invariants.assertion.1] line 199 EXCL: freeze_owner does not match the outstanding filesystems_freeze() hold: SUCCESS
+[check_invariants.pointer_dereference.3] line 199 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_invariants.assertion.2] line 201 EXCL: filesystems_freeze() hold undone by someone else: SUCCESS
+[check_invariants.overflow.5] line 206 arithmetic overflow on signed + in d + 1: SUCCESS
+[check_invariants.array_bounds.1] line 212 array 'believers' lower bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.array_bounds.2] line 212 array 'believers' upper bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.assertion.3] line 212 bd_fsfreeze_count stuck above the number of bdev_freeze() holders: SUCCESS
+[check_invariants.overflow.3] line 212 arithmetic overflow on signed + in believers[(signed long int)d] + return_value_bdev_frame_on: SUCCESS
+[check_invariants.pointer_dereference.4] line 212 dereference failure: pointer NULL in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.5] line 212 dereference failure: pointer invalid in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.6] line 212 dereference failure: deallocated dynamic object in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.7] line 212 dereference failure: dead object in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.8] line 212 dereference failure: pointer outside object bounds in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.9] line 212 dereference failure: invalid integer address in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.array_bounds.3] line 215 array 'believers' lower bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.array_bounds.4] line 215 array 'believers' upper bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.assertion.4] line 215 bd_fsfreeze_count below the number of bdev_freeze() holders: SUCCESS
+[check_invariants.overflow.4] line 215 arithmetic overflow on signed + in believers[(signed long int)d] + return_value_bdev_frame_on$0: SUCCESS
+[check_invariants.pointer_dereference.10] line 215 dereference failure: pointer NULL in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.11] line 215 dereference failure: pointer invalid in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.12] line 215 dereference failure: deallocated dynamic object in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.13] line 215 dereference failure: dead object in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.14] line 215 dereference failure: pointer outside object bounds in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.pointer_dereference.15] line 215 dereference failure: invalid integer address in bdev->bd_fsfreeze_count: SUCCESS
+[check_invariants.array_bounds.5] line 217 array 'believers' lower bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.array_bounds.6] line 217 array 'believers' upper bound in believers[(signed long int)d]: SUCCESS
+[check_invariants.array_bounds.7] line 217 array.sd_linked dynamic object upper bound in bdev->sd_linked[(signed long int)0]: SUCCESS
+[check_invariants.pointer_dereference.16] line 217 dereference failure: pointer NULL in bdev->sd_linked: SUCCESS
+[check_invariants.pointer_dereference.17] line 217 dereference failure: pointer invalid in bdev->sd_linked: SUCCESS
+[check_invariants.pointer_dereference.18] line 217 dereference failure: deallocated dynamic object in bdev->sd_linked: SUCCESS
+[check_invariants.pointer_dereference.19] line 217 dereference failure: dead object in bdev->sd_linked: SUCCESS
+[check_invariants.pointer_dereference.20] line 217 dereference failure: pointer outside object bounds in bdev->sd_linked: SUCCESS
+[check_invariants.pointer_dereference.21] line 217 dereference failure: invalid integer address in bdev->sd_linked: SUCCESS
+[check_invariants.assertion.5] line 218 bdev_freeze() holder exists but the sb is thawed / has no USERSPACE hold: SUCCESS
+[check_invariants.assertion.6] line 222 failed bdev_freeze() left the sb frozen with an orphaned hold: SUCCESS
+[check_invariants.pointer_dereference.22] line 224 dereference failure: pointer outside object bounds in sb->m_dead: SUCCESS
+[check_invariants.assertion.7] line 225 kernel holds != kernel freezers: SUCCESS
+[check_invariants.overflow.6] line 225 arithmetic overflow on signed + in pm_hold + kh: SUCCESS
+[check_invariants.assertion.8] line 226 userspace holds != FIFREEZE + bdev holders: SUCCESS
+[check_invariants.overflow.7] line 226 arithmetic overflow on signed + in fif_hold + devheld[(signed long int)0]: SUCCESS
+[check_invariants.overflow.8] line 226 arithmetic overflow on signed + in fif_hold + devheld[(signed long int)0] + devheld[(signed long int)1]: SUCCESS
+[check_invariants.overflow.9] line 226 arithmetic overflow on signed + in fif_hold + devheld[(signed long int)0] + devheld[(signed long int)1] + orphan_u: SUCCESS
+
+freeze.c function frame_refs
+[frame_refs.pointer_dereference.1] line 160 dereference failure: pointer NULL in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.2] line 160 dereference failure: pointer invalid in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.3] line 160 dereference failure: deallocated dynamic object in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.4] line 160 dereference failure: dead object in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.5] line 160 dereference failure: pointer outside object bounds in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.6] line 160 dereference failure: invalid integer address in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.7] line 162 dereference failure: pointer NULL in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.8] line 162 dereference failure: pointer invalid in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.9] line 162 dereference failure: deallocated dynamic object in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.10] line 162 dereference failure: dead object in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.11] line 162 dereference failure: pointer outside object bounds in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.12] line 162 dereference failure: invalid integer address in fr->caller_ref: SUCCESS
+[frame_refs.pointer_dereference.13] line 163 dereference failure: pointer NULL in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.14] line 163 dereference failure: pointer invalid in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.15] line 163 dereference failure: deallocated dynamic object in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.16] line 163 dereference failure: dead object in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.17] line 163 dereference failure: pointer outside object bounds in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.18] line 163 dereference failure: invalid integer address in fr->caller: SUCCESS
+[frame_refs.pointer_dereference.19] line 164 dereference failure: pointer NULL in fr->w: SUCCESS
+[frame_refs.pointer_dereference.20] line 164 dereference failure: pointer invalid in fr->w: SUCCESS
+[frame_refs.pointer_dereference.21] line 164 dereference failure: deallocated dynamic object in fr->w: SUCCESS
+[frame_refs.pointer_dereference.22] line 164 dereference failure: dead object in fr->w: SUCCESS
+[frame_refs.pointer_dereference.23] line 164 dereference failure: pointer outside object bounds in fr->w: SUCCESS
+[frame_refs.pointer_dereference.24] line 164 dereference failure: invalid integer address in fr->w: SUCCESS
+[frame_refs.overflow.1] line 165 arithmetic overflow on signed + in 1 + (signed int)(fr->w.f.pc != 0): SUCCESS
+[frame_refs.overflow.2] line 165 arithmetic overflow on signed + in n + 1 + (signed int)(fr->w.f.pc != 0): SUCCESS
+[frame_refs.pointer_dereference.25] line 166 dereference failure: pointer NULL in fr->f: SUCCESS
+[frame_refs.pointer_dereference.26] line 166 dereference failure: pointer invalid in fr->f: SUCCESS
+[frame_refs.pointer_dereference.27] line 166 dereference failure: deallocated dynamic object in fr->f: SUCCESS
+[frame_refs.pointer_dereference.28] line 166 dereference failure: dead object in fr->f: SUCCESS
+[frame_refs.pointer_dereference.29] line 166 dereference failure: pointer outside object bounds in fr->f: SUCCESS
+[frame_refs.pointer_dereference.30] line 166 dereference failure: invalid integer address in fr->f: SUCCESS
+[frame_refs.overflow.3] line 167 arithmetic overflow on signed + in n + 1: SUCCESS
+
+freeze.c function frame_runnable
+[frame_runnable.pointer_dereference.1] line 150 dereference failure: pointer NULL in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.2] line 150 dereference failure: pointer invalid in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.3] line 150 dereference failure: deallocated dynamic object in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.4] line 150 dereference failure: dead object in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.5] line 150 dereference failure: pointer outside object bounds in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.6] line 150 dereference failure: invalid integer address in fr->caller: SUCCESS
+[frame_runnable.pointer_dereference.7] line 151 dereference failure: pointer NULL in fr->w: SUCCESS
+[frame_runnable.pointer_dereference.8] line 151 dereference failure: pointer invalid in fr->w: SUCCESS
+[frame_runnable.pointer_dereference.9] line 151 dereference failure: deallocated dynamic object in fr->w: SUCCESS
+[frame_runnable.pointer_dereference.10] line 151 dereference failure: dead object in fr->w: SUCCESS
+[frame_runnable.pointer_dereference.11] line 151 dereference failure: pointer outside object bounds in fr->w: SUCCESS
+[frame_runnable.pointer_dereference.12] line 151 dereference failure: invalid integer address in fr->w: SUCCESS
+
+freeze.c function frames_of
+[frames_of.overflow.1] line 179 arithmetic overflow on signed + in (signed int)(FR0.caller == caller) + (signed int)(FR1.caller == caller): SUCCESS
+
+freeze.c function freezer_runnable
+[freezer_runnable.pointer_dereference.1] line 143 dereference failure: pointer NULL in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.2] line 143 dereference failure: pointer invalid in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.3] line 143 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.4] line 143 dereference failure: dead object in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.5] line 143 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.6] line 143 dereference failure: invalid integer address in f->pc: SUCCESS
+[freezer_runnable.pointer_dereference.7] line 144 dereference failure: pointer NULL in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.8] line 144 dereference failure: pointer invalid in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.9] line 144 dereference failure: deallocated dynamic object in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.10] line 144 dereference failure: dead object in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.11] line 144 dereference failure: pointer outside object bounds in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.12] line 144 dereference failure: invalid integer address in f->sb: SUCCESS
+[freezer_runnable.pointer_dereference.13] line 144 dereference failure: pointer NULL in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.14] line 144 dereference failure: pointer invalid in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.15] line 144 dereference failure: deallocated dynamic object in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.16] line 144 dereference failure: dead object in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.17] line 144 dereference failure: pointer outside object bounds in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.18] line 144 dereference failure: invalid integer address in f->sb->s_writers: SUCCESS
+[freezer_runnable.pointer_dereference.19] line 144 dereference failure: pointer NULL in f->old: SUCCESS
+[freezer_runnable.pointer_dereference.20] line 144 dereference failure: pointer invalid in f->old: SUCCESS
+[freezer_runnable.pointer_dereference.21] line 144 dereference failure: deallocated dynamic object in f->old: SUCCESS
+[freezer_runnable.pointer_dereference.22] line 144 dereference failure: dead object in f->old: SUCCESS
+[freezer_runnable.pointer_dereference.23] line 144 dereference failure: pointer outside object bounds in f->old: SUCCESS
+[freezer_runnable.pointer_dereference.24] line 144 dereference failure: invalid integer address in f->old: SUCCESS
+
+freeze.c function inflight_refs
+[inflight_refs.overflow.1] line 174 arithmetic overflow on signed + in emerg_ref + return_value_frame_refs: SUCCESS
+[inflight_refs.overflow.2] line 174 arithmetic overflow on signed + in emerg_ref + return_value_frame_refs + return_value_frame_refs$0: SUCCESS
+
+freeze.c function main
+[main.overflow.8] line 251 arithmetic overflow on signed + in step + 1: SUCCESS
+[main.array_bounds.1] line 260 array 'log_op' lower bound in log_op[(signed long int)step]: SUCCESS
+[main.array_bounds.2] line 260 array 'log_op' upper bound in log_op[(signed long int)step]: SUCCESS
+[main.pointer_dereference.1] line 265 dereference failure: pointer NULL in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.2] line 265 dereference failure: pointer invalid in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.3] line 265 dereference failure: deallocated dynamic object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.4] line 265 dereference failure: dead object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.5] line 265 dereference failure: pointer outside object bounds in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.6] line 265 dereference failure: invalid integer address in SB.s_op->freeze_fs: SUCCESS
+[main.array_bounds.3] line 276 array 'log_arg' lower bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.4] line 276 array 'log_arg' upper bound in log_arg[(signed long int)step]: SUCCESS
+[main.overflow.1] line 279 arithmetic overflow on signed - in fif_hold - 1: SUCCESS
+[main.pointer_dereference.7] line 285 dereference failure: pointer NULL in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.8] line 285 dereference failure: pointer invalid in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.9] line 285 dereference failure: deallocated dynamic object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.10] line 285 dereference failure: dead object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.11] line 285 dereference failure: pointer outside object bounds in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.12] line 285 dereference failure: invalid integer address in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.13] line 299 dereference failure: pointer NULL in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.14] line 299 dereference failure: pointer invalid in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.15] line 299 dereference failure: deallocated dynamic object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.16] line 299 dereference failure: dead object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.17] line 299 dereference failure: pointer outside object bounds in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.18] line 299 dereference failure: invalid integer address in SB.s_op->freeze_fs: SUCCESS
+[main.array_bounds.5] line 302 array 'log_arg' lower bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.6] line 302 array 'log_arg' upper bound in log_arg[(signed long int)step]: SUCCESS
+[main.pointer_dereference.19] line 312 dereference failure: pointer NULL in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.20] line 312 dereference failure: pointer invalid in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.21] line 312 dereference failure: deallocated dynamic object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.22] line 312 dereference failure: dead object in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.23] line 312 dereference failure: pointer outside object bounds in SB.s_op->freeze_fs: SUCCESS
+[main.pointer_dereference.24] line 312 dereference failure: invalid integer address in SB.s_op->freeze_fs: SUCCESS
+[main.array_bounds.7] line 326 array 'believers' lower bound in believers[(signed long int)arg]: SUCCESS
+[main.array_bounds.8] line 326 array 'believers' upper bound in believers[(signed long int)arg]: SUCCESS
+[main.pointer_dereference.25] line 326 dereference failure: pointer NULL in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.26] line 326 dereference failure: pointer invalid in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.27] line 326 dereference failure: deallocated dynamic object in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.28] line 326 dereference failure: dead object in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.29] line 326 dereference failure: pointer outside object bounds in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.30] line 326 dereference failure: invalid integer address in return_value_bdev_of->bd_fsfreeze_mutex: SUCCESS
+[main.array_bounds.9] line 327 array 'log_arg' lower bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.10] line 327 array 'log_arg' upper bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.11] line 334 array 'believers' lower bound in believers[(signed long int)arg]: SUCCESS
+[main.array_bounds.12] line 334 array 'believers' upper bound in believers[(signed long int)arg]: SUCCESS
+[main.pointer_dereference.31] line 334 dereference failure: pointer NULL in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.32] line 334 dereference failure: pointer invalid in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.33] line 334 dereference failure: deallocated dynamic object in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.34] line 334 dereference failure: dead object in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.35] line 334 dereference failure: pointer outside object bounds in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.pointer_dereference.36] line 334 dereference failure: invalid integer address in return_value_bdev_of$0->bd_fsfreeze_mutex: SUCCESS
+[main.array_bounds.13] line 335 array 'log_arg' lower bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.14] line 335 array 'log_arg' upper bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.15] line 340 array 'believers' lower bound in believers[(signed long int)arg]: SUCCESS
+[main.array_bounds.16] line 340 array 'believers' upper bound in believers[(signed long int)arg]: SUCCESS
+[main.overflow.2] line 340 arithmetic overflow on signed - in believers[(signed long int)arg] - 1: SUCCESS
+[main.array_bounds.17] line 342 array 'devheld' lower bound in devheld[(signed long int)arg]: SUCCESS
+[main.array_bounds.18] line 342 array 'devheld' upper bound in devheld[(signed long int)arg]: SUCCESS
+[main.overflow.3] line 404 arithmetic overflow on signed - in mounts - 1: SUCCESS
+[main.overflow.4] line 411 arithmetic overflow on signed + in mounts + 1: SUCCESS
+[main.pointer_dereference.37] line 418 dereference failure: pointer NULL in return_value_fr_of->caller: SUCCESS
+[main.pointer_dereference.38] line 418 dereference failure: pointer invalid in return_value_fr_of->caller: SUCCESS
+[main.pointer_dereference.39] line 418 dereference failure: deallocated dynamic object in return_value_fr_of->caller: SUCCESS
+[main.pointer_dereference.40] line 418 dereference failure: dead object in return_value_fr_of->caller: SUCCESS
+[main.pointer_dereference.41] line 418 dereference failure: pointer outside object bounds in return_value_fr_of->caller: SUCCESS
+[main.pointer_dereference.42] line 418 dereference failure: invalid integer address in return_value_fr_of->caller: SUCCESS
+[main.array_bounds.19] line 419 array 'log_arg' lower bound in log_arg[(signed long int)step]: SUCCESS
+[main.array_bounds.20] line 419 array 'log_arg' upper bound in log_arg[(signed long int)step]: SUCCESS
+[main.pointer_dereference.43] line 428 dereference failure: pointer NULL in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.44] line 428 dereference failure: pointer invalid in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.45] line 428 dereference failure: deallocated dynamic object in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.46] line 428 dereference failure: dead object in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.47] line 428 dereference failure: pointer outside object bounds in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.48] line 428 dereference failure: invalid integer address in return_value_fr_of$1->caller: SUCCESS
+[main.pointer_dereference.49] line 430 dereference failure: pointer NULL in run->caller: SUCCESS
+[main.pointer_dereference.50] line 430 dereference failure: pointer invalid in run->caller: SUCCESS
+[main.pointer_dereference.51] line 430 dereference failure: deallocated dynamic object in run->caller: SUCCESS
+[main.pointer_dereference.52] line 430 dereference failure: dead object in run->caller: SUCCESS
+[main.pointer_dereference.53] line 430 dereference failure: pointer outside object bounds in run->caller: SUCCESS
+[main.pointer_dereference.54] line 430 dereference failure: invalid integer address in run->caller: SUCCESS
+[main.pointer_dereference.55] line 431 dereference failure: pointer NULL in run->caller_ref: SUCCESS
+[main.pointer_dereference.56] line 431 dereference failure: pointer invalid in run->caller_ref: SUCCESS
+[main.pointer_dereference.57] line 431 dereference failure: deallocated dynamic object in run->caller_ref: SUCCESS
+[main.pointer_dereference.58] line 431 dereference failure: dead object in run->caller_ref: SUCCESS
+[main.pointer_dereference.59] line 431 dereference failure: pointer outside object bounds in run->caller_ref: SUCCESS
+[main.pointer_dereference.60] line 431 dereference failure: invalid integer address in run->caller_ref: SUCCESS
+[main.pointer_dereference.61] line 432 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.62] line 432 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.63] line 432 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.64] line 432 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.65] line 432 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.66] line 432 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.67] line 433 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.68] line 433 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.69] line 433 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.70] line 433 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.71] line 433 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.72] line 433 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.73] line 434 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.74] line 434 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.75] line 434 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.76] line 434 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.77] line 434 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.78] line 434 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.79] line 436 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.80] line 436 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.81] line 436 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.82] line 436 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.83] line 436 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.84] line 436 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.85] line 438 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.86] line 438 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.87] line 438 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.88] line 438 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.89] line 438 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.90] line 438 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.91] line 440 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.92] line 440 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.93] line 440 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.94] line 440 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.95] line 440 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.96] line 440 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.97] line 441 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.98] line 441 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.99] line 441 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.100] line 441 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.101] line 441 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.102] line 441 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.103] line 445 dereference failure: pointer NULL in run->w: SUCCESS
+[main.pointer_dereference.104] line 445 dereference failure: pointer invalid in run->w: SUCCESS
+[main.pointer_dereference.105] line 445 dereference failure: deallocated dynamic object in run->w: SUCCESS
+[main.pointer_dereference.106] line 445 dereference failure: dead object in run->w: SUCCESS
+[main.pointer_dereference.107] line 445 dereference failure: pointer outside object bounds in run->w: SUCCESS
+[main.pointer_dereference.108] line 445 dereference failure: invalid integer address in run->w: SUCCESS
+[main.pointer_dereference.109] line 446 dereference failure: pointer NULL in run->dev: SUCCESS
+[main.pointer_dereference.110] line 446 dereference failure: pointer invalid in run->dev: SUCCESS
+[main.pointer_dereference.111] line 446 dereference failure: deallocated dynamic object in run->dev: SUCCESS
+[main.pointer_dereference.112] line 446 dereference failure: dead object in run->dev: SUCCESS
+[main.pointer_dereference.113] line 446 dereference failure: pointer outside object bounds in run->dev: SUCCESS
+[main.pointer_dereference.114] line 446 dereference failure: invalid integer address in run->dev: SUCCESS
+[main.pointer_dereference.115] line 447 dereference failure: pointer NULL in run->w: SUCCESS
+[main.pointer_dereference.116] line 447 dereference failure: pointer invalid in run->w: SUCCESS
+[main.pointer_dereference.117] line 447 dereference failure: deallocated dynamic object in run->w: SUCCESS
+[main.pointer_dereference.118] line 447 dereference failure: dead object in run->w: SUCCESS
+[main.pointer_dereference.119] line 447 dereference failure: pointer outside object bounds in run->w: SUCCESS
+[main.pointer_dereference.120] line 447 dereference failure: invalid integer address in run->w: SUCCESS
+[main.pointer_dereference.121] line 455 dereference failure: pointer NULL in run->caller: SUCCESS
+[main.pointer_dereference.122] line 455 dereference failure: pointer invalid in run->caller: SUCCESS
+[main.pointer_dereference.123] line 455 dereference failure: deallocated dynamic object in run->caller: SUCCESS
+[main.pointer_dereference.124] line 455 dereference failure: dead object in run->caller: SUCCESS
+[main.pointer_dereference.125] line 455 dereference failure: pointer outside object bounds in run->caller: SUCCESS
+[main.pointer_dereference.126] line 455 dereference failure: invalid integer address in run->caller: SUCCESS
+[main.pointer_dereference.127] line 462 dereference failure: pointer NULL in run->caller: SUCCESS
+[main.pointer_dereference.128] line 462 dereference failure: pointer invalid in run->caller: SUCCESS
+[main.pointer_dereference.129] line 462 dereference failure: deallocated dynamic object in run->caller: SUCCESS
+[main.pointer_dereference.130] line 462 dereference failure: dead object in run->caller: SUCCESS
+[main.pointer_dereference.131] line 462 dereference failure: pointer outside object bounds in run->caller: SUCCESS
+[main.pointer_dereference.132] line 462 dereference failure: invalid integer address in run->caller: SUCCESS
+[main.pointer_dereference.133] line 464 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.134] line 464 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.135] line 464 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.136] line 464 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.137] line 464 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.138] line 464 dereference failure: invalid integer address in run->f: SUCCESS
+[main.overflow.5] line 466 arithmetic overflow on signed + in fif_hold + 1: SUCCESS
+[main.pointer_dereference.139] line 469 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.140] line 469 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.141] line 469 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.142] line 469 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.143] line 469 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.144] line 469 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.145] line 474 dereference failure: pointer NULL in run->f: SUCCESS
+[main.pointer_dereference.146] line 474 dereference failure: pointer invalid in run->f: SUCCESS
+[main.pointer_dereference.147] line 474 dereference failure: deallocated dynamic object in run->f: SUCCESS
+[main.pointer_dereference.148] line 474 dereference failure: dead object in run->f: SUCCESS
+[main.pointer_dereference.149] line 474 dereference failure: pointer outside object bounds in run->f: SUCCESS
+[main.pointer_dereference.150] line 474 dereference failure: invalid integer address in run->f: SUCCESS
+[main.pointer_dereference.151] line 480 dereference failure: pointer NULL in run->w: SUCCESS
+[main.pointer_dereference.152] line 480 dereference failure: pointer invalid in run->w: SUCCESS
+[main.pointer_dereference.153] line 480 dereference failure: deallocated dynamic object in run->w: SUCCESS
+[main.pointer_dereference.154] line 480 dereference failure: dead object in run->w: SUCCESS
+[main.pointer_dereference.155] line 480 dereference failure: pointer outside object bounds in run->w: SUCCESS
+[main.pointer_dereference.156] line 480 dereference failure: invalid integer address in run->w: SUCCESS
+[main.pointer_dereference.157] line 481 dereference failure: pointer NULL in run->dev: SUCCESS
+[main.pointer_dereference.158] line 481 dereference failure: pointer invalid in run->dev: SUCCESS
+[main.pointer_dereference.159] line 481 dereference failure: deallocated dynamic object in run->dev: SUCCESS
+[main.pointer_dereference.160] line 481 dereference failure: dead object in run->dev: SUCCESS
+[main.pointer_dereference.161] line 481 dereference failure: pointer outside object bounds in run->dev: SUCCESS
+[main.pointer_dereference.162] line 481 dereference failure: invalid integer address in run->dev: SUCCESS
+[main.array_bounds.21] line 483 array 'believers' lower bound in believers[(signed long int)d]: SUCCESS
+[main.array_bounds.22] line 483 array 'believers' upper bound in believers[(signed long int)d]: SUCCESS
+[main.overflow.6] line 483 arithmetic overflow on signed + in believers[(signed long int)d] + 1: SUCCESS
+[main.array_bounds.23] line 484 array.w.res dynamic object upper bound in run->w.res[(signed long int)0]: SUCCESS
+[main.pointer_dereference.163] line 484 dereference failure: pointer NULL in run->w: SUCCESS
+[main.pointer_dereference.164] line 484 dereference failure: pointer invalid in run->w: SUCCESS
+[main.pointer_dereference.165] line 484 dereference failure: deallocated dynamic object in run->w: SUCCESS
+[main.pointer_dereference.166] line 484 dereference failure: dead object in run->w: SUCCESS
+[main.pointer_dereference.167] line 484 dereference failure: pointer outside object bounds in run->w: SUCCESS
+[main.pointer_dereference.168] line 484 dereference failure: invalid integer address in run->w: SUCCESS
+[main.pointer_dereference.169] line 484 dereference failure: pointer NULL in run->w: SUCCESS
+[main.pointer_dereference.170] line 484 dereference failure: pointer invalid in run->w: SUCCESS
+[main.pointer_dereference.171] line 484 dereference failure: deallocated dynamic object in run->w: SUCCESS
+[main.pointer_dereference.172] line 484 dereference failure: dead object in run->w: SUCCESS
+[main.pointer_dereference.173] line 484 dereference failure: pointer outside object bounds in run->w: SUCCESS
+[main.pointer_dereference.174] line 484 dereference failure: invalid integer address in run->w: SUCCESS
+[main.array_bounds.24] line 486 array 'devheld' lower bound in devheld[(signed long int)d]: SUCCESS
+[main.array_bounds.25] line 486 array 'devheld' upper bound in devheld[(signed long int)d]: SUCCESS
+[main.overflow.7] line 488 arithmetic overflow on signed + in orphan_u + 1: SUCCESS
+[main.pointer_dereference.175] line 492 dereference failure: pointer NULL in run->caller: SUCCESS
+[main.pointer_dereference.176] line 492 dereference failure: pointer invalid in run->caller: SUCCESS
+[main.pointer_dereference.177] line 492 dereference failure: deallocated dynamic object in run->caller: SUCCESS
+[main.pointer_dereference.178] line 492 dereference failure: dead object in run->caller: SUCCESS
+[main.pointer_dereference.179] line 492 dereference failure: pointer outside object bounds in run->caller: SUCCESS
+[main.pointer_dereference.180] line 492 dereference failure: invalid integer address in run->caller: SUCCESS
+[main.array_bounds.26] line 495 array 'log_ret' lower bound in log_ret[(signed long int)step]: SUCCESS
+[main.array_bounds.27] line 495 array 'log_ret' upper bound in log_ret[(signed long int)step]: SUCCESS
+
+freeze.c function model_release_claims
+[model_release_claims.pointer_dereference.1] line 138 dereference failure: pointer NULL in sb->m_registered: SUCCESS
+[model_release_claims.pointer_dereference.2] line 138 dereference failure: pointer invalid in sb->m_registered: SUCCESS
+[model_release_claims.pointer_dereference.3] line 138 dereference failure: deallocated dynamic object in sb->m_registered: SUCCESS
+[model_release_claims.pointer_dereference.4] line 138 dereference failure: dead object in sb->m_registered: SUCCESS
+[model_release_claims.pointer_dereference.5] line 138 dereference failure: pointer outside object bounds in sb->m_registered: SUCCESS
+[model_release_claims.pointer_dereference.6] line 138 dereference failure: invalid integer address in sb->m_registered: SUCCESS
+
+kernel_freeze.h function __super_lock
+[__super_lock.assertion.1] line 380 shared s_umount not modelled: SUCCESS
+
+kernel_freeze.h function atomic_add_unless
+[atomic_add_unless.pointer_dereference.1] line 280 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.2] line 280 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.3] line 280 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.4] line 280 dereference failure: dead object in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.5] line 280 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.6] line 280 dereference failure: invalid integer address in *v: SUCCESS
+[atomic_add_unless.overflow.1] line 282 arithmetic overflow on signed + in *v + a: SUCCESS
+[atomic_add_unless.pointer_dereference.7] line 282 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.8] line 282 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.9] line 282 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.10] line 282 dereference failure: dead object in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.11] line 282 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_add_unless.pointer_dereference.12] line 282 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function atomic_dec
+[atomic_dec.overflow.1] line 296 arithmetic overflow on signed - in *v - 1: SUCCESS
+[atomic_dec.pointer_dereference.1] line 296 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_dec.pointer_dereference.2] line 296 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_dec.pointer_dereference.3] line 296 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_dec.pointer_dereference.4] line 296 dereference failure: dead object in *v: SUCCESS
+[atomic_dec.pointer_dereference.5] line 296 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_dec.pointer_dereference.6] line 296 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function atomic_dec_and_test
+[atomic_dec_and_test.assertion.1] line 265 s_active: decrement below zero: SUCCESS
+[atomic_dec_and_test.pointer_dereference.1] line 265 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_dec_and_test.pointer_dereference.2] line 265 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_dec_and_test.pointer_dereference.3] line 265 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_dec_and_test.pointer_dereference.4] line 265 dereference failure: dead object in *v: SUCCESS
+[atomic_dec_and_test.pointer_dereference.5] line 265 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_dec_and_test.pointer_dereference.6] line 265 dereference failure: invalid integer address in *v: SUCCESS
+[atomic_dec_and_test.overflow.1] line 266 arithmetic overflow on signed - in *v - 1: SUCCESS
+
+kernel_freeze.h function atomic_inc
+[atomic_inc.overflow.1] line 260 arithmetic overflow on signed + in *v + 1: SUCCESS
+[atomic_inc.pointer_dereference.1] line 260 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_inc.pointer_dereference.2] line 260 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_inc.pointer_dereference.3] line 260 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_inc.pointer_dereference.4] line 260 dereference failure: dead object in *v: SUCCESS
+[atomic_inc.pointer_dereference.5] line 260 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_inc.pointer_dereference.6] line 260 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function atomic_inc_not_zero
+[atomic_inc_not_zero.pointer_dereference.1] line 271 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.2] line 271 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.3] line 271 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.4] line 271 dereference failure: dead object in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.5] line 271 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.6] line 271 dereference failure: invalid integer address in *v: SUCCESS
+[atomic_inc_not_zero.overflow.1] line 273 arithmetic overflow on signed + in *v + 1: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.7] line 273 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.8] line 273 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.9] line 273 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.10] line 273 dereference failure: dead object in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.11] line 273 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_inc_not_zero.pointer_dereference.12] line 273 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function atomic_inc_unless_negative
+[atomic_inc_unless_negative.pointer_dereference.1] line 288 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.2] line 288 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.3] line 288 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.4] line 288 dereference failure: dead object in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.5] line 288 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.6] line 288 dereference failure: invalid integer address in *v: SUCCESS
+[atomic_inc_unless_negative.overflow.1] line 290 arithmetic overflow on signed + in *v + 1: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.7] line 290 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.8] line 290 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.9] line 290 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.10] line 290 dereference failure: dead object in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.11] line 290 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_inc_unless_negative.pointer_dereference.12] line 290 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function atomic_read
+[atomic_read.pointer_dereference.1] line 301 dereference failure: pointer NULL in *v: SUCCESS
+[atomic_read.pointer_dereference.2] line 301 dereference failure: pointer invalid in *v: SUCCESS
+[atomic_read.pointer_dereference.3] line 301 dereference failure: deallocated dynamic object in *v: SUCCESS
+[atomic_read.pointer_dereference.4] line 301 dereference failure: dead object in *v: SUCCESS
+[atomic_read.pointer_dereference.5] line 301 dereference failure: pointer outside object bounds in *v: SUCCESS
+[atomic_read.pointer_dereference.6] line 301 dereference failure: invalid integer address in *v: SUCCESS
+
+kernel_freeze.h function bdev_freeze_co
+[bdev_freeze_co.pointer_dereference.1] line 937 dereference failure: pointer NULL in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.2] line 937 dereference failure: pointer invalid in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.3] line 937 dereference failure: deallocated dynamic object in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.4] line 937 dereference failure: dead object in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.5] line 937 dereference failure: pointer outside object bounds in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.6] line 937 dereference failure: invalid integer address in w->bdev: SUCCESS
+[bdev_freeze_co.pointer_dereference.7] line 941 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.8] line 941 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.9] line 941 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.10] line 941 dereference failure: dead object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.11] line 941 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.12] line 941 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.13] line 952 dereference failure: pointer NULL in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.14] line 952 dereference failure: pointer invalid in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.15] line 952 dereference failure: deallocated dynamic object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.16] line 952 dereference failure: dead object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.17] line 952 dereference failure: pointer outside object bounds in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.18] line 952 dereference failure: invalid integer address in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.19] line 957 dereference failure: pointer NULL in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.20] line 957 dereference failure: pointer invalid in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.21] line 957 dereference failure: deallocated dynamic object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.22] line 957 dereference failure: dead object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.23] line 957 dereference failure: pointer outside object bounds in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.24] line 957 dereference failure: invalid integer address in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.25] line 962 dereference failure: pointer NULL in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.26] line 962 dereference failure: pointer invalid in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.27] line 962 dereference failure: deallocated dynamic object in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.28] line 962 dereference failure: dead object in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.29] line 962 dereference failure: pointer outside object bounds in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.30] line 962 dereference failure: invalid integer address in bdev->bd_holder_ops: SUCCESS
+[bdev_freeze_co.pointer_dereference.31] line 964 dereference failure: pointer NULL in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.32] line 964 dereference failure: pointer invalid in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.33] line 964 dereference failure: deallocated dynamic object in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.34] line 964 dereference failure: dead object in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.35] line 964 dereference failure: pointer outside object bounds in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.36] line 964 dereference failure: invalid integer address in w->holder_ran: SUCCESS
+[bdev_freeze_co.pointer_dereference.37] line 966 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.38] line 966 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.39] line 966 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.40] line 966 dereference failure: dead object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.41] line 966 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.42] line 966 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.43] line 967 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.44] line 967 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.45] line 967 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.46] line 967 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.47] line 967 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.48] line 967 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.assertion.1] line 970 fs_bdev_freeze without bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.49] line 970 dereference failure: pointer NULL in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.50] line 970 dereference failure: pointer invalid in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.51] line 970 dereference failure: deallocated dynamic object in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.52] line 970 dereference failure: dead object in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.53] line 970 dereference failure: pointer outside object bounds in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.54] line 970 dereference failure: invalid integer address in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_freeze_co.pointer_dereference.55] line 975 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.56] line 975 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.57] line 975 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.58] line 975 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.59] line 975 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.60] line 975 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.61] line 976 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.62] line 976 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.63] line 976 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.64] line 976 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.65] line 976 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.66] line 976 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.unwind.0] line 976 unwinding assertion loop 0: SUCCESS
+[bdev_freeze_co.array_bounds.1] line 977 array.sd_sb dynamic object upper bound in bdev->sd_sb[(signed long int)w->i]: SUCCESS
+[bdev_freeze_co.pointer_dereference.67] line 977 dereference failure: pointer NULL in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.68] line 977 dereference failure: pointer invalid in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.69] line 977 dereference failure: deallocated dynamic object in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.70] line 977 dereference failure: dead object in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.71] line 977 dereference failure: pointer outside object bounds in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.72] line 977 dereference failure: invalid integer address in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.array_bounds.2] line 979 array.res dynamic object upper bound in w->res[(signed long int)w->i]: SUCCESS
+[bdev_freeze_co.pointer_dereference.73] line 979 dereference failure: pointer NULL in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.74] line 979 dereference failure: pointer invalid in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.75] line 979 dereference failure: deallocated dynamic object in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.76] line 979 dereference failure: dead object in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.77] line 979 dereference failure: pointer outside object bounds in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.78] line 979 dereference failure: invalid integer address in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.79] line 979 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.80] line 979 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.81] line 979 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.82] line 979 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.83] line 979 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.84] line 979 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.85] line 983 dereference failure: pointer NULL in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.86] line 983 dereference failure: pointer invalid in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.87] line 983 dereference failure: deallocated dynamic object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.88] line 983 dereference failure: dead object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.89] line 983 dereference failure: pointer outside object bounds in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.90] line 983 dereference failure: invalid integer address in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.91] line 984 dereference failure: pointer NULL in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.92] line 984 dereference failure: pointer invalid in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.93] line 984 dereference failure: deallocated dynamic object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.94] line 984 dereference failure: dead object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.95] line 984 dereference failure: pointer outside object bounds in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.96] line 984 dereference failure: invalid integer address in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.97] line 985 dereference failure: pointer NULL in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.98] line 985 dereference failure: pointer invalid in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.99] line 985 dereference failure: deallocated dynamic object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.100] line 985 dereference failure: dead object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.101] line 985 dereference failure: pointer outside object bounds in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.102] line 985 dereference failure: invalid integer address in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.103] line 986 dereference failure: pointer NULL in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.104] line 986 dereference failure: pointer invalid in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.105] line 986 dereference failure: deallocated dynamic object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.106] line 986 dereference failure: dead object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.107] line 986 dereference failure: pointer outside object bounds in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.108] line 986 dereference failure: invalid integer address in w->f: SUCCESS
+[bdev_freeze_co.array_bounds.3] line 988 array.sd_sb dynamic object upper bound in bdev->sd_sb[(signed long int)w->i]: SUCCESS
+[bdev_freeze_co.pointer_dereference.109] line 988 dereference failure: pointer NULL in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.110] line 988 dereference failure: pointer invalid in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.111] line 988 dereference failure: deallocated dynamic object in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.112] line 988 dereference failure: dead object in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.113] line 988 dereference failure: pointer outside object bounds in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.114] line 988 dereference failure: invalid integer address in bdev->sd_sb: SUCCESS
+[bdev_freeze_co.pointer_dereference.115] line 988 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.116] line 988 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.117] line 988 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.118] line 988 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.119] line 988 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.120] line 988 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.121] line 990 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.122] line 990 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.123] line 990 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.124] line 990 dereference failure: dead object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.125] line 990 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.126] line 990 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.127] line 993 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.128] line 993 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.129] line 993 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.130] line 993 dereference failure: dead object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.131] line 993 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.132] line 993 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.133] line 994 dereference failure: pointer NULL in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.134] line 994 dereference failure: pointer invalid in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.135] line 994 dereference failure: deallocated dynamic object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.136] line 994 dereference failure: dead object in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.137] line 994 dereference failure: pointer outside object bounds in w->f: SUCCESS
+[bdev_freeze_co.pointer_dereference.138] line 994 dereference failure: invalid integer address in w->f: SUCCESS
+[bdev_freeze_co.array_bounds.4] line 995 array.res dynamic object upper bound in w->res[(signed long int)w->i]: SUCCESS
+[bdev_freeze_co.pointer_dereference.139] line 995 dereference failure: pointer NULL in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.140] line 995 dereference failure: pointer invalid in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.141] line 995 dereference failure: deallocated dynamic object in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.142] line 995 dereference failure: dead object in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.143] line 995 dereference failure: pointer outside object bounds in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.144] line 995 dereference failure: invalid integer address in w->res: SUCCESS
+[bdev_freeze_co.pointer_dereference.145] line 995 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.146] line 995 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.147] line 995 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.148] line 995 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.149] line 995 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.150] line 995 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.151] line 996 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.152] line 996 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.153] line 996 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.154] line 996 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.155] line 996 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.156] line 996 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.157] line 997 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.158] line 997 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.159] line 997 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.160] line 997 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.161] line 997 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.162] line 997 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.163] line 999 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.164] line 999 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.165] line 999 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.166] line 999 dereference failure: dead object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.167] line 999 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.168] line 999 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_freeze_co.overflow.1] line 1001 arithmetic overflow on signed + in w->i + 1: SUCCESS
+[bdev_freeze_co.pointer_dereference.169] line 1001 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.170] line 1001 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.171] line 1001 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.172] line 1001 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.173] line 1001 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.174] line 1001 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.175] line 1001 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.176] line 1001 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.177] line 1001 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.178] line 1001 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.179] line 1001 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.180] line 1001 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.181] line 1002 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.182] line 1002 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.183] line 1002 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.184] line 1002 dereference failure: dead object in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.185] line 1002 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.186] line 1002 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_freeze_co.pointer_dereference.187] line 1002 dereference failure: pointer NULL in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.188] line 1002 dereference failure: pointer invalid in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.189] line 1002 dereference failure: deallocated dynamic object in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.190] line 1002 dereference failure: dead object in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.191] line 1002 dereference failure: pointer outside object bounds in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.192] line 1002 dereference failure: invalid integer address in w->yield_between: SUCCESS
+[bdev_freeze_co.pointer_dereference.193] line 1003 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.194] line 1003 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.195] line 1003 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.196] line 1003 dereference failure: dead object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.197] line 1003 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.198] line 1003 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.199] line 1007 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.200] line 1007 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.201] line 1007 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.202] line 1007 dereference failure: dead object in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.203] line 1007 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.204] line 1007 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_freeze_co.pointer_dereference.205] line 1016 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.206] line 1016 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.207] line 1016 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.208] line 1016 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.209] line 1016 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.210] line 1016 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.211] line 1016 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.212] line 1016 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.213] line 1016 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.214] line 1016 dereference failure: dead object in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.215] line 1016 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.216] line 1016 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_freeze_co.pointer_dereference.217] line 1017 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.218] line 1017 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.219] line 1017 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.220] line 1017 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.221] line 1017 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.222] line 1017 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.223] line 1018 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.224] line 1018 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.225] line 1018 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.226] line 1018 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.227] line 1018 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.228] line 1018 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.229] line 1019 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.230] line 1019 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.231] line 1019 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.232] line 1019 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.233] line 1019 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.234] line 1019 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.235] line 1021 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.236] line 1021 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.237] line 1021 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.238] line 1021 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.239] line 1021 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_freeze_co.pointer_dereference.240] line 1021 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_freeze_co.assertion.2] line 1023 lockdep_assert_not_held(&bdev->bd_holder_lock): SUCCESS
+[bdev_freeze_co.pointer_dereference.241] line 1023 dereference failure: pointer NULL in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.242] line 1023 dereference failure: pointer invalid in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.243] line 1023 dereference failure: deallocated dynamic object in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.244] line 1023 dereference failure: dead object in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.245] line 1023 dereference failure: pointer outside object bounds in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.246] line 1023 dereference failure: invalid integer address in bdev->bd_holder_lock: SUCCESS
+[bdev_freeze_co.pointer_dereference.247] line 1033 dereference failure: pointer NULL in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.248] line 1033 dereference failure: pointer invalid in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.249] line 1033 dereference failure: deallocated dynamic object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.250] line 1033 dereference failure: dead object in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.251] line 1033 dereference failure: pointer outside object bounds in w->ret: SUCCESS
+[bdev_freeze_co.pointer_dereference.252] line 1033 dereference failure: invalid integer address in w->ret: SUCCESS
+
+kernel_freeze.h function bdev_thaw_co
+[bdev_thaw_co.pointer_dereference.1] line 1044 dereference failure: pointer NULL in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.2] line 1044 dereference failure: pointer invalid in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.3] line 1044 dereference failure: deallocated dynamic object in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.4] line 1044 dereference failure: dead object in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.5] line 1044 dereference failure: pointer outside object bounds in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.6] line 1044 dereference failure: invalid integer address in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.7] line 1048 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.8] line 1048 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.9] line 1048 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.10] line 1048 dereference failure: dead object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.11] line 1048 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.12] line 1048 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.13] line 1067 dereference failure: pointer NULL in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.14] line 1067 dereference failure: pointer invalid in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.15] line 1067 dereference failure: deallocated dynamic object in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.16] line 1067 dereference failure: dead object in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.17] line 1067 dereference failure: pointer outside object bounds in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.18] line 1067 dereference failure: invalid integer address in bdev->bd_holder_ops: SUCCESS
+[bdev_thaw_co.pointer_dereference.19] line 1069 dereference failure: pointer NULL in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.20] line 1069 dereference failure: pointer invalid in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.21] line 1069 dereference failure: deallocated dynamic object in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.22] line 1069 dereference failure: dead object in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.23] line 1069 dereference failure: pointer outside object bounds in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.24] line 1069 dereference failure: invalid integer address in w->holder_ran: SUCCESS
+[bdev_thaw_co.pointer_dereference.25] line 1071 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.26] line 1071 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.27] line 1071 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.28] line 1071 dereference failure: dead object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.29] line 1071 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.30] line 1071 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.31] line 1072 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.32] line 1072 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.33] line 1072 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.34] line 1072 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.35] line 1072 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.36] line 1072 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.assertion.1] line 1074 fs_bdev_thaw without bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.37] line 1074 dereference failure: pointer NULL in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.38] line 1074 dereference failure: pointer invalid in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.39] line 1074 dereference failure: deallocated dynamic object in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.40] line 1074 dereference failure: dead object in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.41] line 1074 dereference failure: pointer outside object bounds in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.42] line 1074 dereference failure: invalid integer address in bdev->bd_fsfreeze_mutex: SUCCESS
+[bdev_thaw_co.pointer_dereference.43] line 1078 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.44] line 1078 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.45] line 1078 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.46] line 1078 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.47] line 1078 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.48] line 1078 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.49] line 1079 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.50] line 1079 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.51] line 1079 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.52] line 1079 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.53] line 1079 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.54] line 1079 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.unwind.0] line 1079 unwinding assertion loop 0: SUCCESS
+[bdev_thaw_co.array_bounds.1] line 1080 array.sd_sb dynamic object upper bound in bdev->sd_sb[(signed long int)w->i]: SUCCESS
+[bdev_thaw_co.pointer_dereference.55] line 1080 dereference failure: pointer NULL in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.pointer_dereference.56] line 1080 dereference failure: pointer invalid in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.pointer_dereference.57] line 1080 dereference failure: deallocated dynamic object in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.pointer_dereference.58] line 1080 dereference failure: dead object in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.pointer_dereference.59] line 1080 dereference failure: pointer outside object bounds in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.pointer_dereference.60] line 1080 dereference failure: invalid integer address in bdev->sd_sb: SUCCESS
+[bdev_thaw_co.array_bounds.2] line 1082 array.res dynamic object upper bound in w->res[(signed long int)w->i]: SUCCESS
+[bdev_thaw_co.pointer_dereference.61] line 1082 dereference failure: pointer NULL in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.62] line 1082 dereference failure: pointer invalid in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.63] line 1082 dereference failure: deallocated dynamic object in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.64] line 1082 dereference failure: dead object in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.65] line 1082 dereference failure: pointer outside object bounds in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.66] line 1082 dereference failure: invalid integer address in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.67] line 1082 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.68] line 1082 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.69] line 1082 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.70] line 1082 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.71] line 1082 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.72] line 1082 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.array_bounds.3] line 1087 array.res dynamic object upper bound in w->res[(signed long int)w->i]: SUCCESS
+[bdev_thaw_co.pointer_dereference.73] line 1087 dereference failure: pointer NULL in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.74] line 1087 dereference failure: pointer invalid in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.75] line 1087 dereference failure: deallocated dynamic object in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.76] line 1087 dereference failure: dead object in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.77] line 1087 dereference failure: pointer outside object bounds in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.78] line 1087 dereference failure: invalid integer address in w->res: SUCCESS
+[bdev_thaw_co.pointer_dereference.79] line 1087 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.80] line 1087 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.81] line 1087 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.82] line 1087 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.83] line 1087 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.84] line 1087 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.85] line 1088 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.86] line 1088 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.87] line 1088 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.88] line 1088 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.89] line 1088 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.90] line 1088 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.91] line 1089 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.92] line 1089 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.93] line 1089 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.94] line 1089 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.95] line 1089 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.96] line 1089 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.97] line 1091 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.98] line 1091 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.99] line 1091 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.100] line 1091 dereference failure: dead object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.101] line 1091 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.102] line 1091 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_thaw_co.overflow.1] line 1093 arithmetic overflow on signed + in w->i + 1: SUCCESS
+[bdev_thaw_co.pointer_dereference.103] line 1093 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.104] line 1093 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.105] line 1093 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.106] line 1093 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.107] line 1093 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.108] line 1093 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.109] line 1093 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.110] line 1093 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.111] line 1093 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.112] line 1093 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.113] line 1093 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.114] line 1093 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.115] line 1094 dereference failure: pointer NULL in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.116] line 1094 dereference failure: pointer invalid in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.117] line 1094 dereference failure: deallocated dynamic object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.118] line 1094 dereference failure: dead object in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.119] line 1094 dereference failure: pointer outside object bounds in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.120] line 1094 dereference failure: invalid integer address in w->i: SUCCESS
+[bdev_thaw_co.pointer_dereference.121] line 1094 dereference failure: pointer NULL in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.122] line 1094 dereference failure: pointer invalid in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.123] line 1094 dereference failure: deallocated dynamic object in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.124] line 1094 dereference failure: dead object in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.125] line 1094 dereference failure: pointer outside object bounds in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.126] line 1094 dereference failure: invalid integer address in w->yield_between: SUCCESS
+[bdev_thaw_co.pointer_dereference.127] line 1095 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.128] line 1095 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.129] line 1095 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.130] line 1095 dereference failure: dead object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.131] line 1095 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.132] line 1095 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.133] line 1099 dereference failure: pointer NULL in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.134] line 1099 dereference failure: pointer invalid in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.135] line 1099 dereference failure: deallocated dynamic object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.136] line 1099 dereference failure: dead object in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.137] line 1099 dereference failure: pointer outside object bounds in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.138] line 1099 dereference failure: invalid integer address in w->pc: SUCCESS
+[bdev_thaw_co.pointer_dereference.139] line 1100 dereference failure: pointer NULL in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.140] line 1100 dereference failure: pointer invalid in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.141] line 1100 dereference failure: deallocated dynamic object in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.142] line 1100 dereference failure: dead object in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.143] line 1100 dereference failure: pointer outside object bounds in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.144] line 1100 dereference failure: invalid integer address in w->bdev: SUCCESS
+[bdev_thaw_co.pointer_dereference.145] line 1104 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.146] line 1104 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.147] line 1104 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.148] line 1104 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.149] line 1104 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.150] line 1104 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.151] line 1104 dereference failure: pointer NULL in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.152] line 1104 dereference failure: pointer invalid in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.153] line 1104 dereference failure: deallocated dynamic object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.154] line 1104 dereference failure: dead object in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.155] line 1104 dereference failure: pointer outside object bounds in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.156] line 1104 dereference failure: invalid integer address in w->count: SUCCESS
+[bdev_thaw_co.pointer_dereference.157] line 1105 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.158] line 1105 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.159] line 1105 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.160] line 1105 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.161] line 1105 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.162] line 1105 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.163] line 1107 dereference failure: pointer NULL in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.164] line 1107 dereference failure: pointer invalid in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.165] line 1107 dereference failure: deallocated dynamic object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.166] line 1107 dereference failure: dead object in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.167] line 1107 dereference failure: pointer outside object bounds in w->fs_error: SUCCESS
+[bdev_thaw_co.pointer_dereference.168] line 1107 dereference failure: invalid integer address in w->fs_error: SUCCESS
+[bdev_thaw_co.assertion.2] line 1109 lockdep_assert_not_held(&bdev->bd_holder_lock): SUCCESS
+[bdev_thaw_co.pointer_dereference.169] line 1109 dereference failure: pointer NULL in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.170] line 1109 dereference failure: pointer invalid in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.171] line 1109 dereference failure: deallocated dynamic object in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.172] line 1109 dereference failure: dead object in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.173] line 1109 dereference failure: pointer outside object bounds in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.174] line 1109 dereference failure: invalid integer address in bdev->bd_holder_lock: SUCCESS
+[bdev_thaw_co.pointer_dereference.175] line 1118 dereference failure: pointer NULL in w->ret: SUCCESS
+[bdev_thaw_co.pointer_dereference.176] line 1118 dereference failure: pointer invalid in w->ret: SUCCESS
+[bdev_thaw_co.pointer_dereference.177] line 1118 dereference failure: deallocated dynamic object in w->ret: SUCCESS
+[bdev_thaw_co.pointer_dereference.178] line 1118 dereference failure: dead object in w->ret: SUCCESS
+[bdev_thaw_co.pointer_dereference.179] line 1118 dereference failure: pointer outside object bounds in w->ret: SUCCESS
+[bdev_thaw_co.pointer_dereference.180] line 1118 dereference failure: invalid integer address in w->ret: SUCCESS
+
+kernel_freeze.h function check_freeze_result
+[check_freeze_result.pointer_dereference.1] line 1144 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.2] line 1144 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.3] line 1144 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.4] line 1144 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.5] line 1144 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.6] line 1144 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_freeze_result.assertion.1] line 1146 freeze_super returned a positive value: SUCCESS
+[check_freeze_result.assertion.2] line 1149 freeze_super==0 did not add exactly one kernel hold: SUCCESS
+[check_freeze_result.overflow.1] line 1149 arithmetic overflow on signed + in pre.k + 1: SUCCESS
+[check_freeze_result.assertion.3] line 1152 freeze_super==0 did not add exactly one userspace hold: SUCCESS
+[check_freeze_result.overflow.2] line 1152 arithmetic overflow on signed + in pre.u + 1: SUCCESS
+[check_freeze_result.assertion.4] line 1154 freeze_super==0 but not SB_FREEZE_COMPLETE: SUCCESS
+[check_freeze_result.pointer_dereference.7] line 1154 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.8] line 1154 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.9] line 1154 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.10] line 1154 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.11] line 1154 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.12] line 1154 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_freeze_result.assertion.5] line 1157 failed freeze_super changed the holds or the owner: SUCCESS
+[check_freeze_result.pointer_dereference.13] line 1157 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.14] line 1157 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.15] line 1157 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.16] line 1157 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.17] line 1157 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_freeze_result.pointer_dereference.18] line 1157 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function check_sb_invariants
+[check_sb_invariants.pointer_dereference.1] line 1216 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.2] line 1216 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.3] line 1216 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.4] line 1216 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.5] line 1216 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.6] line 1216 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_sb_invariants.array_bounds.1] line 1218 array.s_writers.rw_sem dynamic object upper bound in sb->s_writers.rw_sem[(signed long int)0]: SUCCESS
+[check_sb_invariants.array_bounds.2] line 1218 array.s_writers.rw_sem dynamic object upper bound in sb->s_writers.rw_sem[(signed long int)1]: SUCCESS
+[check_sb_invariants.overflow.1] line 1218 arithmetic overflow on signed + in sb->s_writers.rw_sem[(signed long int)0].wheld + sb->s_writers.rw_sem[(signed long int)1].wheld: SUCCESS
+[check_sb_invariants.overflow.2] line 1218 arithmetic overflow on signed + in sb->s_writers.rw_sem[(signed long int)0].wheld + sb->s_writers.rw_sem[(signed long int)1].wheld + sb->s_writers.rw_sem[(signed long int)2].wheld: SUCCESS
+[check_sb_invariants.array_bounds.3] line 1219 array.s_writers.rw_sem dynamic object upper bound in sb->s_writers.rw_sem[(signed long int)2]: SUCCESS
+[check_sb_invariants.assertion.1] line 1221 s_umount held between steps: SUCCESS
+[check_sb_invariants.pointer_dereference.7] line 1221 dereference failure: pointer NULL in sb->s_umount: SUCCESS
+[check_sb_invariants.pointer_dereference.8] line 1221 dereference failure: pointer invalid in sb->s_umount: SUCCESS
+[check_sb_invariants.pointer_dereference.9] line 1221 dereference failure: deallocated dynamic object in sb->s_umount: SUCCESS
+[check_sb_invariants.pointer_dereference.10] line 1221 dereference failure: dead object in sb->s_umount: SUCCESS
+[check_sb_invariants.pointer_dereference.11] line 1221 dereference failure: pointer outside object bounds in sb->s_umount: SUCCESS
+[check_sb_invariants.pointer_dereference.12] line 1221 dereference failure: invalid integer address in sb->s_umount: SUCCESS
+[check_sb_invariants.assertion.2] line 1222 freeze_kcount < 0: SUCCESS
+[check_sb_invariants.assertion.3] line 1223 freeze_ucount < 0: SUCCESS
+[check_sb_invariants.pointer_dereference.13] line 1224 dereference failure: pointer NULL in sb->m_dead: SUCCESS
+[check_sb_invariants.pointer_dereference.14] line 1224 dereference failure: pointer invalid in sb->m_dead: SUCCESS
+[check_sb_invariants.pointer_dereference.15] line 1224 dereference failure: deallocated dynamic object in sb->m_dead: SUCCESS
+[check_sb_invariants.pointer_dereference.16] line 1224 dereference failure: dead object in sb->m_dead: SUCCESS
+[check_sb_invariants.pointer_dereference.17] line 1224 dereference failure: pointer outside object bounds in sb->m_dead: SUCCESS
+[check_sb_invariants.pointer_dereference.18] line 1224 dereference failure: invalid integer address in sb->m_dead: SUCCESS
+[check_sb_invariants.assertion.4] line 1225 dead sb with active refs: SUCCESS
+[check_sb_invariants.pointer_dereference.19] line 1225 dereference failure: pointer NULL in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.20] line 1225 dereference failure: pointer invalid in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.21] line 1225 dereference failure: deallocated dynamic object in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.22] line 1225 dereference failure: dead object in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.23] line 1225 dereference failure: pointer outside object bounds in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.24] line 1225 dereference failure: invalid integer address in sb->s_active: SUCCESS
+[check_sb_invariants.assertion.5] line 1228 s_active != mounts + (frozen==COMPLETE) + in-flight refs: SUCCESS
+[check_sb_invariants.pointer_dereference.25] line 1228 dereference failure: pointer NULL in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.26] line 1228 dereference failure: pointer invalid in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.27] line 1228 dereference failure: deallocated dynamic object in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.28] line 1228 dereference failure: dead object in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.29] line 1228 dereference failure: pointer outside object bounds in sb->s_active: SUCCESS
+[check_sb_invariants.pointer_dereference.30] line 1228 dereference failure: invalid integer address in sb->s_active: SUCCESS
+[check_sb_invariants.assertion.6] line 1230 frozen==COMPLETE <=> kcount+ucount>0 violated: SUCCESS
+[check_sb_invariants.overflow.3] line 1230 arithmetic overflow on signed + in k + u: SUCCESS
+[check_sb_invariants.assertion.7] line 1232 freeze_owner set while not SB_FREEZE_COMPLETE: SUCCESS
+[check_sb_invariants.pointer_dereference.31] line 1232 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.32] line 1232 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.33] line 1232 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.34] line 1232 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.35] line 1232 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.36] line 1232 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_sb_invariants.assertion.8] line 1234 unknown freeze_owner: SUCCESS
+[check_sb_invariants.pointer_dereference.37] line 1234 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.38] line 1234 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.39] line 1234 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.40] line 1234 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.41] line 1234 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.42] line 1234 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.43] line 1234 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.44] line 1234 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.45] line 1234 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.46] line 1234 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.47] line 1234 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_sb_invariants.pointer_dereference.48] line 1234 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_sb_invariants.assertion.9] line 1238 sb_writers rwsem write-held while SB_UNFROZEN (leaked by thaw): SUCCESS
+[check_sb_invariants.assertion.10] line 1240 sb_writers rwsems do not match the path that froze the sb: SUCCESS
+[check_sb_invariants.pointer_dereference.49] line 1240 dereference failure: pointer NULL in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.pointer_dereference.50] line 1240 dereference failure: pointer invalid in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.pointer_dereference.51] line 1240 dereference failure: deallocated dynamic object in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.pointer_dereference.52] line 1240 dereference failure: dead object in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.pointer_dereference.53] line 1240 dereference failure: pointer outside object bounds in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.pointer_dereference.54] line 1240 dereference failure: invalid integer address in sb->g_froze_rdonly: SUCCESS
+[check_sb_invariants.assertion.11] line 1242 intermediate freeze level visible between steps: SUCCESS
+
+kernel_freeze.h function check_thaw_result
+[check_thaw_result.pointer_dereference.1] line 1165 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.2] line 1165 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.3] line 1165 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.4] line 1165 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.5] line 1165 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.6] line 1165 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_thaw_result.assertion.1] line 1167 thaw returned a positive value: SUCCESS
+[check_thaw_result.assertion.2] line 1170 thaw==0 did not remove exactly one kernel hold: SUCCESS
+[check_thaw_result.overflow.1] line 1170 arithmetic overflow on signed - in pre.k - 1: SUCCESS
+[check_thaw_result.assertion.3] line 1173 thaw==0 did not remove exactly one userspace hold: SUCCESS
+[check_thaw_result.overflow.2] line 1173 arithmetic overflow on signed - in pre.u - 1: SUCCESS
+[check_thaw_result.assertion.4] line 1176 failed thaw changed the freeze state: SUCCESS
+[check_thaw_result.pointer_dereference.7] line 1176 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.8] line 1176 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.9] line 1176 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.10] line 1176 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.11] line 1176 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.12] line 1176 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.13] line 1176 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.14] line 1176 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.15] line 1176 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.16] line 1176 dereference failure: dead object in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.17] line 1176 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[check_thaw_result.pointer_dereference.18] line 1176 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function down_write
+[down_write.assertion.1] line 224 s_umount: acquired while held (self-deadlock): SUCCESS
+[down_write.pointer_dereference.1] line 224 dereference failure: pointer NULL in *sem: SUCCESS
+[down_write.pointer_dereference.2] line 224 dereference failure: pointer invalid in *sem: SUCCESS
+[down_write.pointer_dereference.3] line 224 dereference failure: deallocated dynamic object in *sem: SUCCESS
+[down_write.pointer_dereference.4] line 224 dereference failure: dead object in *sem: SUCCESS
+[down_write.pointer_dereference.5] line 224 dereference failure: pointer outside object bounds in *sem: SUCCESS
+[down_write.pointer_dereference.6] line 224 dereference failure: invalid integer address in *sem: SUCCESS
+
+kernel_freeze.h function freeze_dec
+[freeze_dec.pointer_dereference.1] line 518 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.2] line 518 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.3] line 518 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.4] line 518 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.5] line 518 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.6] line 518 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_dec.overflow.1] line 519 arithmetic overflow on signed - in sb->s_writers.freeze_kcount - 1: SUCCESS
+[freeze_dec.pointer_dereference.7] line 519 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.8] line 519 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.9] line 519 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.10] line 519 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.11] line 519 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.12] line 519 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.13] line 520 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.14] line 520 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.15] line 520 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.16] line 520 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.17] line 520 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.18] line 520 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_dec.overflow.2] line 521 arithmetic overflow on signed - in sb->s_writers.freeze_ucount - 1: SUCCESS
+[freeze_dec.pointer_dereference.19] line 521 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.20] line 521 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.21] line 521 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.22] line 521 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.23] line 521 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.24] line 521 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_dec.overflow.3] line 522 arithmetic overflow on signed + in sb->s_writers.freeze_kcount + sb->s_writers.freeze_ucount: SUCCESS
+[freeze_dec.pointer_dereference.25] line 522 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.26] line 522 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.27] line 522 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.28] line 522 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.29] line 522 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_dec.pointer_dereference.30] line 522 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function freeze_inc
+[freeze_inc.overflow.1] line 507 arithmetic overflow on signed + in sb->s_writers.freeze_kcount + 1: SUCCESS
+[freeze_inc.pointer_dereference.1] line 507 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.2] line 507 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.3] line 507 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.4] line 507 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.5] line 507 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.6] line 507 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_inc.overflow.2] line 509 arithmetic overflow on signed + in sb->s_writers.freeze_ucount + 1: SUCCESS
+[freeze_inc.pointer_dereference.7] line 509 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.8] line 509 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.9] line 509 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.10] line 509 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.11] line 509 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.12] line 509 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_inc.overflow.3] line 510 arithmetic overflow on signed + in sb->s_writers.freeze_kcount + sb->s_writers.freeze_ucount: SUCCESS
+[freeze_inc.pointer_dereference.13] line 510 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.14] line 510 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.15] line 510 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.16] line 510 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.17] line 510 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_inc.pointer_dereference.18] line 510 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function freeze_super_co
+[freeze_super_co.pointer_dereference.1] line 652 dereference failure: pointer NULL in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.2] line 652 dereference failure: pointer invalid in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.3] line 652 dereference failure: deallocated dynamic object in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.4] line 652 dereference failure: dead object in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.5] line 652 dereference failure: pointer outside object bounds in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.6] line 652 dereference failure: invalid integer address in f->sb: SUCCESS
+[freeze_super_co.pointer_dereference.7] line 653 dereference failure: pointer NULL in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.8] line 653 dereference failure: pointer invalid in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.9] line 653 dereference failure: deallocated dynamic object in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.10] line 653 dereference failure: dead object in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.11] line 653 dereference failure: pointer outside object bounds in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.12] line 653 dereference failure: invalid integer address in f->who: SUCCESS
+[freeze_super_co.pointer_dereference.13] line 654 dereference failure: pointer NULL in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.14] line 654 dereference failure: pointer invalid in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.15] line 654 dereference failure: deallocated dynamic object in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.16] line 654 dereference failure: dead object in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.17] line 654 dereference failure: pointer outside object bounds in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.18] line 654 dereference failure: invalid integer address in f->freeze_owner: SUCCESS
+[freeze_super_co.pointer_dereference.19] line 657 dereference failure: pointer NULL in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.20] line 657 dereference failure: pointer invalid in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.21] line 657 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.22] line 657 dereference failure: dead object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.23] line 657 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.24] line 657 dereference failure: invalid integer address in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.25] line 664 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.26] line 664 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.27] line 664 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.28] line 664 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.29] line 664 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.30] line 664 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.31] line 670 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.32] line 670 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.33] line 670 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.34] line 670 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.35] line 670 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.36] line 670 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.37] line 677 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.38] line 677 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.39] line 677 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.40] line 677 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.41] line 677 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.42] line 677 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.43] line 681 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.44] line 681 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.45] line 681 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.46] line 681 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.47] line 681 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.48] line 681 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.49] line 685 dereference failure: pointer NULL in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.50] line 685 dereference failure: pointer invalid in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.51] line 685 dereference failure: deallocated dynamic object in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.52] line 685 dereference failure: dead object in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.53] line 685 dereference failure: pointer outside object bounds in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.54] line 685 dereference failure: invalid integer address in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.55] line 685 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.56] line 685 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.57] line 685 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.58] line 685 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.59] line 685 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.60] line 685 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.61] line 688 dereference failure: pointer NULL in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.62] line 688 dereference failure: pointer invalid in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.63] line 688 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.64] line 688 dereference failure: dead object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.65] line 688 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.66] line 688 dereference failure: invalid integer address in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.67] line 691 dereference failure: pointer NULL in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.68] line 691 dereference failure: pointer invalid in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.69] line 691 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.70] line 691 dereference failure: dead object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.71] line 691 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.72] line 691 dereference failure: invalid integer address in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.73] line 693 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.74] line 693 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.75] line 693 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.76] line 693 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.77] line 693 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.78] line 693 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.79] line 693 dereference failure: pointer NULL in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.80] line 693 dereference failure: pointer invalid in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.81] line 693 dereference failure: deallocated dynamic object in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.82] line 693 dereference failure: dead object in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.83] line 693 dereference failure: pointer outside object bounds in f->old: SUCCESS
+[freeze_super_co.pointer_dereference.84] line 693 dereference failure: invalid integer address in f->old: SUCCESS
+[freeze_super_co.assertion.1] line 696 scheduler resumed a sleeping waiter: SUCCESS
+[freeze_super_co.pointer_dereference.85] line 701 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.86] line 701 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.87] line 701 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.88] line 701 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.89] line 701 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.90] line 701 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.91] line 702 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.92] line 702 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.93] line 702 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.94] line 702 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.95] line 702 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.96] line 702 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.97] line 706 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.98] line 706 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.99] line 706 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.100] line 706 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.101] line 706 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.102] line 706 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.103] line 716 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.104] line 716 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.105] line 716 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.106] line 716 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.107] line 716 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.108] line 716 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.109] line 717 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.110] line 717 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.111] line 717 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.112] line 717 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.113] line 717 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.114] line 717 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.115] line 718 dereference failure: pointer NULL in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.116] line 718 dereference failure: pointer invalid in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.117] line 718 dereference failure: deallocated dynamic object in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.118] line 718 dereference failure: dead object in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.119] line 718 dereference failure: pointer outside object bounds in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.120] line 718 dereference failure: invalid integer address in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.121] line 721 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.122] line 721 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.123] line 721 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.124] line 721 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.125] line 721 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.126] line 721 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.127] line 725 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.128] line 725 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.129] line 725 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.130] line 725 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.131] line 725 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.132] line 725 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.133] line 728 dereference failure: pointer NULL in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.134] line 728 dereference failure: pointer invalid in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.135] line 728 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.136] line 728 dereference failure: dead object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.137] line 728 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.138] line 728 dereference failure: invalid integer address in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.139] line 731 dereference failure: pointer NULL in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.140] line 731 dereference failure: pointer invalid in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.141] line 731 dereference failure: deallocated dynamic object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.142] line 731 dereference failure: dead object in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.143] line 731 dereference failure: pointer outside object bounds in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.144] line 731 dereference failure: invalid integer address in f->pc: SUCCESS
+[freeze_super_co.pointer_dereference.145] line 736 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.146] line 736 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.147] line 736 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.148] line 736 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.149] line 736 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.150] line 736 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.151] line 742 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.152] line 742 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.153] line 742 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.154] line 742 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.155] line 742 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.156] line 742 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.157] line 746 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.158] line 746 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.159] line 746 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.160] line 746 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.161] line 746 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.162] line 746 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.163] line 751 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.164] line 751 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.165] line 751 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.166] line 751 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.167] line 751 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.168] line 751 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.169] line 754 dereference failure: pointer NULL in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.170] line 754 dereference failure: pointer invalid in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.171] line 754 dereference failure: deallocated dynamic object in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.172] line 754 dereference failure: dead object in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.173] line 754 dereference failure: pointer outside object bounds in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.174] line 754 dereference failure: invalid integer address in sb->s_op: SUCCESS
+[freeze_super_co.pointer_dereference.175] line 754 dereference failure: pointer NULL in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.176] line 754 dereference failure: pointer invalid in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.177] line 754 dereference failure: deallocated dynamic object in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.178] line 754 dereference failure: dead object in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.179] line 754 dereference failure: pointer outside object bounds in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.180] line 754 dereference failure: invalid integer address in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.181] line 755 dereference failure: pointer NULL in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.182] line 755 dereference failure: pointer invalid in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.183] line 755 dereference failure: deallocated dynamic object in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.184] line 755 dereference failure: dead object in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.185] line 755 dereference failure: pointer outside object bounds in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.186] line 755 dereference failure: invalid integer address in sb->s_op->freeze_fs: SUCCESS
+[freeze_super_co.pointer_dereference.187] line 755 dereferenced function pointer must be one of [model_unfreeze_fs, model_freeze_fs]: SUCCESS
+[freeze_super_co.pointer_dereference.188] line 759 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.189] line 759 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.190] line 759 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.191] line 759 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.192] line 759 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.193] line 759 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.194] line 763 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.195] line 763 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.196] line 763 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.197] line 763 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.198] line 763 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.199] line 763 dereference failure: invalid integer address in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.200] line 772 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.201] line 772 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.202] line 772 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.203] line 772 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.204] line 772 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.205] line 772 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.206] line 773 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.207] line 773 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.208] line 773 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.209] line 773 dereference failure: dead object in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.210] line 773 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.211] line 773 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[freeze_super_co.pointer_dereference.212] line 774 dereference failure: pointer NULL in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.213] line 774 dereference failure: pointer invalid in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.214] line 774 dereference failure: deallocated dynamic object in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.215] line 774 dereference failure: dead object in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.216] line 774 dereference failure: pointer outside object bounds in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.217] line 774 dereference failure: invalid integer address in sb->g_froze_rdonly: SUCCESS
+[freeze_super_co.pointer_dereference.218] line 778 dereference failure: pointer NULL in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.219] line 778 dereference failure: pointer invalid in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.220] line 778 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.221] line 778 dereference failure: dead object in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.222] line 778 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[freeze_super_co.pointer_dereference.223] line 778 dereference failure: invalid integer address in f->ret: SUCCESS
+
+kernel_freeze.h function hweight32
+[hweight32.assertion.1] line 311 hweight32 stub: argument wider than FREEZE_HOLDERS: SUCCESS
+
+kernel_freeze.h function lockdep_sb_freeze_acquire
+[lockdep_sb_freeze_acquire.overflow.1] line 488 arithmetic overflow on signed + in level + 1: SUCCESS
+
+kernel_freeze.h function lockdep_sb_freeze_release
+[lockdep_sb_freeze_release.overflow.1] line 480 arithmetic overflow on signed - in level - 1: SUCCESS
+
+kernel_freeze.h function may_freeze
+[may_freeze.assertion.1] line 528 lockdep_assert_held(s_umount): SUCCESS
+[may_freeze.pointer_dereference.1] line 528 dereference failure: pointer NULL in *(&sb->s_umount): SUCCESS
+[may_freeze.pointer_dereference.2] line 528 dereference failure: deallocated dynamic object in *(&sb->s_umount): SUCCESS
+[may_freeze.pointer_dereference.3] line 528 dereference failure: dead object in *(&sb->s_umount): SUCCESS
+[may_freeze.pointer_dereference.4] line 528 dereference failure: pointer outside object bounds in *(&sb->s_umount): SUCCESS
+[may_freeze.pointer_dereference.5] line 541 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.6] line 541 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.7] line 541 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.8] line 541 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.9] line 541 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.10] line 541 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_freeze.overflow.1] line 548 arithmetic overflow on signed + in sb->s_writers.freeze_kcount + sb->s_writers.freeze_ucount: SUCCESS
+[may_freeze.pointer_dereference.11] line 548 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.12] line 548 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.13] line 548 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.14] line 548 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.15] line 548 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.16] line 548 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.17] line 555 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.18] line 555 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.19] line 555 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.20] line 555 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.21] line 555 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.22] line 555 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.23] line 558 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.24] line 558 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.25] line 558 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.26] line 558 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.27] line 558 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_freeze.pointer_dereference.28] line 558 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function may_unfreeze
+[may_unfreeze.assertion.1] line 565 lockdep_assert_held(s_umount): SUCCESS
+[may_unfreeze.pointer_dereference.1] line 565 dereference failure: pointer NULL in *(&sb->s_umount): SUCCESS
+[may_unfreeze.pointer_dereference.2] line 565 dereference failure: deallocated dynamic object in *(&sb->s_umount): SUCCESS
+[may_unfreeze.pointer_dereference.3] line 565 dereference failure: dead object in *(&sb->s_umount): SUCCESS
+[may_unfreeze.pointer_dereference.4] line 565 dereference failure: pointer outside object bounds in *(&sb->s_umount): SUCCESS
+[may_unfreeze.pointer_dereference.5] line 582 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.6] line 582 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.7] line 582 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.8] line 582 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.9] line 582 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.10] line 582 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.11] line 585 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.12] line 585 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.13] line 585 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.14] line 585 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.15] line 585 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.16] line 585 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.17] line 593 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.18] line 593 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.19] line 593 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.20] line 593 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.21] line 593 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.22] line 593 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.overflow.1] line 601 arithmetic overflow on signed + in sb->s_writers.freeze_kcount + sb->s_writers.freeze_ucount: SUCCESS
+[may_unfreeze.pointer_dereference.23] line 601 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.24] line 601 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.25] line 601 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.26] line 601 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.27] line 601 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.28] line 601 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.29] line 611 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.30] line 611 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.31] line 611 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.32] line 611 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.33] line 611 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.34] line 611 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.35] line 612 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.36] line 612 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.37] line 612 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.38] line 612 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.39] line 612 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.40] line 612 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.41] line 614 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.42] line 614 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.43] line 614 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.44] line 614 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.45] line 614 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.46] line 614 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.47] line 618 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.48] line 618 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.49] line 618 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.50] line 618 dereference failure: dead object in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.51] line 618 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[may_unfreeze.pointer_dereference.52] line 618 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function model_kill_sb
+[model_kill_sb.assertion.1] line 360 kill_sb on a superblock that is not SB_UNFROZEN: SUCCESS
+[model_kill_sb.pointer_dereference.1] line 360 dereference failure: pointer NULL in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.2] line 360 dereference failure: pointer invalid in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.3] line 360 dereference failure: deallocated dynamic object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.4] line 360 dereference failure: dead object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.5] line 360 dereference failure: pointer outside object bounds in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.6] line 360 dereference failure: invalid integer address in s->s_writers: SUCCESS
+[model_kill_sb.assertion.2] line 362 kill_sb with freeze holders left: SUCCESS
+[model_kill_sb.pointer_dereference.7] line 362 dereference failure: pointer NULL in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.8] line 362 dereference failure: pointer invalid in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.9] line 362 dereference failure: deallocated dynamic object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.10] line 362 dereference failure: dead object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.11] line 362 dereference failure: pointer outside object bounds in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.12] line 362 dereference failure: invalid integer address in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.13] line 362 dereference failure: pointer NULL in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.14] line 362 dereference failure: pointer invalid in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.15] line 362 dereference failure: deallocated dynamic object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.16] line 362 dereference failure: dead object in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.17] line 362 dereference failure: pointer outside object bounds in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.18] line 362 dereference failure: invalid integer address in s->s_writers: SUCCESS
+[model_kill_sb.pointer_dereference.19] line 364 dereference failure: pointer NULL in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.20] line 364 dereference failure: pointer invalid in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.21] line 364 dereference failure: deallocated dynamic object in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.22] line 364 dereference failure: dead object in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.23] line 364 dereference failure: pointer outside object bounds in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.24] line 364 dereference failure: invalid integer address in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.25] line 367 dereference failure: pointer NULL in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.26] line 367 dereference failure: pointer invalid in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.27] line 367 dereference failure: deallocated dynamic object in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.28] line 367 dereference failure: dead object in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.29] line 367 dereference failure: pointer outside object bounds in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.30] line 367 dereference failure: invalid integer address in s->s_flags: SUCCESS
+[model_kill_sb.pointer_dereference.31] line 368 dereference failure: pointer NULL in s->m_dead: SUCCESS
+[model_kill_sb.pointer_dereference.32] line 368 dereference failure: pointer invalid in s->m_dead: SUCCESS
+[model_kill_sb.pointer_dereference.33] line 368 dereference failure: deallocated dynamic object in s->m_dead: SUCCESS
+[model_kill_sb.pointer_dereference.34] line 368 dereference failure: dead object in s->m_dead: SUCCESS
+[model_kill_sb.pointer_dereference.35] line 368 dereference failure: pointer outside object bounds in s->m_dead: SUCCESS
+[model_kill_sb.pointer_dereference.36] line 368 dereference failure: invalid integer address in s->m_dead: SUCCESS
+
+kernel_freeze.h function mutex_lock
+[mutex_lock.assertion.1] line 882 mutex: acquired while held: SUCCESS
+[mutex_lock.pointer_dereference.1] line 882 dereference failure: pointer NULL in *m: SUCCESS
+[mutex_lock.pointer_dereference.2] line 882 dereference failure: pointer invalid in *m: SUCCESS
+[mutex_lock.pointer_dereference.3] line 882 dereference failure: deallocated dynamic object in *m: SUCCESS
+[mutex_lock.pointer_dereference.4] line 882 dereference failure: dead object in *m: SUCCESS
+[mutex_lock.pointer_dereference.5] line 882 dereference failure: pointer outside object bounds in *m: SUCCESS
+[mutex_lock.pointer_dereference.6] line 882 dereference failure: invalid integer address in *m: SUCCESS
+
+kernel_freeze.h function mutex_unlock
+[mutex_unlock.assertion.1] line 888 mutex: released while not held: SUCCESS
+[mutex_unlock.pointer_dereference.1] line 888 dereference failure: pointer NULL in *m: SUCCESS
+[mutex_unlock.pointer_dereference.2] line 888 dereference failure: pointer invalid in *m: SUCCESS
+[mutex_unlock.pointer_dereference.3] line 888 dereference failure: deallocated dynamic object in *m: SUCCESS
+[mutex_unlock.pointer_dereference.4] line 888 dereference failure: dead object in *m: SUCCESS
+[mutex_unlock.pointer_dereference.5] line 888 dereference failure: pointer outside object bounds in *m: SUCCESS
+[mutex_unlock.pointer_dereference.6] line 888 dereference failure: invalid integer address in *m: SUCCESS
+
+kernel_freeze.h function percpu_down_write
+[percpu_down_write.assertion.1] line 239 percpu_down_write: level already write-held: SUCCESS
+[percpu_down_write.pointer_dereference.1] line 239 dereference failure: pointer NULL in sem->wheld: SUCCESS
+[percpu_down_write.pointer_dereference.2] line 239 dereference failure: pointer invalid in sem->wheld: SUCCESS
+[percpu_down_write.pointer_dereference.3] line 239 dereference failure: deallocated dynamic object in sem->wheld: SUCCESS
+[percpu_down_write.pointer_dereference.4] line 239 dereference failure: dead object in sem->wheld: SUCCESS
+[percpu_down_write.pointer_dereference.5] line 239 dereference failure: pointer outside object bounds in sem->wheld: SUCCESS
+[percpu_down_write.pointer_dereference.6] line 239 dereference failure: invalid integer address in sem->wheld: SUCCESS
+
+kernel_freeze.h function percpu_up_write
+[percpu_up_write.assertion.1] line 245 percpu_up_write: level not write-held: SUCCESS
+[percpu_up_write.pointer_dereference.1] line 245 dereference failure: pointer NULL in sem->wheld: SUCCESS
+[percpu_up_write.pointer_dereference.2] line 245 dereference failure: pointer invalid in sem->wheld: SUCCESS
+[percpu_up_write.pointer_dereference.3] line 245 dereference failure: deallocated dynamic object in sem->wheld: SUCCESS
+[percpu_up_write.pointer_dereference.4] line 245 dereference failure: dead object in sem->wheld: SUCCESS
+[percpu_up_write.pointer_dereference.5] line 245 dereference failure: pointer outside object bounds in sem->wheld: SUCCESS
+[percpu_up_write.pointer_dereference.6] line 245 dereference failure: invalid integer address in sem->wheld: SUCCESS
+
+kernel_freeze.h function run_freezer
+[run_freezer.pointer_dereference.1] line 1205 dereference failure: pointer NULL in f->sb: SUCCESS
+[run_freezer.pointer_dereference.2] line 1205 dereference failure: pointer invalid in f->sb: SUCCESS
+[run_freezer.pointer_dereference.3] line 1205 dereference failure: deallocated dynamic object in f->sb: SUCCESS
+[run_freezer.pointer_dereference.4] line 1205 dereference failure: dead object in f->sb: SUCCESS
+[run_freezer.pointer_dereference.5] line 1205 dereference failure: pointer outside object bounds in f->sb: SUCCESS
+[run_freezer.pointer_dereference.6] line 1205 dereference failure: invalid integer address in f->sb: SUCCESS
+[run_freezer.pointer_dereference.7] line 1209 dereference failure: pointer NULL in f->sb: SUCCESS
+[run_freezer.pointer_dereference.8] line 1209 dereference failure: pointer invalid in f->sb: SUCCESS
+[run_freezer.pointer_dereference.9] line 1209 dereference failure: deallocated dynamic object in f->sb: SUCCESS
+[run_freezer.pointer_dereference.10] line 1209 dereference failure: dead object in f->sb: SUCCESS
+[run_freezer.pointer_dereference.11] line 1209 dereference failure: pointer outside object bounds in f->sb: SUCCESS
+[run_freezer.pointer_dereference.12] line 1209 dereference failure: invalid integer address in f->sb: SUCCESS
+[run_freezer.pointer_dereference.13] line 1209 dereference failure: pointer NULL in f->who: SUCCESS
+[run_freezer.pointer_dereference.14] line 1209 dereference failure: pointer invalid in f->who: SUCCESS
+[run_freezer.pointer_dereference.15] line 1209 dereference failure: deallocated dynamic object in f->who: SUCCESS
+[run_freezer.pointer_dereference.16] line 1209 dereference failure: dead object in f->who: SUCCESS
+[run_freezer.pointer_dereference.17] line 1209 dereference failure: pointer outside object bounds in f->who: SUCCESS
+[run_freezer.pointer_dereference.18] line 1209 dereference failure: invalid integer address in f->who: SUCCESS
+[run_freezer.pointer_dereference.19] line 1209 dereference failure: pointer NULL in f->ret: SUCCESS
+[run_freezer.pointer_dereference.20] line 1209 dereference failure: pointer invalid in f->ret: SUCCESS
+[run_freezer.pointer_dereference.21] line 1209 dereference failure: deallocated dynamic object in f->ret: SUCCESS
+[run_freezer.pointer_dereference.22] line 1209 dereference failure: dead object in f->ret: SUCCESS
+[run_freezer.pointer_dereference.23] line 1209 dereference failure: pointer outside object bounds in f->ret: SUCCESS
+[run_freezer.pointer_dereference.24] line 1209 dereference failure: invalid integer address in f->ret: SUCCESS
+
+kernel_freeze.h function sb_freeze_unlock
+[sb_freeze_unlock.overflow.1] line 494 arithmetic overflow on signed - in level - 1: SUCCESS
+[sb_freeze_unlock.overflow.2] line 494 arithmetic overflow on signed - in level - 1: SUCCESS
+
+kernel_freeze.h function sb_rdonly
+[sb_rdonly.pointer_dereference.1] line 317 dereference failure: pointer NULL in sb->s_flags: SUCCESS
+[sb_rdonly.pointer_dereference.2] line 317 dereference failure: pointer invalid in sb->s_flags: SUCCESS
+[sb_rdonly.pointer_dereference.3] line 317 dereference failure: deallocated dynamic object in sb->s_flags: SUCCESS
+[sb_rdonly.pointer_dereference.4] line 317 dereference failure: dead object in sb->s_flags: SUCCESS
+[sb_rdonly.pointer_dereference.5] line 317 dereference failure: pointer outside object bounds in sb->s_flags: SUCCESS
+[sb_rdonly.pointer_dereference.6] line 317 dereference failure: invalid integer address in sb->s_flags: SUCCESS
+
+kernel_freeze.h function sd_cursor_from
+[sd_cursor_from.array_bounds.1] line 901 array.sd_linked dynamic object upper bound in bdev->sd_linked[(signed long int)0]: SUCCESS
+[sd_cursor_from.pointer_dereference.1] line 901 dereference failure: pointer NULL in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.2] line 901 dereference failure: pointer invalid in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.3] line 901 dereference failure: deallocated dynamic object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.4] line 901 dereference failure: dead object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.5] line 901 dereference failure: pointer outside object bounds in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.6] line 901 dereference failure: invalid integer address in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.7] line 901 dereference failure: pointer NULL in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.8] line 901 dereference failure: pointer invalid in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.9] line 901 dereference failure: deallocated dynamic object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.10] line 901 dereference failure: dead object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.11] line 901 dereference failure: pointer outside object bounds in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.12] line 901 dereference failure: invalid integer address in bdev->sd_linked: SUCCESS
+[sd_cursor_from.array_bounds.2] line 903 array.sd_linked dynamic object upper bound in bdev->sd_linked[(signed long int)1]: SUCCESS
+[sd_cursor_from.pointer_dereference.13] line 903 dereference failure: pointer NULL in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.14] line 903 dereference failure: pointer invalid in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.15] line 903 dereference failure: deallocated dynamic object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.16] line 903 dereference failure: dead object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.17] line 903 dereference failure: pointer outside object bounds in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.18] line 903 dereference failure: invalid integer address in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.19] line 903 dereference failure: pointer NULL in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.20] line 903 dereference failure: pointer invalid in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.21] line 903 dereference failure: deallocated dynamic object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.22] line 903 dereference failure: dead object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.23] line 903 dereference failure: pointer outside object bounds in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.24] line 903 dereference failure: invalid integer address in bdev->sd_linked: SUCCESS
+[sd_cursor_from.array_bounds.3] line 905 array.sd_linked dynamic object upper bound in bdev->sd_linked[(signed long int)2]: SUCCESS
+[sd_cursor_from.pointer_dereference.25] line 905 dereference failure: pointer NULL in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.26] line 905 dereference failure: pointer invalid in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.27] line 905 dereference failure: deallocated dynamic object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.28] line 905 dereference failure: dead object in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.29] line 905 dereference failure: pointer outside object bounds in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.30] line 905 dereference failure: invalid integer address in bdev->nsd: SUCCESS
+[sd_cursor_from.pointer_dereference.31] line 905 dereference failure: pointer NULL in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.32] line 905 dereference failure: pointer invalid in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.33] line 905 dereference failure: deallocated dynamic object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.34] line 905 dereference failure: dead object in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.35] line 905 dereference failure: pointer outside object bounds in bdev->sd_linked: SUCCESS
+[sd_cursor_from.pointer_dereference.36] line 905 dereference failure: invalid integer address in bdev->sd_linked: SUCCESS
+
+kernel_freeze.h function snap_holds
+[snap_holds.pointer_dereference.1] line 1133 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[snap_holds.pointer_dereference.2] line 1133 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[snap_holds.pointer_dereference.3] line 1133 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[snap_holds.pointer_dereference.4] line 1133 dereference failure: dead object in sb->s_writers: SUCCESS
+[snap_holds.pointer_dereference.5] line 1133 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[snap_holds.pointer_dereference.6] line 1133 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function super_flags
+[super_flags.pointer_dereference.1] line 407 dereference failure: pointer NULL in *(&sb->s_flags): SUCCESS
+[super_flags.pointer_dereference.2] line 407 dereference failure: deallocated dynamic object in *(&sb->s_flags): SUCCESS
+[super_flags.pointer_dereference.3] line 407 dereference failure: dead object in *(&sb->s_flags): SUCCESS
+[super_flags.pointer_dereference.4] line 407 dereference failure: pointer outside object bounds in *(&sb->s_flags): SUCCESS
+
+kernel_freeze.h function super_lock
+[super_lock.assertion.1] line 412 lockdep_assert_not_held(s_umount): SUCCESS
+[super_lock.pointer_dereference.1] line 412 dereference failure: pointer NULL in *(&sb->s_umount): SUCCESS
+[super_lock.pointer_dereference.2] line 412 dereference failure: deallocated dynamic object in *(&sb->s_umount): SUCCESS
+[super_lock.pointer_dereference.3] line 412 dereference failure: dead object in *(&sb->s_umount): SUCCESS
+[super_lock.pointer_dereference.4] line 412 dereference failure: pointer outside object bounds in *(&sb->s_umount): SUCCESS
+[super_lock.pointer_dereference.5] line 429 dereference failure: pointer NULL in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.6] line 429 dereference failure: pointer invalid in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.7] line 429 dereference failure: deallocated dynamic object in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.8] line 429 dereference failure: dead object in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.9] line 429 dereference failure: pointer outside object bounds in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.10] line 429 dereference failure: invalid integer address in sb->s_flags: SUCCESS
+[super_lock.assertion.2] line 434 super_lock: !SB_BORN: SUCCESS
+[super_lock.pointer_dereference.11] line 434 dereference failure: pointer NULL in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.12] line 434 dereference failure: pointer invalid in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.13] line 434 dereference failure: deallocated dynamic object in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.14] line 434 dereference failure: dead object in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.15] line 434 dereference failure: pointer outside object bounds in sb->s_flags: SUCCESS
+[super_lock.pointer_dereference.16] line 434 dereference failure: invalid integer address in sb->s_flags: SUCCESS
+
+kernel_freeze.h function super_unlock
+[super_unlock.assertion.1] line 388 shared s_umount not modelled: SUCCESS
+
+kernel_freeze.h function thaw_super_locked
+[thaw_super_locked.pointer_dereference.1] line 787 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.2] line 787 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.3] line 787 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.4] line 787 dereference failure: dead object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.5] line 787 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.6] line 787 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.7] line 804 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.8] line 804 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.9] line 804 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.10] line 804 dereference failure: dead object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.11] line 804 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.12] line 804 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.13] line 805 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.14] line 805 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.15] line 805 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.16] line 805 dereference failure: dead object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.17] line 805 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.18] line 805 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.19] line 812 dereference failure: pointer NULL in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.20] line 812 dereference failure: pointer invalid in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.21] line 812 dereference failure: deallocated dynamic object in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.22] line 812 dereference failure: dead object in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.23] line 812 dereference failure: pointer outside object bounds in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.24] line 812 dereference failure: invalid integer address in sb->s_op: SUCCESS
+[thaw_super_locked.pointer_dereference.25] line 812 dereference failure: pointer NULL in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.26] line 812 dereference failure: pointer invalid in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.27] line 812 dereference failure: deallocated dynamic object in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.28] line 812 dereference failure: dead object in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.29] line 812 dereference failure: pointer outside object bounds in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.30] line 812 dereference failure: invalid integer address in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.31] line 813 dereference failure: pointer NULL in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.32] line 813 dereference failure: pointer invalid in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.33] line 813 dereference failure: deallocated dynamic object in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.34] line 813 dereference failure: dead object in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.35] line 813 dereference failure: pointer outside object bounds in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.36] line 813 dereference failure: invalid integer address in sb->s_op->unfreeze_fs: SUCCESS
+[thaw_super_locked.pointer_dereference.37] line 813 dereferenced function pointer must be one of [model_unfreeze_fs, model_freeze_fs]: SUCCESS
+[thaw_super_locked.pointer_dereference.38] line 822 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.39] line 822 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.40] line 822 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.41] line 822 dereference failure: dead object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.42] line 822 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.43] line 822 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.44] line 823 dereference failure: pointer NULL in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.45] line 823 dereference failure: pointer invalid in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.46] line 823 dereference failure: deallocated dynamic object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.47] line 823 dereference failure: dead object in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.48] line 823 dereference failure: pointer outside object bounds in sb->s_writers: SUCCESS
+[thaw_super_locked.pointer_dereference.49] line 823 dereference failure: invalid integer address in sb->s_writers: SUCCESS
+
+kernel_freeze.h function up_write
+[up_write.assertion.1] line 230 s_umount: released while not held: SUCCESS
+[up_write.pointer_dereference.1] line 230 dereference failure: pointer NULL in *sem: SUCCESS
+[up_write.pointer_dereference.2] line 230 dereference failure: pointer invalid in *sem: SUCCESS
+[up_write.pointer_dereference.3] line 230 dereference failure: deallocated dynamic object in *sem: SUCCESS
+[up_write.pointer_dereference.4] line 230 dereference failure: dead object in *sem: SUCCESS
+[up_write.pointer_dereference.5] line 230 dereference failure: pointer outside object bounds in *sem: SUCCESS
+[up_write.pointer_dereference.6] line 230 dereference failure: invalid integer address in *sem: SUCCESS
+
+kernel_freeze.h function warn_check
+[warn_check.assertion.1] line 151 WARN freeze_super: dying superblock (super.c:2253): SUCCESS
+[warn_check.assertion.2] line 151 WARN thaw_super: dying superblock (super.c:2420): SUCCESS
+[warn_check.assertion.3] line 151 WARN freeze_inc: bad flags (super.c:2083): SUCCESS
+[warn_check.assertion.4] line 151 WARN freeze_inc: two holders (super.c:2084): SUCCESS
+[warn_check.assertion.5] line 151 WARN freeze_dec: bad flags (super.c:2095): SUCCESS
+[warn_check.assertion.6] line 151 WARN freeze_dec: two holders (super.c:2096): SUCCESS
+[warn_check.assertion.7] line 151 WARN may_freeze: bad flags (super.c:2110): SUCCESS
+[warn_check.assertion.8] line 151 WARN may_freeze: two holders (super.c:2111): SUCCESS
+[warn_check.assertion.9] line 151 WARN may_freeze: EXCL without KERNEL (super.c:2114): SUCCESS
+[warn_check.assertion.10] line 151 WARN may_freeze: EXCL extra flags (super.c:2116): SUCCESS
+[warn_check.assertion.11] line 151 WARN may_freeze: EXCL without owner (super.c:2118): SUCCESS
+[warn_check.assertion.12] line 151 WARN may_unfreeze: bad flags (super.c:2147): SUCCESS
+[warn_check.assertion.13] line 151 WARN may_unfreeze: two holders (super.c:2148): SUCCESS
+[warn_check.assertion.14] line 151 WARN may_unfreeze: EXCL without KERNEL (super.c:2151): SUCCESS
+[warn_check.assertion.15] line 151 WARN may_unfreeze: EXCL extra flags (super.c:2153): SUCCESS
+[warn_check.assertion.16] line 151 WARN may_unfreeze: EXCL without owner (super.c:2155): SUCCESS
+[warn_check.assertion.17] line 151 WARN may_unfreeze: EXCL thaw with freeze_kcount == 0 (super.c:2157): SUCCESS
+[warn_check.assertion.18] line 151 WARN freeze_super: COMPLETE without holder (super.c:2261): SUCCESS
+[warn_check.assertion.19] line 151 WARN freeze_super: rdonly path found a holder (super.c:2281): SUCCESS
+[warn_check.assertion.20] line 151 WARN freeze_super: full path found a holder (super.c:2329): SUCCESS
+[warn_check.assertion.21] line 151 WARN bdev_allow_freeze: no deny held (bdev.c:408): SUCCESS
+
+kernel_freeze.h function warn_on
+[warn_on.array_bounds.1] line 113 array 'warned' lower bound in warned[(signed long int)site]: SUCCESS
+[warn_on.array_bounds.2] line 113 array 'warned' upper bound in warned[(signed long int)site]: SUCCESS
+
+** 0 of 1592 failed (1 iterations)
+VERIFICATION SUCCESSFUL
+# exit=0 wall=393s

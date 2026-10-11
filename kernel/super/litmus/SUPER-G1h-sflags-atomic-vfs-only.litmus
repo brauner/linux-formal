@@ -1,0 +1,39 @@
+C SUPER-G1h-sflags-atomic-vfs-only
+
+(*
+ * Expected: Sometimes
+ *
+ * Question: SUPER-G1 with only the VFS writers turned into atomic
+ * read-modify-writes and the filesystem's s_flags |= X left plain.  Does
+ * that close the race?  No: the plain load can precede both atomics and
+ * its store follow them, wiping SB_ACTIVE and SB_BORN.  The fix has to be
+ * on the filesystem side (no s_flags writes without s_umount, as ext4 did
+ * in d3476f3dad4a "ext4: don't set SB_RDONLY after filesystem errors"),
+ * or every writer has to become atomic (SUPER-G1f).
+ *)
+
+{
+	flags=0;
+}
+
+P0(atomic_t *flags)
+{
+	int r0;
+
+	atomic_or(16, flags);
+	r0 = atomic_fetch_or_release(1, flags);
+	smp_mb();
+}
+
+P1(atomic_t *flags)
+{
+	int r4;
+	int r5;
+
+	r4 = atomic_read(flags);
+	r5 = r4 | 8;
+	atomic_set(flags, r5);
+}
+
+locations [flags;]
+exists (flags=24 \/ flags=9 \/ flags=8)

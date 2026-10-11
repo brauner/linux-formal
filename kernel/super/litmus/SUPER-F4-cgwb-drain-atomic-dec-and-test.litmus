@@ -1,0 +1,62 @@
+C SUPER-F4-cgwb-drain-atomic-dec-and-test
+
+(*
+ * Expected: Never
+ *
+ * Question: the same wait/wake shape as SUPER-F3 a few lines later in
+ * generic_shutdown_super(): cgroup_writeback_umount() drains
+ * s_isw_nr_in_flight with wait_var_event(), and the last
+ * cgroup_writeback_unpin() wakes it.  The difference is that the unpin
+ * uses atomic_dec_and_test(), which is fully ordered, exactly what
+ * wake_up_var()'s comment asks for.
+ *
+ * Code (fs/fs-writeback.c, HEAD fc1c25014ff8):
+ *   512         if (atomic_dec_and_test(&sb->s_isw_nr_in_flight))   (cgroup_writeback_unpin())
+ *   513                 wake_up_var(&sb->s_isw_nr_in_flight);
+ *   518         wait_var_event(&sb->s_isw_nr_in_flight,             (cgroup_writeback_drain())
+ *   519                        !atomic_read(&sb->s_isw_nr_in_flight));
+ * fs/super.c:
+ *   734                 cgroup_writeback_umount(sb);
+ *
+ * Encoding: as SUPER-F3 with one switch in flight (cnt=1) and the
+ * drainer doing no decrement of its own.
+ *)
+
+{
+	cnt=1;
+	wq=0;
+	state=0;
+}
+
+P0(atomic_t *cnt, int *wq, int *state, spinlock_t *wql)
+{
+	int r1;
+	int r2;
+
+	r1 = atomic_read(cnt);
+	if (r1 != 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*wq, 1);
+		smp_store_mb(*state, 2);
+		spin_unlock(wql);
+		r2 = atomic_read(cnt);
+	}
+}
+
+P1(atomic_t *cnt, int *wq, int *woken, spinlock_t *wql)
+{
+	int r3;
+	int r4;
+
+	r3 = atomic_dec_and_test(cnt);
+	if (r3) {
+		r4 = READ_ONCE(*wq);
+		if (r4 != 0) {
+			spin_lock(wql);
+			WRITE_ONCE(*woken, 1);
+			spin_unlock(wql);
+		}
+	}
+}
+
+exists (0:r1=1 /\ 0:r2=1 /\ 1:r3=1 /\ 1:r4=0)

@@ -1,0 +1,46 @@
+freeze_steal -- HoldsOK violated -- real (F2 root cause): FITHAW takes a block device's freeze
+
+Layout: one superblock; b freezes it through a block device (fs_bdev_freeze() ->
+fs_super_freeze(), FREEZE_MAY_NEST | FREEZE_HOLDER_USERSPACE); r is a task that
+never froze and calls FITHAW.  Lines are fs/super.c at fc1c25014ff8.
+
+ 2-3   b  get_active_super() L1193, freeze_super() L2248: super_lock_excl() L2252,
+          atomic_inc(&s_active) L2256.
+ 4     b  SB_UNFROZEN, not read-only: SB_FREEZE_WRITE L2289, super_unlock_excl() L2291.
+ 5-12  b  sb_wait_write() for the three levels L2292/L2297/L2311 (s_umount retaken
+          L2293), sync_filesystem() L2300, ->freeze_fs() L2314.
+ 13    b  freeze_inc(): freeze_ucount 1 L2329, SB_FREEZE_COMPLETE L2331; its active
+          reference stays as the one all freezers share.
+ 14    r  ioctl_fsthaw() (fs/ioctl.c L402) -> thaw_super(FREEZE_HOLDER_USERSPACE) L2416 ->
+          thaw_super_locked() L2345: may_unfreeze() only asks freeze_ucount > 0
+          (L2186-2187) -> freeze_dec() to 0, ->unfreeze_fs(), SB_UNFROZEN,
+          sb_freeze_unlock(), deactivate_locked_super(): returns 0.
+
+b's hold is gone although b never thawed: FIFREEZE and every block-device freeze
+share freeze_ucount, so any FITHAW takes whichever userspace hold there is.
+SuperHolder's holder_one_steal/holder_one_steal_count show what follows: the
+filesystem runs thawed under a suspended dm device and dm resume leaves
+bd_fsfreeze_count at 1 for good.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_steal.log)
+
+# Invariant HoldsOK is violated.
+  1 Initial predicate
+      pc = [b=f_gas, r=r_lock, U=u_go]
+      pv = [b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], r=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=2
+  3 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=3; sb.um=b
+  4 FCheck: pc.b=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  5 FSw: pc.b=f_sw1w; sb.wpend.1=T
+  6 FSw1w: pc.b=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  7 FRelock: pc.b=f_sw2; sb.frozen=2; sb.fvis=2; sb.um=b
+  8 FSw: pc.b=f_sw2w; sb.wpend.2=T
+  9 FSwWait: pc.b=f_sync; sb.wpend.2=F; sb.wheld.2=T
+ 10 FSync: pc.b=f_sw3; sb.frozen=3; sb.fvis=3
+ 11 FSw: pc.b=f_sw3w; sb.wpend.3=T
+ 12 FSwWait: pc.b=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 13 FFreezeFs: pc.b=f_put; pv.b.granted=T; pv.b.tmp=1; sb.frozen=4; sb.fvis=4; sb.ucount=1; sb.sharedRef=1; sb.um=none
+ 14 Rogue: pc.r=done; sb.frozen=0; sb.fvis=0; sb.ucount=0; sb.active=2; sb.sharedRef=0; sb.wheld.1=F; sb.wheld.2=F; sb.wheld.3=F

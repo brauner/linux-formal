@@ -1,0 +1,82 @@
+C SUPER-E1-cursor-pin-vs-claim-put
+
+(*
+ * Expected: Never
+ *
+ * Question: super_dev_first()/super_dev_next() pin an entry with
+ * refcount_inc_not_zero() under rcu_read_lock(), drop RCU, and later
+ * resume from prev->sd_node.next under a new rcu_read_lock().  The owner
+ * of the claim drops it with super_dev_put(), which unlinks and frees
+ * (kfree_rcu()) only when sd_ref reaches zero.  Can a cursor that pinned
+ * the entry ever resume from an unlinked or freed entry?  The pin and the
+ * put are read-modify-writes of sd_ref, so one is ordered first: either
+ * the put sees the pin and leaves the entry linked (the cursor's own put
+ * unlinks it later), or the pin sees zero and fails.  The relaxed
+ * ordering of refcount_inc_not_zero() does not matter because the
+ * entry's removal is program-ordered after the cursor's resume.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   468         /* Unlink only once unpinned, so a cursor never resumes from a removed node. */
+ *   469         if (fsd && refcount_dec_and_test(&fsd->sd_ref)) {
+ *   470                 rhltable_remove(&super_dev_table, &fsd->sd_node, super_dev_params);
+ *   471                 put_super(fsd->sd_sb);
+ *   472                 kfree_rcu(fsd, sd_rcu);
+ *   513         for (; pos; pos = rcu_dereference_all(pos->next)) {
+ *   515                 if (refcount_inc_not_zero(&sb_dev->sd_ref))
+ *   525         rcu_read_lock();                      (super_dev_first())
+ *   526         sb_dev = super_dev_get(rhltable_lookup(&super_dev_table, &dev, super_dev_params));
+ *   527         rcu_read_unlock();
+ *   535         rcu_read_lock();                      (super_dev_next())
+ *   536         sb_dev = super_dev_get(rcu_dereference_all(prev->sd_node.next));
+ *   537         rcu_read_unlock();
+ *   539         super_dev_put(prev);
+ *
+ * Encoding: head is the slot holding entry E (1 linked, 0 unlinked),
+ * e_linked mirrors whether E is still on the chain when the cursor reads
+ * E's next pointer, e_freed is kfree_rcu()'s kfree() (synchronize_rcu()
+ * plus the free).  sdref=1 is the owner's claim.  P0 is a cursor: pin in
+ * one RCU section, resume in the next.  P1 is the owner's super_dev_put().
+ * Bad outcome: the pin succeeded and the resume saw E unlinked or freed.
+ *)
+
+{
+	sdref=1;
+	head=1;
+	e_linked=1;
+	e_freed=0;
+}
+
+P0(int *head, int *e_linked, int *e_freed, atomic_t *sdref)
+{
+	int r0;
+	int r1;
+	int r2;
+	int r3;
+
+	rcu_read_lock();
+	r0 = rcu_dereference(*head);
+	if (r0 == 1) {
+		r1 = atomic_cmpxchg_relaxed(sdref, 1, 2);
+	}
+	rcu_read_unlock();
+	rcu_read_lock();
+	r2 = READ_ONCE(*e_linked);
+	r3 = READ_ONCE(*e_freed);
+	rcu_read_unlock();
+}
+
+P1(int *head, int *e_linked, int *e_freed, atomic_t *sdref)
+{
+	int r4;
+
+	r4 = atomic_fetch_sub_release(1, sdref);
+	if (r4 == 1) {
+		smp_rmb();
+		WRITE_ONCE(*e_linked, 0);
+		rcu_assign_pointer(*head, 0);
+		synchronize_rcu();
+		WRITE_ONCE(*e_freed, 1);
+	}
+}
+
+exists (0:r0=1 /\ 0:r1=1 /\ (0:r2=0 \/ 0:r3=1))

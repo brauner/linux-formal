@@ -1,0 +1,15 @@
+Test SUPER-F3f-fserror-wake-after-mb Allowed
+States 5
+0:r0=1; 0:r1=0; 0:r2=0; 1:r3=2; 1:r4=0;
+0:r0=2; 0:r1=0; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r0=2; 0:r1=1; 0:r2=0; 1:r3=1; 1:r4=0;
+0:r0=2; 0:r1=1; 0:r2=0; 1:r3=1; 1:r4=1;
+0:r0=2; 0:r1=1; 0:r2=1; 1:r3=1; 1:r4=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (0:r0=2 /\ 0:r1=1 /\ 0:r2=1 /\ 1:r3=1 /\ 1:r4=0)
+Observation SUPER-F3f-fserror-wake-after-mb Never 0 5
+Time SUPER-F3f-fserror-wake-after-mb 0.03
+Hash=1480fc39a2b048ef97c2b52222ddb3ff
+

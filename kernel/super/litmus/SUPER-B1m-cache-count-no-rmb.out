@@ -1,0 +1,16 @@
+Test SUPER-B1m-cache-count-no-rmb Allowed
+States 5
+1:r3=0; 1:r4=0; 1:r5=0;
+1:r3=1; 1:r4=0; 1:r5=0;
+1:r3=1; 1:r4=0; 1:r5=1;
+1:r3=1; 1:r4=1; 1:r5=0;
+1:r3=1; 1:r4=1; 1:r5=1;
+Ok
+Witnesses
+Positive: 3 Negative: 2
+Flag data-race
+Condition exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0))
+Observation SUPER-B1m-cache-count-no-rmb Sometimes 3 2
+Time SUPER-B1m-cache-count-no-rmb 0.01
+Hash=e15d63884b37d682950b34c29490d9a9
+

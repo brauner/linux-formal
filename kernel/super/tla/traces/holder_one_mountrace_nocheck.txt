@@ -1,0 +1,35 @@
+holder_one_mountrace_nocheck -- FrozenWhileHeld violated -- mutation FIX_SETUP_CHECK off (what setup_bdev_super()'s frozen check buys)
+
+Layout: m1 mounts s1 on d1 while dm1 suspends d1.
+
+ 2     m1  sget_dev(): (d1, s1) published, s1 new.
+ 4-5   dm1 bdev_freeze(d1): count 1; no holder has d1 open yet: just sync_blockdev().
+ 6-8   m1  setup_bdev_super() claims d1 and, without the check at L1810-1816, mounts.
+ 11    dm1 bdev_freeze() returned 0 with s1 live and unfrozen.
+
+With the check (holder_one_mountrace) the mount sees the count and fails, or, if it
+looked before the increment, dm's walk sees its entry and freezes it once born.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_mountrace_nocheck.log)
+
+# Invariant FrozenWhileHeld is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, dm1=d_start, u1=u_go]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm1=[ret=ok, dv=d1, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+  5 BfHops: pc.dm1=bf_bsync
+  6 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  7 MCheck: pc.m1=m_born
+  8 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+  9 BfBsync: pc.dm1=bf_end
+ 10 BfEnd: pc.dm1=d_frzret; dev.d1.fm=none
+ 11 DFrzRet: pc.dm1=d_hold

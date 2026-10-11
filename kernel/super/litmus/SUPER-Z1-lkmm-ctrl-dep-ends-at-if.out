@@ -1,0 +1,14 @@
+Test SUPER-Z1-lkmm-ctrl-dep-ends-at-if Allowed
+States 4
+0:r0=0; 1:r1=0;
+0:r0=0; 1:r1=1;
+0:r0=1; 1:r1=0;
+0:r0=1; 1:r1=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:r0=1 /\ 1:r1=1)
+Observation SUPER-Z1-lkmm-ctrl-dep-ends-at-if Sometimes 1 3
+Time SUPER-Z1-lkmm-ctrl-dep-ends-at-if 0.00
+Hash=48c531619e98847272405ce763622823
+

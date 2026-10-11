@@ -1,0 +1,15 @@
+Test SUPER-F1-frozen-wake-no-mb-isolated Allowed
+States 5
+0:r0=0; 1:r1=1; 1:r2=1;
+0:r0=0; 1:r1=1; 1:r2=4;
+0:r0=0; 1:r1=4; 1:r2=0;
+0:r0=1; 1:r1=1; 1:r2=1;
+0:r0=1; 1:r1=1; 1:r2=4;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (1:r1=1 /\ 1:r2=1 /\ 0:r0=0)
+Observation SUPER-F1-frozen-wake-no-mb-isolated Sometimes 1 4
+Time SUPER-F1-frozen-wake-no-mb-isolated 0.01
+Hash=6dfb711c7d9288de43d3d1e2760d4ff7
+

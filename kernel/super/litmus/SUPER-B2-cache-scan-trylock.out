@@ -1,0 +1,13 @@
+Test SUPER-B2-cache-scan-trylock Allowed
+States 3
+1:r2=0; 1:r3=0; 1:r4=0;
+1:r2=1; 1:r3=0; 1:r4=0;
+1:r2=1; 1:r3=1; 1:r4=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:r2=1 /\ 1:r3=1 /\ 1:r4=0)
+Observation SUPER-B2-cache-scan-trylock Never 0 3
+Time SUPER-B2-cache-scan-trylock 0.02
+Hash=be38cdf676eb6d1b935d7c12819424b6
+

@@ -1,0 +1,62 @@
+holder_shared_steal -- UserOK violated -- latent (F4): fs_bdev_thaw() thaws the superblock whose freeze failed, taking a FIFREEZE hold
+
+Layout: as holder_shared_fail, plus f2 doing FIFREEZE on s2.
+
+ 15-30 dm3 bdev_freeze(d3): both per-superblock freezes fail, swallowed, returns 0.
+ 36    f2  FIFREEZE on s2: freeze_ucount 1, f2 holds it.
+ 31-37 dm3 bdev_thaw(d3) -> fs_bdev_thaw(): thaw_super(s2, FREEZE_MAY_NEST |
+           FREEZE_HOLDER_USERSPACE) takes f2's hold (they share freeze_ucount): s2
+           thawed while f2 believes it is frozen; f2's FITHAW will get -EINVAL.
+
+Latent for the same reasons as holder_shared_fail (and erofs has no ->freeze_fs, so
+FIFREEZE is -EOPNOTSUPP there, fs/ioctl.c L393-394).
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_shared_steal.log)
+
+# Invariant UserOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, m2=m_sget, u1=u_go, u2=u_go, dm3=d_start, f2=f_frz]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], m2=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u2=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm3=[ret=ok, dv=d3, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], f2=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0, d2=0, d3=0]
+      dev = [d1=[cl={}, cnt=0, fm=none], d2=[cl={}, cnt=0, fm=none], d3=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0, d2=0, d3=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}], s2=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 DStart: pc.dm3=bf_lock; pv.dm3.k=d_frzret
+  4 MSget: tab={<d1,s1>,<d2,s2>}; pc.m2=m_claim; sbs.s2.st=new; sbs.s2.um=m2; sbs.s2.act=1
+  5 MClaim: pc.m2=m_check; dev.d2.cl={s2}; sbs.s2.mem={d2}
+  6 MCheck: pc.m2=m_xclaim
+  7 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  8 MCheck: pc.m1=m_xclaim
+  9 MXClaim: pc.m1=m_xreg; dev.d3.cl={s1}; sbs.s1.mem={d1,d3}
+ 10 MXClaim: pc.m2=m_xreg; dev.d3.cl={s1,s2}; sbs.s2.mem={d2,d3}
+ 11 MXReg: tab={<d1,s1>,<d2,s2>,<d3,s1>}; pc.m1=m_xchk
+ 12 MXReg: tab={<d1,s1>,<d2,s2>,<d3,s1>,<d3,s2>}; pc.m2=m_xchk
+ 13 MXChk: pc.m1=m_born
+ 14 MXChk: pc.m2=m_born
+ 15 BfLock: pc.dm3=bf_hops; dev.d3.cnt=1; dev.d3.fm=dm3; gc.d3=1
+ 16 BfHops: pc.dm3=bf_walk; pv.dm3.todo={s1,s2}
+ 17 Walk: pc.dm3=bf_gas; pv.dm3.todo={s2}; pv.dm3.cur=s1
+ 18 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 19 MBorn: pc.m2=done; sbs.s2.st=born; sbs.s2.um=none; sbs.s2.mnt=T
+ 20 Gas: pc.dm3=bf_frz; sbs.s1.act=2
+ 21 BfFrz: pc.dm3=bf_put; pv.dm3.e=EIO; pv.dm3.n=1
+ 22 Put: pc.dm3=bf_walk; sbs.s1.act=1
+ 23 Walk: pc.dm3=bf_gas; pv.dm3.todo={}; pv.dm3.cur=s2
+ 24 Gas: pc.dm3=bf_frz; sbs.s2.act=2
+ 25 BfFrz: pc.dm3=bf_put; pv.dm3.n=2
+ 26 Put: pc.dm3=bf_walk; sbs.s2.act=1
+ 27 Walk: pc.dm3=bf_sync
+ 28 BfSync: pc.dm3=bf_end; pv.dm3.e=ok
+ 29 BfEnd: pc.dm3=d_frzret; dev.d3.fm=none
+ 30 DFrzRet: pc.dm3=d_hold
+ 31 DHold: pc.dm3=bt_lock; pv.dm3.k=done
+ 32 BtLock: pc.dm3=bt_hops; dev.d3.fm=dm3
+ 33 BtHops: pc.dm3=bt_walk; pv.dm3.todo={s1,s2}; pv.dm3.n=0
+ 34 Walk: pc.dm3=bt_gas; pv.dm3.todo={s1}
+ 35 Gas: pc.dm3=bt_thw; sbs.s2.act=2
+ 36 FFrz: pc.f2=f_hold; sbs.s2.act=3; sbs.s2.frz=T; sbs.s2.uc=1
+ 37 BtThw: pc.dm3=bt_put; pv.dm3.n=1; sbs.s2.act=2; sbs.s2.frz=F; sbs.s2.uc=0

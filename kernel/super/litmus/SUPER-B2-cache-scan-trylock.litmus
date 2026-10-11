@@ -1,0 +1,63 @@
+C SUPER-B2-cache-scan-trylock
+
+(*
+ * Expected: Never
+ *
+ * Question: super_cache_scan() can also run before SB_BORN (the shrinker
+ * is registered in sget_fc()).  Its super_trylock_shared() checks s_root
+ * and SB_BORN under s_umount.  Does a scanner that gets s_umount and sees
+ * SB_BORN always see the fill_super() state?
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   200         if (!super_trylock_shared(sb))
+ *   201                 return SHRINK_STOP;
+ *   670         if (down_read_trylock(&sb->s_umount)) {
+ *   671                 if (!(sb->s_flags & SB_DYING) && sb->s_root &&
+ *   672                     (sb->s_flags & SB_BORN))
+ *   673                         return true;
+ *   351         down_write_nested(&s->s_umount, SINGLE_DEPTH_NESTING); (alloc_super())
+ *   1955        super_wake(sb, SB_BORN);              (vfs_get_tree(), s_umount still held)
+ * fs/namespace.c fc_mount():  up_write(&fc->root->d_sb->s_umount);
+ *
+ * Encoding: LKMM has no rwsem; s_umount is a spinlock (mutual exclusion
+ * plus acquire/release, which is what the rwsem provides here) and
+ * down_read_trylock() is spin_trylock().  P0 holds it from alloc_super()
+ * until vfs_get_tree()'s caller drops it.  The scanner's checks are plain
+ * loads under the lock.  The point is that super_cache_scan() needs no
+ * barrier of its own: s_umount orders everything (contrast SUPER-B1).
+ *)
+
+{
+	flags=0;
+	s_root=0;
+}
+
+P0(int *flags, int *s_root, spinlock_t *umount)
+{
+	int r0;
+	int r1;
+
+	spin_lock(umount);
+	*s_root = 1;
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 1;
+	smp_store_release(flags, r1);
+	smp_mb();
+	spin_unlock(umount);
+}
+
+P1(int *flags, int *s_root, spinlock_t *umount)
+{
+	int r2;
+	int r3;
+	int r4;
+
+	r2 = spin_trylock(umount);
+	if (r2) {
+		r3 = *flags;
+		r4 = *s_root;
+		spin_unlock(umount);
+	}
+}
+
+exists (1:r2=1 /\ 1:r3=1 /\ 1:r4=0)

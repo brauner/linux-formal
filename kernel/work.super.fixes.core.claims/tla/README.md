@@ -3,9 +3,9 @@
 Tree: work.super.fixes.core.claims at 587d78169911, on fc1c25014ff8
 (v7.3-rc6-301). Line numbers below are fs/super.c at 587d78169911.
 
-`SuperDevTable.tla` is a copy of the device table model written for the
-review of work.super.fixes at fc1c25014ff8, with the cursor of this branch
-behind `FIX_UNBORN_WAIT`. With the switch off the model is the
+`SuperDevTable.tla` is a copy of the device table model of
+[`kernel/super/tla/`](../../super/tla/README.md) (fc1c25014ff8), with the
+cursor of this branch behind `FIX_UNBORN_WAIT`. With the switch off the model is the
 fc1c25014ff8 code. The table entries, the claims of filesystems, the
 freezers and user_get_super() are modelled exactly as there. Only the
 cursor (super_dev_first(), super_dev_get(), super_dev_next()) is new.

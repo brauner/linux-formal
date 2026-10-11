@@ -1,0 +1,81 @@
+C SUPER-F2-frozen-wake-covered-by-pagefault-mb
+
+(*
+ * Expected: Never
+ *
+ * Question: SUPER-F1 with the stores freeze_super() really does.  A waiter
+ * in wait_for_partially_frozen() can only have read SB_FREEZE_WRITE under
+ * s_umount (freeze_super() drops s_umount only in that stage), so it
+ * waits for frozen != SB_FREEZE_WRITE.  After that stage freeze_super()
+ * always stores SB_FREEZE_PAGEFAULT and calls sb_wait_write() ->
+ * percpu_down_write(), which executes smp_mb() in readers_active_check()
+ * before returning.  Every later wake_up_var() (SB_FREEZE_COMPLETE, or
+ * SB_UNFROZEN on the sync_filesystem()/freeze_fs() error paths, or a later
+ * thaw or rdonly freeze) comes after that barrier.  Is a lost wakeup still
+ * possible?
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   2289        sb->s_writers.frozen = SB_FREEZE_WRITE;
+ *   2291        super_unlock_excl(sb);
+ *   2292        sb_wait_write(sb, SB_FREEZE_WRITE);
+ *   2293        __super_lock_excl(sb);
+ *   2296        sb->s_writers.frozen = SB_FREEZE_PAGEFAULT;
+ *   2297        sb_wait_write(sb, SB_FREEZE_PAGEFAULT);
+ *   2310        sb->s_writers.frozen = SB_FREEZE_FS;
+ *   2311        sb_wait_write(sb, SB_FREEZE_FS);
+ *   2331        sb->s_writers.frozen = SB_FREEZE_COMPLETE;
+ *   2332        wake_up_var(&sb->s_writers.frozen);
+ * kernel/locking/percpu-rwsem.c percpu_down_write():
+ *           rcuwait_wait_event(&sem->writer, readers_active_check(sem), TASK_UNINTERRUPTIBLE);
+ *   readers_active_check(): ... smp_mb(); /* C matches B */ return true;
+ *
+ * Encoding: as SUPER-F1; P0 stores SB_FREEZE_PAGEFAULT, smp_mb() for
+ * percpu_down_write(), SB_FREEZE_FS, smp_mb(), SB_FREEZE_COMPLETE and
+ * then wakes.  Store buffering between the PAGEFAULT store and the
+ * queue check on one side and the waiter's queueing and re-check on the
+ * other: either the waker sees the waiter or the waiter sees a value
+ * other than SB_FREEZE_WRITE.  The code is correct, by an argument that
+ * does not appear anywhere in it; store_release_wake_up() (or an
+ * smp_mb() before each wake_up_var()) would make each pair correct on
+ * its own.
+ *)
+
+{
+	frozen=1;
+	wq=0;
+	state=0;
+}
+
+P0(int *frozen, int *wq, int *woken, spinlock_t *wql)
+{
+	int r0;
+
+	WRITE_ONCE(*frozen, 2);
+	smp_mb();
+	WRITE_ONCE(*frozen, 3);
+	smp_mb();
+	WRITE_ONCE(*frozen, 4);
+	r0 = READ_ONCE(*wq);
+	if (r0 != 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*woken, 1);
+		spin_unlock(wql);
+	}
+}
+
+P1(int *frozen, int *wq, int *state, spinlock_t *wql)
+{
+	int r1;
+	int r2;
+
+	r1 = READ_ONCE(*frozen);
+	if (r1 == 1) {
+		spin_lock(wql);
+		WRITE_ONCE(*wq, 1);
+		smp_store_mb(*state, 2);
+		spin_unlock(wql);
+		r2 = READ_ONCE(*frozen);
+	}
+}
+
+exists (1:r1=1 /\ 1:r2=1 /\ 0:r0=0)

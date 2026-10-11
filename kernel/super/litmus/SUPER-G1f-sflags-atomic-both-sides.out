@@ -1,0 +1,11 @@
+Test SUPER-G1f-sflags-atomic-both-sides Allowed
+States 1
+[flags]=25;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists ([flags]=24 \/ [flags]=9 \/ [flags]=8)
+Observation SUPER-G1f-sflags-atomic-both-sides Never 0 3
+Time SUPER-G1f-sflags-atomic-both-sides 0.01
+Hash=8ca9adf2c96bb68721265986c1d65d9f
+

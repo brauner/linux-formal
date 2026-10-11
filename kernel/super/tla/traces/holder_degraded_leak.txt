@@ -1,0 +1,50 @@
+holder_degraded_leak -- FinalOK violated -- cross-check (F5): a freeze through the refused entry outlives its thaw
+
+Layout: as holder_degraded.
+
+ 3     dm2 bdev_freeze(d2): count 0 -> 1 (block/bdev.c L307); it looks at the holder ops
+           only after taking bd_holder_lock (L316).
+ 4-8   m1  s1 claims d2 (holder ops set) and publishes (d2, s1).
+ 9-10  dm2 bd_holder_lock: fs_holder_ops -> fs_bdev_freeze() pins (d2, s1), waits for
+           SB_BORN.
+ 11-12 m1  the registration sees the count: refused, d2 released (no holder left), the
+           mount goes on; SB_BORN.
+ 13-15 dm2 freezes s1 through d2.
+ 21-24 dm2 bdev_thaw(d2): no holder ops, no walk, count 0: s1 stays frozen.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_degraded_leak.log)
+
+# Invariant FinalOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm2=d_start]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm2=[ret=ok, dv=d2, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0, d2=0]
+      dev = [d1=[cl={}, cnt=0, fm=none], d2=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0, d2=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 DStart: pc.dm2=bf_lock; pv.dm2.k=d_frzret
+  3 BfLock: pc.dm2=bf_hops; dev.d2.cnt=1; dev.d2.fm=dm2; gc.d2=1
+  4 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  5 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  6 MCheck: pc.m1=m_xclaim
+  7 MXClaim: pc.m1=m_xreg; dev.d2.cl={s1}; sbs.s1.mem={d1,d2}
+  8 MXReg: tab={<d1,s1>,<d2,s1>}; pc.m1=m_xchk
+  9 BfHops: pc.dm2=bf_walk; pv.dm2.todo={s1}
+ 10 Walk: pc.dm2=bf_gas; pv.dm2.todo={}; pv.dm2.cur=s1
+ 11 MXChk: tab={<d1,s1>}; pc.m1=m_born; dev.d2.cl={}; sbs.s1.mem={d1}
+ 12 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 13 Gas: pc.dm2=bf_frz; sbs.s1.act=2
+ 14 Umount: pc.u1=done; sbs.s1.act=1; sbs.s1.mnt=F
+ 15 BfFrz: pc.dm2=bf_put; pv.dm2.n=1; pv.dm2.froze={s1}; sbs.s1.act=2; sbs.s1.frz=T; sbs.s1.uc=1
+ 16 Put: pc.dm2=bf_walk; sbs.s1.act=1
+ 17 Walk: pc.dm2=bf_sync
+ 18 BfSync: pc.dm2=bf_end
+ 19 BfEnd: pc.dm2=d_frzret; dev.d2.fm=none
+ 20 DFrzRet: pc.dm2=d_hold
+ 21 DHold: pc.dm2=bt_lock; pv.dm2.k=done
+ 22 BtLock: pc.dm2=bt_hops; dev.d2.fm=dm2
+ 23 BtHops: pc.dm2=bt_end; pv.dm2.n=0
+ 24 BtEnd: pc.dm2=done; dev.d2.cnt=0; dev.d2.fm=none; gc.d2=0

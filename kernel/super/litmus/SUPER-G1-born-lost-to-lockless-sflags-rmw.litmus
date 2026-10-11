@@ -1,0 +1,82 @@
+C SUPER-G1-born-lost-to-lockless-sflags-rmw
+
+(*
+ * Expected: Sometimes
+ *
+ * Question: super_wake() updates s_flags with a non-atomic
+ * read-modify-write (a plain load, then a release store), as do the
+ * other VFS writers (vfs_get_super()'s |= SB_ACTIVE, reconfigure_super(),
+ * generic_shutdown_super()'s &= ~SB_ACTIVE).  Those VFS writers exclude
+ * each other with s_umount.  Some filesystems write s_flags without
+ * s_umount; FUSE does so from the daemon's write(2) of the FUSE_INIT
+ * reply, which with the default asynchronous INIT runs while the mounter
+ * finishes vfs_get_super() and vfs_get_tree().  Can the mount lose
+ * SB_BORN or SB_ACTIVE?
+ *
+ * Code (HEAD fc1c25014ff8):
+ * fs/super.c
+ *   1390                err = fill_super(sb, fc);     (vfs_get_super(), s_umount held)
+ *   1394                sb->s_flags |= SB_ACTIVE;
+ *   1955        super_wake(sb, SB_BORN);              (vfs_get_tree(), s_umount held)
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ * fs/fuse/inode.c
+ *   1836        return fuse_send_init(fm);            (fuse_fill_super(), end of fill_super)
+ *   1518                ia->args.end = process_init_reply;
+ *   1519                err = fuse_simple_background(fm, &ia->args, GFP_KERNEL);
+ *   1365                if (flags & FUSE_HANDLE_KILLPRIV_V2) {   (process_init_reply(),
+ *   1366                        fc->handle_killpriv_v2 = 1;       daemon's write(2), no s_umount)
+ *   1367                        fm->sb->s_flags |= SB_NOSEC;
+ *
+ * Encoding: flags bits SB_BORN=1, SB_NOSEC=8, SB_ACTIVE=16 (the real
+ * values do not matter).  P0 is the mounter after fuse_fill_super()
+ * returned: |= SB_ACTIVE, then super_wake(SB_BORN).  P1 is
+ * process_init_reply().  Marked accesses throughout, so the outcome is
+ * not a compiler artefact: it is allowed even under sequential
+ * consistency (P1's load before P0's store, P1's store after it).  The
+ * kernel's accesses are plain, which makes it a data race as well.
+ *
+ * Consequence of a lost SB_BORN (final flags 24): super_lock() waits for
+ * SB_BORN|SB_DYING, so every sync(2), drop_caches write, quota sync and
+ * emergency remount/thaw that iterates over this superblock sleeps
+ * uninterruptibly until it is unmounted (filesystems_freeze() skips FUSE,
+ * which has no freeze_fs, but not efivarfs, which races the same way
+ * from efivarfs_ops_notifier()); the flusher's super_trylock_shared() and
+ * super_cache_count() treat it as unborn, so its dirty inodes are never
+ * written back by the flusher and its caches are never shrunk.  The daemon owner (unprivileged in a user namespace)
+ * controls the timing of the reply and can keep the mount alive.
+ * A lost SB_ACTIVE (final flags 9) stops fuse_evict_inode() from sending
+ * FORGETs and makes iput_final() evict instead of caching.
+ *)
+
+{
+	flags=0;
+}
+
+P0(int *flags)
+{
+	int r0;
+	int r1;
+	int r2;
+	int r3;
+
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 16;
+	WRITE_ONCE(*flags, r1);
+	r2 = READ_ONCE(*flags);
+	r3 = r2 | 1;
+	smp_store_release(flags, r3);
+	smp_mb();
+}
+
+P1(int *flags)
+{
+	int r4;
+	int r5;
+
+	r4 = READ_ONCE(*flags);
+	r5 = r4 | 8;
+	WRITE_ONCE(*flags, r5);
+}
+
+locations [flags;]
+exists (flags=24 \/ flags=9 \/ flags=8)

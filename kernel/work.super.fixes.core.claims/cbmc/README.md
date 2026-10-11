@@ -6,9 +6,9 @@ their device claim"): the unborn-wait `super_dev_get()`
 (work.super.fixes.core.claims, rejected in favour of the sd_claims fix).  It
 was not merged; the sd_claims fix was kept instead and is not modelled here.
 
-`devtable.c` is a copy of the device table harness written for the review of
-work.super.fixes (fc1c25014ff8), extended with SB_BORN and the unborn-wait
-cursor.  The rest of the table code it copies (`super_dev_alloc()`,
+`devtable.c` is a copy of the device table harness of
+[`kernel/super/cbmc/`](../../super/cbmc/README.md) (fc1c25014ff8), extended
+with SB_BORN and the unborn-wait cursor.  The rest of the table code it copies (`super_dev_alloc()`,
 `super_dev_put()`, `super_dev_insert()`, `super_dev_register()`,
 `kill_super_notify()`, `super_dev_lookup()`, `fs_bdev_register()`,
 `fs_bdev_unregister()`, `user_get_super()`, `put_super()`) is the same at

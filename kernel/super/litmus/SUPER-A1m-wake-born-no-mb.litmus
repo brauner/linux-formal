@@ -1,0 +1,89 @@
+C SUPER-A1m-wake-born-no-mb
+
+(*
+ * Expected: Sometimes
+ *
+ * Mutation of SUPER-A1: super_wake() without its smp_mb() between the
+ * release store of s_flags and wake_up_var().  A release store orders
+ * what precedes it, not the waitqueue_active() load that follows, so
+ * the store buffering shape is allowed: the smp_mb() at fs/super.c:170
+ * is load-bearing.
+ *
+ * Question: can super_lock() sleep forever because vfs_get_tree()'s
+ * super_wake(sb, SB_BORN) found the waitqueue empty while the waiter,
+ * already queued, still read s_flags without SB_BORN?  Store buffering
+ * between the flag store and the waitqueue_active() load on the waker
+ * side and the list_add() and the flag load on the waiter side.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   88  static bool super_flags(const struct super_block *sb, unsigned int flags)
+ *   94          return smp_load_acquire(&sb->s_flags) & flags;
+ *   118         wait_var_event(&sb->s_flags, super_flags(sb, SB_BORN | SB_DYING));
+ *   154 static void super_wake(struct super_block *sb, unsigned int flag)
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ *   170         smp_mb();                  (removed in this mutant)
+ *   171         wake_up_var(&sb->s_flags);
+ * include/linux/wait_bit.h ___wait_var_event():
+ *           long __int = prepare_to_wait_event(__wq_head, ...);
+ *           if (condition) break;
+ * kernel/sched/wait.c prepare_to_wait_event():
+ *           spin_lock_irqsave(&wq_head->lock, flags);
+ *           __add_wait_queue(wq_head, wq_entry);
+ *           set_current_state(state);          (smp_store_mb())
+ *           spin_unlock_irqrestore(&wq_head->lock, flags);
+ * kernel/sched/wait_bit.c __wake_up_bit():
+ *           if (waitqueue_active(wq_head))
+ *                   __wake_up(wq_head, TASK_NORMAL, 1, &key);
+ *
+ * Encoding: flags is sb->s_flags (SB_BORN=1, SB_DYING=2), wq is the
+ * hashed waitqueue head (0 empty, 1 the waiter is queued), wql its lock,
+ * state the waiter's task state.  P0 is super_wake(SB_BORN), P1 is
+ * super_lock() in wait_var_event(): the early check, then one round of
+ * prepare_to_wait_event() and the re-check.  Bad outcome: P1 queued and
+ * re-checked without seeing SB_BORN (it sleeps) and P0 saw an empty
+ * queue (it never wakes P1).
+ *)
+
+{
+	flags=0;
+	wq=0;
+	state=0;
+}
+
+P0(int *flags, int *wq, int *woken, spinlock_t *wql)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 1;
+	smp_store_release(flags, r1);
+	r2 = READ_ONCE(*wq);
+	if (r2 != 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*woken, 1);
+		spin_unlock(wql);
+	}
+}
+
+P1(int *flags, int *wq, int *state, spinlock_t *wql)
+{
+	int r3;
+	int r4;
+	int r5;
+	int r6;
+
+	r3 = smp_load_acquire(flags);
+	r4 = r3 & 3;
+	if (r4 == 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*wq, 1);
+		smp_store_mb(*state, 2);
+		spin_unlock(wql);
+		r5 = smp_load_acquire(flags);
+		r6 = r5 & 3;
+	}
+}
+
+exists (1:r4=0 /\ 1:r6=0 /\ 0:r2=0)

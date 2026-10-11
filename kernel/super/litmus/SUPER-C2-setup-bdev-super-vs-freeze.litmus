@@ -1,0 +1,75 @@
+C SUPER-C2-setup-bdev-super-vs-freeze
+
+(*
+ * Expected: Never
+ *
+ * Question: for a single-device superblock the claim is published by
+ * sget_fc()'s set() callback under sb_lock, long before
+ * setup_bdev_super() opens the device; fs_bdev_register() then takes the
+ * share path (refcount_inc_not_zero(), no barrier, no count check) and
+ * setup_bdev_super() does its own smp_mb() and count check.  Same store
+ * buffering question as SUPER-C1.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   861         spin_lock(&sb_lock);                  (sget_fc())
+ *   881         err = set(s, fc);
+ *   503         err = super_dev_insert(fsd);          (super_dev_register())
+ *   901         spin_unlock(&sb_lock);
+ *   1652        scoped_guard(rcu) {                   (fs_bdev_register())
+ *   1653                sb_dev = super_dev_lookup(dev, sb);
+ *   1654                if (sb_dev && refcount_inc_not_zero(&sb_dev->sd_ref)) {
+ *   1656                        return 0;
+ *   1809        /* The sget_fc() entry is already published; pairs with bdev_freeze(). */
+ *   1810        smp_mb();
+ *   1811        if (atomic_read(&bdev->bd_fsfreeze_count) > 0) {
+ *
+ * Encoding: as SUPER-C1; P0 adds sb_lock around the insert and the share
+ * path's lookup plus relaxed refcount_inc_not_zero() (cmpxchg_relaxed
+ * of sd_ref from 1 to 2) before setup_bdev_super()'s barrier.
+ *)
+
+{
+	count=0;
+	head=0;
+	sdref=1;
+}
+
+P0(int *head, atomic_t *count, atomic_t *sdref, spinlock_t *bucket, spinlock_t *sb_lock)
+{
+	int r0;
+	int r5;
+	int r6;
+
+	spin_lock(sb_lock);
+	spin_lock(bucket);
+	rcu_assign_pointer(*head, 1);
+	spin_unlock(bucket);
+	spin_unlock(sb_lock);
+	rcu_read_lock();
+	r5 = rcu_dereference(*head);
+	if (r5 == 1) {
+		r6 = atomic_cmpxchg_relaxed(sdref, 1, 2);
+	}
+	rcu_read_unlock();
+	smp_mb();
+	r0 = atomic_read(count);
+}
+
+P1(int *head, atomic_t *count, spinlock_t *holder)
+{
+	int r1;
+	int r2;
+	int r3;
+
+	r1 = atomic_cmpxchg(count, 0, 1);
+	if (r1 == 0) {
+		r2 = atomic_read(count);
+		spin_lock(holder);
+		spin_unlock(holder);
+		rcu_read_lock();
+		r3 = rcu_dereference(*head);
+		rcu_read_unlock();
+	}
+}
+
+exists (0:r0=0 /\ 1:r1=0 /\ 1:r3=0)

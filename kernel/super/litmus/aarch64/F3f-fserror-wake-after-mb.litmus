@@ -1,0 +1,26 @@
+AArch64 F3f-fserror-wake-after-mb
+(* LKMM result: Never; SUPER-F3f: smp_mb() = DMB ISH added before wake_up_var().
+   P0 fserror_pending_dec(): refcount_dec_and_test() = atomic_fetch_sub_release()
+   (LSE: NEG + LDADDL), on success smp_acquire__after_ctrl_dep() = smp_rmb()
+   = DMB ISHLD, then wake_up_var() -> waitqueue_active() = LDR of the head.
+   P1 fserror_unmount() -> wait_var_event(): __add_wait_queue() store,
+   set_current_state() = smp_store_mb() = STR; DMB ISH, then the re-check
+   LDR of s_pending_errors.  The waitqueue spinlock is left out (P1's
+   store and barrier are inside it; P0 takes it only after a non-empty
+   check). cnt=1: the unmount already dropped the bias. *)
+{
+cnt=1;
+wq=0;
+state=0;
+0:X0=cnt; 0:X1=wq;
+1:X0=cnt; 1:X1=wq; 1:X2=state;
+}
+ P0                  | P1               ;
+ MOV W9,#-1          | MOV W9,#1        ;
+ LDADDL W9,W10,[X0]  | STR W9,[X1]      ;
+ CMP W10,#1          | MOV W8,#2        ;
+ B.NE L0             | STR W8,[X2]      ;
+ DMB ISH             | DMB ISH          ;
+ LDR W11,[X1]        | LDR W12,[X0]     ;
+ L0:                 |                  ;
+exists (0:X10=1 /\ 0:X11=0 /\ 1:X12=1)

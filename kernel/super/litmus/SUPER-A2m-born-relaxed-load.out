@@ -1,0 +1,20 @@
+Test SUPER-A2m-born-relaxed-load Allowed
+States 9
+1:r3=0; 1:r4=0; 1:r5=0; 1:r6=0;
+1:r3=1; 1:r4=0; 1:r5=0; 1:r6=0;
+1:r3=1; 1:r4=0; 1:r5=0; 1:r6=1;
+1:r3=1; 1:r4=0; 1:r5=1; 1:r6=0;
+1:r3=1; 1:r4=0; 1:r5=1; 1:r6=1;
+1:r3=1; 1:r4=1; 1:r5=0; 1:r6=0;
+1:r3=1; 1:r4=1; 1:r5=0; 1:r6=1;
+1:r3=1; 1:r4=1; 1:r5=1; 1:r6=0;
+1:r3=1; 1:r4=1; 1:r5=1; 1:r6=1;
+Ok
+Witnesses
+Positive: 7 Negative: 2
+Flag data-race
+Condition exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0 \/ 1:r6=0))
+Observation SUPER-A2m-born-relaxed-load Sometimes 7 2
+Time SUPER-A2m-born-relaxed-load 0.02
+Hash=a4ca15c245126dc3ae4fecef2101752e
+

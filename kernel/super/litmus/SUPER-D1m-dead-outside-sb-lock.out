@@ -1,0 +1,13 @@
+Test SUPER-D1m-dead-outside-sb-lock Allowed
+States 3
+1:r5=-1;
+1:r5=0;
+1:r5=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (1:r5=0)
+Observation SUPER-D1m-dead-outside-sb-lock Sometimes 1 3
+Time SUPER-D1m-dead-outside-sb-lock 0.02
+Hash=0047912ee3304c079f6ba36a53b51c83
+

@@ -1,0 +1,15 @@
+Test SUPER-A1m-wake-born-no-mb Allowed
+States 5
+0:r2=0; 1:r4=0; 1:r6=0;
+0:r2=0; 1:r4=0; 1:r6=1;
+0:r2=0; 1:r4=1; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=1;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (1:r4=0 /\ 1:r6=0 /\ 0:r2=0)
+Observation SUPER-A1m-wake-born-no-mb Sometimes 1 4
+Time SUPER-A1m-wake-born-no-mb 0.02
+Hash=7513e4268d4d34d7e3e910c78d7fc8f1
+

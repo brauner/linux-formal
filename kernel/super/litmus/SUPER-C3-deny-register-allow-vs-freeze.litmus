@@ -1,0 +1,79 @@
+C SUPER-C3-deny-register-allow-vs-freeze
+
+(*
+ * Expected: Never
+ *
+ * Question: a device add (btrfs_open_device_deny_freeze() and the later
+ * bdev_allow_freeze()) denies freezes, registers its claim while the
+ * count is negative (so the registrar's check always passes) and then
+ * re-allows freezes with a relaxed atomic_inc().  Can a bdev_freeze() that
+ * succeeds after the allow miss the new claim?  The freezer can only
+ * succeed by reading the allow's write (if it ran before the deny, the
+ * deny fails), so this is message passing from the insert to the
+ * freezer's lookup through the count.
+ *
+ * Code (fs/btrfs/volumes.c, HEAD fc1c25014ff8):
+ *   2907        ret = bdev_deny_freeze(file_bdev(probe_file));
+ *   2913        bdev_file = fs_bdev_file_open_by_dev(file_bdev(probe_file)->bd_dev,
+ *   3145        bdev_allow_freeze(file_bdev(bdev_file));     (btrfs_init_new_device())
+ * fs/super.c:
+ *   1664        err = super_dev_insert(sb_dev);
+ *   1669        smp_mb();
+ *   1670        if (atomic_read(&file_bdev(bdev_file)->bd_fsfreeze_count) > 0) {
+ * block/bdev.c:
+ *   395         return atomic_dec_unless_positive(&bdev->bd_fsfreeze_count) ? 0 : -EBUSY;
+ *   408         WARN_ON_ONCE(atomic_read(&bdev->bd_fsfreeze_count) >= 0);
+ *   409         atomic_inc(&bdev->bd_fsfreeze_count);
+ *   307         if (!atomic_inc_unless_negative(&bdev->bd_fsfreeze_count)) {
+ *
+ * Encoding: count starts at 0.  atomic_dec_unless_positive() and
+ * atomic_inc_unless_negative() are fully ordered cmpxchg loops; with
+ * count in {-1, 0, 1} they are atomic_cmpxchg(count, 0, -1) and
+ * atomic_cmpxchg(count, 0, 1).  The allow is a relaxed atomic_inc().
+ * Bad outcome: the deny succeeded, the freezer succeeded (hence after
+ * the allow) and its lookup missed the claim.  What makes it Never is
+ * fs_bdev_register()'s smp_mb(), which also orders the insert before the
+ * relaxed allow (SUPER-C3m).
+ *)
+
+{
+	count=0;
+	head=0;
+}
+
+P0(int *head, atomic_t *count, spinlock_t *bucket)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_cmpxchg(count, 0, -1);
+	if (r0 == 0) {
+		spin_lock(bucket);
+		rcu_assign_pointer(*head, 1);
+		spin_unlock(bucket);
+		smp_mb();
+		r1 = atomic_read(count);
+		r2 = atomic_read(count);
+		atomic_inc(count);
+	}
+}
+
+P1(int *head, atomic_t *count, spinlock_t *holder)
+{
+	int r3;
+	int r4;
+	int r5;
+
+	r3 = atomic_cmpxchg(count, 0, 1);
+	if (r3 == 0) {
+		r4 = atomic_read(count);
+		spin_lock(holder);
+		spin_unlock(holder);
+		rcu_read_lock();
+		r5 = rcu_dereference(*head);
+		rcu_read_unlock();
+	}
+}
+
+exists (0:r0=0 /\ 1:r3=0 /\ 1:r5=0)

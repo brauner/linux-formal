@@ -1,0 +1,56 @@
+holder_degraded_steal -- FrozenWhileHeld violated -- cross-check of dtmultideg_tree (F5): the stray thaw takes another device's freeze
+
+Layout: as holder_degraded plus dm1 suspending d1; the proposed fs_bdev_thaw() change
+is on (it does not help here).
+
+ 3-10  dm2 bdev_freeze(d2) without holder (count 1), then bdev_thaw(d2) starts.
+ 14-18 dm1 bdev_freeze(d1) walks (d1, s1) and waits for SB_BORN.
+ 15-20 m1/dm2 s1 claims d2 and publishes (d2, s1); dm2's thaw walk pins it.
+ 21-22 m1  the d2 registration is refused, the mount goes on, SB_BORN.
+ 23-28 dm1 freezes s1: freeze_ucount 1, dm1's suspend completes.
+ 29-30 dm2 thaw_super(s1) through the refused entry: takes dm1's hold, s1 thawed under
+           the suspended d1.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_degraded_steal.log)
+
+# Invariant FrozenWhileHeld is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm1=d_start, dm2=d_start]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm1=[ret=ok, dv=d1, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm2=[ret=ok, dv=d2, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0, d2=0]
+      dev = [d1=[cl={}, cnt=0, fm=none], d2=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0, d2=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 DStart: pc.dm2=bf_lock; pv.dm2.k=d_frzret
+  3 BfLock: pc.dm2=bf_hops; dev.d2.cnt=1; dev.d2.fm=dm2; gc.d2=1
+  4 BfHops: pc.dm2=bf_bsync
+  5 BfBsync: pc.dm2=bf_end
+  6 BfEnd: pc.dm2=d_frzret; dev.d2.fm=none
+  7 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  8 DFrzRet: pc.dm2=d_hold
+  9 DHold: pc.dm2=bt_lock; pv.dm2.k=done
+ 10 BtLock: pc.dm2=bt_hops; dev.d2.fm=dm2
+ 11 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+ 12 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+ 13 MCheck: pc.m1=m_xclaim
+ 14 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+ 15 MXClaim: pc.m1=m_xreg; dev.d2.cl={s1}; sbs.s1.mem={d1,d2}
+ 16 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+ 17 MXReg: tab={<d1,s1>,<d2,s1>}; pc.m1=m_xchk
+ 18 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+ 19 BtHops: pc.dm2=bt_walk; pv.dm2.todo={s1}
+ 20 Walk: pc.dm2=bt_gas; pv.dm2.todo={}; pv.dm2.cur=s1
+ 21 MXChk: tab={<d1,s1>}; pc.m1=m_born; dev.d2.cl={}; sbs.s1.mem={d1}
+ 22 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 23 Gas: pc.dm1=bf_frz; sbs.s1.act=2
+ 24 BfFrz: pc.dm1=bf_put; pv.dm1.n=1; pv.dm1.froze={s1}; sbs.s1.act=3; sbs.s1.frz=T; sbs.s1.uc=1
+ 25 Put: pc.dm1=bf_walk; sbs.s1.act=2
+ 26 Walk: pc.dm1=bf_sync
+ 27 BfSync: pc.dm1=bf_end
+ 28 BfEnd: pc.dm1=d_frzret; dev.d1.fm=none
+ 29 Gas: pc.dm2=bt_thw; sbs.s1.act=3
+ 30 BtThw: pc.dm2=bt_put; pv.dm2.n=1; sbs.s1.act=2; sbs.s1.frz=F; sbs.s1.uc=0
+ 31 DFrzRet: pc.dm1=d_hold

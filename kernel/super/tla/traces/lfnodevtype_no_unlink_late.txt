@@ -1,0 +1,77 @@
+lfnodevtype_no_unlink_late -- NoErr (FIX_UNLINK_LATE off): "iterator advances from an unlinked node"
+
+The shape before 2d2a2d7aa987: kill_super_notify() unlinked s_instances.  The iterator
+holds a passive reference on S1, drops sb_lock for the callback, S1's teardown unlinks the
+node, and the iterator retakes sb_lock and advances from an unlinked node (hlist_del_init()
+leaves ->next NULL: the walk ends early and misses the rest).  Unlinking in put_super()
+(L426) at the last passive reference keeps the iterator's node linked.
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoErr is violated
+  1 Initial
+  2 m_lock     m1: m_lock -> m_nomatch
+      rcu={m1}
+      sblock=m1
+  3 m_nomatch  m1: m_nomatch -> m_alloc
+      rcu={}
+      sblock=noone
+  4 m_alloc    m1: m_alloc -> m_lock
+      L[m1] s=S1
+      hasact[m1]={S1}
+      own[S1]=1
+      st[S1]=alloc
+      act[S1]=1
+      umx[S1]=m1
+      pass[S1]=1
+  5 m_lock     m1: m_lock -> m_nomatch
+      rcu={m1}
+      sblock=m1
+  6 m_nomatch  m1: m_nomatch -> m_set
+  7 m_set      m1: m_set -> m_shreg
+      rcu={}
+      sblock=noone
+      fsi[S1]=live
+      fsl=<S1>
+      st[S1]=pub
+      ent[S1]={st: linked, ref: 1}
+      pass[S1]=2
+      sbl=<S1>
+  8 i_lock     it: i_lock -> i_loop
+      L[it] cur=S1
+      rcu={it}
+      sblock=it
+  9 i_loop     it: i_loop -> i_slock
+      tmp[it]={S1: 1, S2: 0}
+      rcu={}
+      sblock=noone
+      pass[S1]=3
+ 10 m_shreg    m1: m_shreg -> m_fill
+      shr[S1]=reg
+ 11 m_fill     m1: m_fill -> m_dls
+ 12 m_dls      m1: m_dls -> m_shfree
+      hasact[m1]={}
+      act[S1]=0
+ 13 m_shfree   m1: m_shfree -> m_gss
+      shr[S1]=freed
+ 14 m_gss      m1: m_gss -> m_notify
+      dying[S1]=True
+      umx[S1]=noone
+ 15 i_slock    it: i_slock -> i_putprev
+ 16 m_notify   m1: m_notify -> PS1
+      L[m1] ret=m_dead ps=S1
+      ent[S1]={st: gone, ref: 0}
+ 17 PS1        m1: PS1 -> m_dead
+      pass[S1]=2
+ 18 i_putprev  it: i_putprev -> i_relock
+ 19 m_dead     m1: m_dead -> m_freefsi
+      fsl=<>
+      dead[S1]=True
+ 20 i_relock   it: i_relock -> i_loop
+      L[it] cur=nil prv=S1
+      rcu={it}
+      sblock=it
+      err={iterator advances from an unlinked node}

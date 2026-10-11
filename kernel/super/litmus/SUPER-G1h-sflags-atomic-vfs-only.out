@@ -1,0 +1,14 @@
+Test SUPER-G1h-sflags-atomic-vfs-only Allowed
+States 4
+[flags]=8;
+[flags]=9;
+[flags]=24;
+[flags]=25;
+Ok
+Witnesses
+Positive: 3 Negative: 3
+Condition exists ([flags]=24 \/ [flags]=9 \/ [flags]=8)
+Observation SUPER-G1h-sflags-atomic-vfs-only Sometimes 3 3
+Time SUPER-G1h-sflags-atomic-vfs-only 0.02
+Hash=6e97f1a28ba836b61357203308e961c7
+

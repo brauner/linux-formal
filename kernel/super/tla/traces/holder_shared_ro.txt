@@ -1,0 +1,77 @@
+holder_shared_ro -- FinalOK violated -- real (F2b on a shared erofs device): the emergency thaw leaves the shared device frozen and the next mount using it fails
+
+Layout: two read-only (erofs) superblocks, s1 on d1 and s2 on d2, both with the extra
+device d3 claimed with the file_system_type as holder (shared); dm3 suspends and
+resumes d3; e is the emergency thaw.
+
+ 6-18  m2  s2 mounts with d3 ((d3, s2) published); s1's mount is slower.
+ 14-25 dm3 bdev_freeze(d3): the walk freezes s2 (the read-only shortcut).
+ 26-30 dm3 dm resume: bdev_thaw(d3) -> fs_bdev_thaw() pins (d3, s2), get_active_super().
+ 31-34 e   do_thaw_all_callback(s2): bdev_thaw(s2->s_bdev) = d2: -EINVAL;
+           thaw_super_locked(FREEZE_HOLDER_USERSPACE) takes d3's hold.
+ 35-38 dm3 thaw_super(s2): -EINVAL; one superblock on d3 so far: returned;
+           bd_fsfreeze_count(d3) stays 1.
+ 39-41 m1  s1 opens d3: fs_bdev_register() sees the count (L1670): -EBUSY, the mount
+           of s1 fails.
+
+erofs extra devices are never s_bdev, so any freeze of them is taken by the
+emergency thaw's thaw_super_locked() rather than its bdev_thaw() loop.
+holder_shared_ro_fixed passes with the proposed fs_bdev_thaw() change.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_shared_ro.log)
+
+# Invariant FinalOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, m2=m_sget, u1=u_go, u2=u_go, dm3=d_start, e=e_start]
+      pv = [m1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], m2=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], u1=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], u2=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}], dm3=[e=ok, ret=ok, dv=d3, k=done, todo={}, cur=none, n=0, froze={}, it={}], e=[e=ok, ret=ok, dv=none, k=done, todo={}, cur=none, n=0, froze={}, it={}]]
+      dn = [d1=0, d2=0, d3=0]
+      dev = [d1=[cl={}, cnt=0, fm=none], d2=[cl={}, cnt=0, fm=none], d3=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0, d2=0, d3=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}], s2=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 EStart: pc.e=e_next; pv.e.it={s1,s2}
+  3 ENext: pv.e.cur=s1; pv.e.it={s2}
+  4 DStart: pc.dm3=bf_lock; pv.dm3.k=d_frzret
+  5 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  6 MSget: tab={<d1,s1>,<d2,s2>}; pc.m2=m_claim; sbs.s2.st=new; sbs.s2.um=m2; sbs.s2.act=1
+  7 ENext: pc.e=e_gas; pv.e.cur=s2; pv.e.it={}
+  8 MClaim: pc.m2=m_check; dev.d2.cl={s2}; sbs.s2.mem={d2}
+  9 MCheck: pc.m2=m_xclaim
+ 10 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+ 11 MXClaim: pc.m2=m_xreg; dev.d3.cl={s2}; sbs.s2.mem={d2,d3}
+ 12 MXReg: tab={<d1,s1>,<d2,s2>,<d3,s2>}; pc.m2=m_xchk
+ 13 MXChk: pc.m2=m_born
+ 14 BfLock: pc.dm3=bf_hops; dev.d3.cnt=1; dev.d3.fm=dm3; gc.d3=1
+ 15 MCheck: pc.m1=m_xclaim
+ 16 BfHops: pc.dm3=bf_walk; pv.dm3.todo={s2}
+ 17 Walk: pc.dm3=bf_gas; pv.dm3.todo={}; pv.dm3.cur=s2
+ 18 MBorn: pc.m2=done; sbs.s2.st=born; sbs.s2.um=none; sbs.s2.mnt=T
+ 19 Gas: pc.dm3=bf_frz; sbs.s2.act=2
+ 20 BfFrz: pc.dm3=bf_put; pv.dm3.n=1; pv.dm3.froze={s2}; sbs.s2.act=3; sbs.s2.frz=T; sbs.s2.uc=1
+ 21 Put: pc.dm3=bf_walk; sbs.s2.act=2
+ 22 Walk: pc.dm3=bf_sync
+ 23 BfSync: pc.dm3=bf_end
+ 24 BfEnd: pc.dm3=d_frzret; dev.d3.fm=none
+ 25 DFrzRet: pc.dm3=d_hold
+ 26 DHold: pc.dm3=bt_lock; pv.dm3.k=done
+ 27 BtLock: pc.dm3=bt_hops; dev.d3.fm=dm3
+ 28 BtHops: pc.dm3=bt_walk; pv.dm3.todo={s2}; pv.dm3.n=0
+ 29 Walk: pc.dm3=bt_gas; pv.dm3.todo={}
+ 30 Gas: pc.dm3=bt_thw; sbs.s2.act=3
+ 31 EGas: pc.e=bt_lock; pv.e.dv=d2; pv.e.k=e_btret; sbs.s2.act=4
+ 32 BtLock: pc.e=e_btret; pv.e.ret=EINVAL
+ 33 EBtRet: pc.e=e_lock
+ 34 ELock: pc.e=e_put; sbs.s2.act=3; sbs.s2.frz=F; sbs.s2.uc=0
+ 35 BtThw: pc.dm3=bt_put; pv.dm3.e=EINVAL; pv.dm3.n=1
+ 36 Put: pc.dm3=bt_walk; sbs.s2.act=2
+ 37 Walk: pc.dm3=bt_end
+ 38 BtEnd: pc.dm3=done; pv.dm3.ret=EINVAL; dev.d3.fm=none; gc.d3=0
+ 39 MXClaim: pc.m1=m_xreg; dev.d3.cl={s1,s2}; sbs.s1.mem={d1,d3}
+ 40 MXReg: tab={<d1,s1>,<d2,s2>,<d3,s1>,<d3,s2>}; pc.m1=m_xchk
+ 41 MXChk: tab={<d2,s2>,<d3,s2>}; pc.m1=done; pv.m1.ret=EBUSY; dev.d1.cl={}; dev.d3.cl={s2}; sbs.s1.st=dead; sbs.s1.um=none; sbs.s1.act=0; sbs.s1.mem={}
+ 42 Umount: pc.u2=done; sbs.s2.act=1; sbs.s2.mnt=F
+ 43 Abandon: pc.u1=done
+ 44 Put: tab={}; pc.e=e_next; dev.d2.cl={}; dev.d3.cl={}; sbs.s2.st=dead; sbs.s2.act=0; sbs.s2.mem={}
+ 45 ENext: pc.e=done

@@ -1,0 +1,97 @@
+C SUPER-F3f-fserror-wake-after-mb
+
+(*
+ * Expected: Never
+ *
+ * Fix candidate for SUPER-F3: fserror_pending_dec() with smp_mb()
+ * between refcount_dec_and_test() and wake_up_var().
+ *
+ * Question: generic_shutdown_super() calls fserror_unmount(), which drops
+ * the bias of s_pending_errors and, if error reports are still queued,
+ * waits in wait_var_event() for the count to reach zero.  The last
+ * fserror_worker() drops the count with refcount_dec_and_test() and then
+ * calls wake_up_var() with no further barrier.  wake_up_var() requires a
+ * full barrier between the update and its waitqueue_active() check, and
+ * says a fully ordered operation such as atomic_dec_and_test() provides
+ * it.  refcount_dec_and_test() is not fully ordered: it is
+ * atomic_fetch_sub_release() plus smp_acquire__after_ctrl_dep() (an
+ * smp_rmb()) on success, which orders the decrement's load, not its
+ * store, before the queue check.  Can the unmount sleep forever?
+ *
+ * Code (fs/fserror.c, HEAD fc1c25014ff8):
+ *   31          if (!refcount_dec_and_test(&sb->s_pending_errors))   (fserror_unmount())
+ *   32                  wait_var_event(&sb->s_pending_errors,
+ *   33                                 refcount_read(&sb->s_pending_errors) < 1);
+ *   38          if (refcount_dec_and_test(&sb->s_pending_errors))   (fserror_pending_dec())
+ *   39                  wake_up_var(&sb->s_pending_errors);
+ * fs/super.c:
+ *   733                 fserror_unmount(sb);          (generic_shutdown_super(), s_umount held)
+ * include/linux/refcount.h __refcount_sub_and_test():
+ *           int old = atomic_fetch_sub_release(i, &r->refs);
+ *           if (old > 0 && old == i) {
+ *                   smp_acquire__after_ctrl_dep();
+ *
+ * Encoding: cnt is s_pending_errors at 2 (the bias plus one queued
+ * report).  P0 is the unmount: its own refcount_dec_and_test() (2 to 1,
+ * not last) and then wait_var_event(): the early check, queueing with
+ * set_current_state()'s barrier, the re-check.  P1 is the last
+ * fserror_free_event(): refcount_dec_and_test() (1 to 0) and
+ * wake_up_var()'s waitqueue_active() check.  Bad outcome: P0 queued and
+ * re-read 1 (it sleeps), P1 saw the queue empty (it never wakes P0).
+ *
+ * Result: allowed.  The SB shape needs a full barrier on both sides; P1
+ * has only release plus smp_rmb().  On arm64 the decrement is LDADDL and
+ * smp_rmb() is DMB ISHLD, which does not order the LDADDL's store before
+ * the later load (see aarch64/F3-fserror-unmount-lost-wakeup.litmus,
+ * allowed under the Arm model too); on x86 LOCK XADD is a full barrier.
+ * Consequence: umount (or the final deactivate) hangs in D state in
+ * generic_shutdown_super() with s_umount held.  Fix: smp_mb() between
+ * refcount_dec_and_test() and wake_up_var() in fserror_pending_dec()
+ * (SUPER-F3f), or an atomic_t with atomic_dec_and_wake_up(), as
+ * cgroup_writeback_unpin() does with atomic_dec_and_test() (SUPER-F4).
+ *)
+
+{
+	cnt=2;
+	wq=0;
+	state=0;
+}
+
+P0(atomic_t *cnt, int *wq, int *state, spinlock_t *wql)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_fetch_sub_release(1, cnt);
+	if (r0 == 2) {
+		r1 = atomic_read(cnt);
+		if (r1 == 1) {
+			spin_lock(wql);
+			WRITE_ONCE(*wq, 1);
+			smp_store_mb(*state, 2);
+			spin_unlock(wql);
+			r2 = atomic_read(cnt);
+		}
+	}
+}
+
+P1(atomic_t *cnt, int *wq, int *woken, spinlock_t *wql)
+{
+	int r3;
+	int r4;
+
+	r3 = atomic_fetch_sub_release(1, cnt);
+	if (r3 == 1) {
+		smp_rmb();
+		smp_mb();
+		r4 = READ_ONCE(*wq);
+		if (r4 != 0) {
+			spin_lock(wql);
+			WRITE_ONCE(*woken, 1);
+			spin_unlock(wql);
+		}
+	}
+}
+
+exists (0:r0=2 /\ 0:r1=1 /\ 0:r2=1 /\ 1:r3=1 /\ 1:r4=0)

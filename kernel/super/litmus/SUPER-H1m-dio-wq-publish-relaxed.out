@@ -1,0 +1,13 @@
+Test SUPER-H1m-dio-wq-publish-relaxed Allowed
+States 3
+1:r1=wq; 1:r2=0;
+1:r1=wq; 1:r2=1;
+1:r1=z; 1:r2=0;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (1:r1=wq /\ 1:r2=0)
+Observation SUPER-H1m-dio-wq-publish-relaxed Sometimes 1 2
+Time SUPER-H1m-dio-wq-publish-relaxed 0.00
+Hash=e813a31d60ebdf4431598513efee198b
+

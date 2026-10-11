@@ -1,0 +1,50 @@
+freeze_wake_nobarrier -- NoLostWakeup violated -- mutation SBW_BARRIER off (what keeps wait_for_partially_frozen() safe without smp_mb() before wake_up_var())
+
+Layout: u (FIFREEZE) and b (block device) freeze concurrently; stores to
+s_writers.frozen are buffered (WEAK_WAKE) and, as a mutation, percpu_down_write() is
+not a full barrier.
+
+ 2-5   u  freeze_super(): SB_FREEZE_WRITE, s_umount dropped, the WRITE rwsem.
+ 6-8   b  freeze_super() sees SB_FREEZE_WRITE: wait_for_partially_frozen() L2060 samples
+          old = WRITE (L2065) and drops s_umount (L2067) -- the task is delayed before
+          it queues itself.
+ 9-15  u  retakes s_umount, stores PAGEFAULT, FS, COMPLETE; without the barrier these
+          stores are all still in u's store buffer.
+ 16    u  wake_up_var() (L2332): waitqueue_active() sees nobody -- b is not queued yet.
+ 17    b  prepare_to_wait_event() queues b, reads frozen: still WRITE (the stores are
+          buffered) == old: b sleeps.
+ 18       u's stores drain.  b sleeps with its condition true and no wakeup coming.
+
+In the kernel this cannot happen: the PAGEFAULT store is followed by
+percpu_down_write()'s atomic_xchg() (kernel/locking/percpu-rwsem.c L89), so a
+waiter that still reads WRITE was queued before u's later wake_up_var() looks at
+the queue, and a waiter reading any later value does not sleep (it only ever
+waits with old == WRITE).  freeze_wake_weak and freeze_all_weak pass with the
+kernel's barriers.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_wake_nobarrier.log)
+
+# Invariant NoLostWakeup is violated.
+  1 Initial predicate
+      pc = [u=f_lock, b=f_gas, w=w_start, U=u_go]
+      pv = [u=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], w=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FLock: pc.u=f_check; pv.u.tmp=1; sb.active=2; sb.um=u
+  3 FCheck: pc.u=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  4 FSw: pc.u=f_sw1w; sb.wpend.1=T
+  5 FSw1w: pc.u=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  6 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=3
+  7 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=4; sb.um=b
+  8 FCheck: pc.b=fw_enq; pv.b.old=1; sb.um=none
+  9 FRelock: pc.u=f_sw2; sb.frozen=2; sb.um=u; sb.pend={u}
+ 10 FSw: pc.u=f_sw2w; sb.wpend.2=T
+ 11 FSwWait: pc.u=f_sync; sb.wpend.2=F; sb.wheld.2=T
+ 12 FSync: pc.u=f_sw3; sb.frozen=3
+ 13 FSw: pc.u=f_sw3w; sb.wpend.3=T
+ 14 FSwWait: pc.u=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 15 FFreezeFs: pc.u=wake; pv.u.cont=to_shared; pv.u.nxt=f_hold; pv.u.granted=T; sb.frozen=4; sb.ucount=1; sb.wk={u}
+ 16 WakeStep: pc.u=rel; sb.wk={}
+ 17 FWaitEnq: pc.b=fw_sleep; sb.waitq={b}
+ 18 Flush: sb.fvis=4; sb.pend={}

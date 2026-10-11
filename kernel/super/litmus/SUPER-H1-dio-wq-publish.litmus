@@ -1,0 +1,58 @@
+C SUPER-H1-dio-wq-publish
+
+(*
+ * Expected: Never
+ *
+ * Question: sb_init_dio_done_wq() allocates a workqueue and publishes it
+ * with try_cmpxchg() on s_dio_done_wq; direct I/O submitters test
+ * s_dio_done_wq with a plain load and completions (possibly on another
+ * CPU, from the bio end_io path) pass it to queue_work().  Does a task
+ * that sees the pointer see the initialised workqueue?
+ *
+ * Code (HEAD fc1c25014ff8):
+ * fs/super.c
+ *   2436        struct workqueue_struct *wq = alloc_workqueue("dio/%s",
+ *   2443        old = NULL;
+ *   2447        if (!try_cmpxchg(&sb->s_dio_done_wq, &old, wq)) {
+ *   2449                destroy_workqueue(wq);
+ * fs/iomap/direct-io.c
+ *   806         if (!wait_for_completion && !inode->i_sb->s_dio_done_wq) {
+ *   807                 ret = sb_init_dio_done_wq(inode->i_sb);
+ *   233                 queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
+ * (likewise fs/direct-io.c dio_set_defer_completion()/dio_bio_end_aio(),
+ * fs/backing-file.c, fs/fuse/file.c)
+ *
+ * Encoding: wq is the workqueue (its initialisation is the store of 1),
+ * p is s_dio_done_wq initially pointing at a dummy location z meaning
+ * NULL.  try_cmpxchg() is fully ordered on success (cmpxchg() here).  The
+ * reader uses a READ_ONCE() and an address dependency; the kernel's load
+ * is plain (a data race under LKMM, harmless for an aligned pointer load
+ * the compiler emits once).  The completion side is the same reader on
+ * another CPU: it is reached through the I/O the submitter issued after
+ * seeing the pointer.
+ *)
+
+{
+	p=z;
+	z=0;
+	wq=0;
+}
+
+P0(int **p, int *wq, int *z)
+{
+	int *r0;
+
+	WRITE_ONCE(*wq, 1);
+	r0 = cmpxchg(p, z, wq);
+}
+
+P1(int **p, int *wq)
+{
+	int *r1;
+	int r2;
+
+	r1 = READ_ONCE(*p);
+	r2 = READ_ONCE(*r1);
+}
+
+exists (1:r1=wq /\ 1:r2=0)

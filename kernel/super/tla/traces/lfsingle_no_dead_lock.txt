@@ -1,0 +1,77 @@
+lfsingle_no_dead_lock -- NoErr (FIX_DEAD_LOCK off): "test() dereferences a freed s_fs_info"
+
+SB_DEAD set without sb_lock: m2's sget_fc() passes the SB_DEAD check (L865) for the dying
+S1, kill_super_notify() sets SB_DEAD, kill_anon_super() returns and the filesystem frees
+s_fs_info, then m2's test() (L867) runs on it.  Setting SB_DEAD under sb_lock (L565-567)
+waits out a test() in progress.
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoErr is violated
+  1 Initial
+  2 i_lock     it: i_lock -> i_loop
+      rcu={it}
+      sblock=it
+  3 h_pick     sh: h_pick -> Done
+  4 i_loop     it: i_loop -> Done
+      rcu={}
+      sblock=noone
+  5 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+  6 m_scan     m1: m_scan -> m_nomatch
+  7 m_nomatch  m1: m_nomatch -> m_alloc
+      rcu={}
+      sblock=noone
+  8 m_alloc    m1: m_alloc -> m_lock
+      L[m1] s=S1
+      hasact[m1]={S1}
+      own[S1]=1
+      st[S1]=alloc
+      act[S1]=1
+      umx[S1]=m1
+      pass[S1]=1
+  9 m_lock     m1: m_lock -> m_scan
+      rcu={m1}
+      sblock=m1
+ 10 m_scan     m1: m_scan -> m_nomatch
+ 11 m_nomatch  m1: m_nomatch -> m_set
+ 12 m_set      m1: m_set -> m_shreg
+      rcu={}
+      sblock=noone
+      fsi[S1]=live
+      fsl=<S1>
+      st[S1]=pub
+      ent[S1]={st: linked, ref: 1}
+      pass[S1]=2
+      sbl=<S1>
+ 13 u_pin      ug: u_pin -> u_lock
+      L[ug] s=S1
+      ent[S1]={st: linked, ref: 2}
+ 14 m_shreg    m1: m_shreg -> m_fill
+      shr[S1]=reg
+ 15 m_fill     m1: m_fill -> m_dls
+ 16 m_dls      m1: m_dls -> m_shfree
+      hasact[m1]={}
+      act[S1]=0
+ 17 m_shfree   m1: m_shfree -> m_gss
+      shr[S1]=freed
+ 18 m_lock     m2: m_lock -> m_scan
+      rcu={m2}
+      sblock=m2
+ 19 m_gss      m1: m_gss -> m_notify
+      dying[S1]=True
+      umx[S1]=noone
+ 20 m_notify   m1: m_notify -> m_dead
+      ent[S1]={st: linked, ref: 1}
+ 21 m_scan     m2: m_scan -> m_test
+      L[m2] old=S1
+ 22 m_dead     m1: m_dead -> m_freefsi
+      dead[S1]=True
+ 23 m_freefsi  m1: m_freefsi -> m_put0
+      fsi[S1]=freed
+ 24 m_test     m2: m_test -> m_grab0
+      err={test() dereferences a freed s_fs_info}

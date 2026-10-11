@@ -1,0 +1,70 @@
+C SUPER-A2-born-publishes-fill-super
+
+(*
+ * Expected: Never
+ *
+ * Question: does a task that sees SB_BORN through super_flags() also see
+ * what fill_super() initialised before vfs_get_tree() set SB_BORN
+ * (s_root, s_op, s_bdi)?  Message passing: release store in super_wake()
+ * against the acquire load in super_flags().
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   94          return smp_load_acquire(&sb->s_flags) & flags;
+ *   118         wait_var_event(&sb->s_flags, super_flags(sb, SB_BORN | SB_DYING));
+ *   121         if (super_flags(sb, SB_DYING))
+ *   160         * Pairs with smp_load_acquire() in super_lock() to make sure
+ *   161         * all initializations in the superblock are seen by the user
+ *   162         * seeing SB_BORN sent.
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ *   1955        super_wake(sb, SB_BORN);              (vfs_get_tree())
+ * fill_super() stores, e.g. sb->s_op = &ext4_sops; sb->s_root = d_make_root(root);
+ * and setup_bdev_super() sb->s_bdi = bdi_get(bdev->bd_disk->bdi);
+ *
+ * Encoding: plain stores and loads for the fill_super() fields, as in the
+ * kernel, so herd7 also checks that the pairing makes them race-free.
+ * P0 is fill_super() followed by super_wake(SB_BORN); P1 is a waiter
+ * that saw SB_BORN in wait_var_event() and then uses the superblock.
+ * Note that super_lock() takes s_umount after the wait, which orders the
+ * same accesses a second time; this test shows that the acquire load is
+ * sufficient on its own.
+ *)
+
+{
+	flags=0;
+	s_root=0;
+	s_op=0;
+	s_bdi=0;
+}
+
+P0(int *flags, int *s_root, int *s_op, int *s_bdi)
+{
+	int r0;
+	int r1;
+
+	*s_bdi = 1;
+	*s_op = 1;
+	*s_root = 1;
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 1;
+	smp_store_release(flags, r1);
+	smp_mb();
+}
+
+P1(int *flags, int *s_root, int *s_op, int *s_bdi)
+{
+	int r2;
+	int r3;
+	int r4;
+	int r5;
+	int r6;
+
+	r2 = smp_load_acquire(flags);
+	r3 = r2 & 1;
+	if (r3 == 1) {
+		r4 = *s_root;
+		r5 = *s_op;
+		r6 = *s_bdi;
+	}
+}
+
+exists (1:r3=1 /\ (1:r4=0 \/ 1:r5=0 \/ 1:r6=0))

@@ -1,0 +1,13 @@
+Test SUPER-G4-remount-ro-vs-write-access Allowed
+States 3
+0:r1=0; 0:r2=0; 1:r3=1;
+0:r1=0; 0:r2=1; 1:r3=0;
+0:r1=1; 0:r2=-1; 1:r3=0;
+No
+Witnesses
+Positive: 0 Negative: 7
+Condition exists (0:r1=0 /\ 0:r2=0 /\ 1:r3=0)
+Observation SUPER-G4-remount-ro-vs-write-access Never 0 7
+Time SUPER-G4-remount-ro-vs-write-access 0.04
+Hash=dec39bd767bc3b30cf4b84b6725b9b49
+

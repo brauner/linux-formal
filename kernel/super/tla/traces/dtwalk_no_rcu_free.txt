@@ -1,0 +1,78 @@
+dtwalk_no_rcu_free -- NoFreedReach (FIX_RCU_FREE off)
+
+super_dev_put() freeing with kfree() at removal: cursor C1 reads d2's head (entry 1,
+L525-526) inside its RCU section, s2's kill_super_notify() drops the last claim (L553),
+removes and frees the entry; C1 is still about to read it.  kfree_rcu() (L472) is
+load-bearing.
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoFreedReach is violated
+  1 Initial
+  2 C_start    C1: C_start -> W0
+      L[C1] dev=d2 ret=Done ph=ugs
+  3 fs_alloc   s2: fs_alloc -> fs_set
+      E[1]={sb: s2, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s2]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  4 fs_set     s2: fs_set -> fs_setpass
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=1
+  5 fs_setpass s2: fs_setpass -> fs_open
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s2]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  6 fs_open    s2: fs_open -> R0
+      L[s2] sb=s2 dev=d2 ret=fs_bdevchk
+      bdOpen[d2]=1
+  7 R0         s2: R0 -> R1
+      L[s2] pos=1
+      rcu={s2}
+  8 R1         s2: R1 -> R2
+      L[s2] fnd=1
+  9 R2         s2: R2 -> fs_bdevchk
+      L[s2] res=ok pos=0 fnd=0
+      E[1]={sb: s2, st: linked, dev: d2, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 10 fs_bdevchk s2: fs_bdevchk -> fs_x
+      use[s2]={d1: False, d2: True}
+ 11 fs_x       s2: fs_x -> fs_born
+ 12 fs_born    s2: fs_born -> fs_fail
+ 13 fs_fail    s2: fs_fail -> fs_relx
+      S[s2]={pass: 2, ph: nascent, act: 0, um: fs, sget: 1, own: 1}
+ 14 fs_relx    s2: fs_relx -> fs_dying
+ 15 fs_dying   s2: fs_dying -> fs_relm
+      S[s2]={pass: 2, ph: dying, act: 0, um: free, sget: 1, own: 1}
+ 16 fs_relm    s2: fs_relm -> U0
+      L[s2] ret=fs_relmput
+      use[s2]={d1: False, d2: False}
+ 17 U0         s2: U0 -> U1
+      L[s2] pos=1
+      rcu={s2}
+ 18 U1         s2: U1 -> U2
+      L[s2] fnd=1
+ 19 U2         s2: U2 -> P1
+      L[s2] pret=fs_relmput pos=0 fnd=0 pe=1
+      rcu={}
+ 20 P1         s2: P1 -> fs_relmput
+      L[s2] pe=0
+      E[1]={sb: s2, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+ 21 fs_relmput s2: fs_relmput -> fs_notify
+      bdOpen[d2]=0
+ 22 W0         C1: W0 -> W1
+      L[C1] pos=1 stab={1}
+      rcu={C1}
+ 23 fs_notify  s2: fs_notify -> P1
+      L[s2] pret=fs_dead pe=1
+      S[s2]={pass: 2, ph: dying, act: 0, um: free, sget: 0, own: 1}
+ 24 P1         s2: P1 -> P2
+      L[C1] stab={}
+      E[1]={sb: s2, st: linked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+ 25 P2         s2: P2 -> P3
+      E[1]={sb: s2, st: unlinked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+      head[d2]=0
+ 26 P3         s2: P3 -> fs_dead
+      L[s2] pe=0
+      E[1]={sb: s2, st: freed, dev: d2, ref: 0, next: 0, gp: {}, pass: 2}
+      S[s2]={pass: 1, ph: dying, act: 0, um: free, sget: 0, own: 1}

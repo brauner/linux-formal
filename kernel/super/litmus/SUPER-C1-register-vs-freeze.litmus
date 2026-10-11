@@ -1,0 +1,76 @@
+C SUPER-C1-register-vs-freeze
+
+(*
+ * Expected: Never
+ *
+ * Question: fs_bdev_register() publishes a new {dev, sb} claim and then
+ * refuses with -EBUSY if the device is frozen; bdev_freeze() bumps the
+ * freeze count and then walks the claims.  Store buffering: it must be
+ * impossible that the registrar reads a zero count (the claim stands)
+ * and the freezer's lookup misses the claim (the superblock is not
+ * frozen although the device is).
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   486         err = rhltable_insert(&super_dev_table, &fsd->sd_node, super_dev_params);
+ *   1664        err = super_dev_insert(sb_dev);
+ *   1668        /* Publish the entry before reading the count; pairs with bdev_freeze(). */
+ *   1669        smp_mb();
+ *   1670        if (atomic_read(&file_bdev(bdev_file)->bd_fsfreeze_count) > 0) {
+ *   1558        mutex_unlock(&bdev->bd_holder_lock);  (fs_bdev_freeze())
+ *   1560        for (sb_dev = super_dev_first(dev); sb_dev; sb_dev = super_dev_next(sb_dev)) {
+ *   525         rcu_read_lock();
+ *   526         sb_dev = super_dev_get(rhltable_lookup(&super_dev_table, &dev, super_dev_params));
+ * block/bdev.c bdev_freeze():
+ *   304         mutex_lock(&bdev->bd_fsfreeze_mutex);
+ *   307         if (!atomic_inc_unless_negative(&bdev->bd_fsfreeze_count)) {
+ *   311         if (atomic_read(&bdev->bd_fsfreeze_count) > 1) {
+ *   316         mutex_lock(&bdev->bd_holder_lock);
+ *   318                 error = bdev->bd_holder_ops->freeze(bdev);
+ * include/linux/rhashtable.h __rhashtable_insert_fast():
+ *           rcu_assign_pointer() of the predecessor slot, or rht_assign_unlock()
+ *
+ * Encoding: head is the hash chain slot the claim is linked into
+ * (rcu_assign_pointer() under the bucket bit lock, modelled as a
+ * spinlock), count is bd_fsfreeze_count.  atomic_inc_unless_negative()
+ * is a cmpxchg loop with full ordering on success; with a single freezer
+ * and a count of 0 it is atomic_cmpxchg(count, 0, 1).  bd_fsfreeze_mutex
+ * only serialises freezers and is left out; bd_holder_lock is kept.
+ * rhashtable resizing is assumed to preserve "an insert followed by a
+ * full barrier is seen by a later lookup" (lookups recheck future_tbl
+ * after an smp_rmb()).
+ *)
+
+{
+	count=0;
+	head=0;
+}
+
+P0(int *head, atomic_t *count, spinlock_t *bucket)
+{
+	int r0;
+
+	spin_lock(bucket);
+	rcu_assign_pointer(*head, 1);
+	spin_unlock(bucket);
+	smp_mb();
+	r0 = atomic_read(count);
+}
+
+P1(int *head, atomic_t *count, spinlock_t *holder)
+{
+	int r1;
+	int r2;
+	int r3;
+
+	r1 = atomic_cmpxchg(count, 0, 1);
+	if (r1 == 0) {
+		r2 = atomic_read(count);
+		spin_lock(holder);
+		spin_unlock(holder);
+		rcu_read_lock();
+		r3 = rcu_dereference(*head);
+		rcu_read_unlock();
+	}
+}
+
+exists (0:r0=0 /\ 1:r1=0 /\ 1:r3=0)

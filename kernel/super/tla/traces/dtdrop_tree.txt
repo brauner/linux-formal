@@ -1,0 +1,151 @@
+dtdrop_tree -- NoErr: "a freeze taken through the device outlives its thaw"
+
+Layout: s1 with main device d1 and member device d2 registered during the mount and
+released again before SB_BORN while the mount succeeds: btrfs_open_devices() opens every
+scanned device of the fs_devices (holder = the superblock, fs_holder_ops), and
+open_ctree() -> btrfs_free_extra_devids() -> __btrfs_free_extra_devids() closes the ones
+not in the metadata with fs_bdev_file_release() -- no bdev_deny_freeze() around either.
+(btrfs_open_one_device()'s devid/uuid mismatch path, error_free_page, is the same.)
+F2 is a dm suspend/resume of d2.  Lines are fs/super.c at fc1c25014ff8.
+
+ 2-9   s1  sget_fc(), set() registers (d1, s1) (L493), setup_bdev_super() of d1 (L1799).
+ 10-17 s1  fs_bdev_file_open_by_path(d2): fs_bdev_register() inserts (d2, s1) (L486,
+           L488), bd_fsfreeze_count is 0 at L1678: accepted.
+ 18-19 s1  the device is not in the metadata: fs_bdev_file_release() -> fs_bdev_unregister()
+           (L1766) looks the entry up (L1772) ...
+ 20    F2  bdev_freeze(d2): count 0 -> 1 (block/bdev.c L307); bd_holder_ops is set (s1 still
+           has d2 open) -> fs_bdev_freeze() (L1557).
+ 24-27 F2  super_dev_first(d2) pins the entry (L515): ref 2.
+ 21-23,28 s1  ... and drops its claim: super_dev_put() (L1774) 2 -> 1, the entry stays linked
+           under F2's pin; bdev_fput(): no holder is left on d2 (bd_holder_ops NULL).
+ 29-30 s1  the mount succeeds: SB_BORN (L1963), up_write(s_umount).
+ 31-32 F2  get_active_super(s1) (L1569 -> L1201), which had waited for SB_BORN, succeeds.
+ 33    F2  fs_super_freeze() -> freeze_super(s1, FREEZE_MAY_NEST | FREEZE_HOLDER_USERSPACE)
+           L1571: s1 frozen (freeze_ucount 1, one active reference kept for the freeze);
+           deactivate_super() L1574; count++.
+ 34-39 F2  super_dev_next(): no next; super_dev_put(): 0, the entry is removed (L469-472).
+ 40-41 F2  bdev_freeze() returns 0: d2 frozen.
+ 42-44 F2  bdev_thaw(d2): count 1, bd_holder_ops is NULL (nobody holds d2), so no ->thaw
+           (block/bdev.c L363-364); count 1 -> 0 (L367-368).
+           s1 stays frozen with nobody to thaw it: writes to s1 block in sb_start_write(),
+           the freeze keeps an active reference so an unmount never shuts s1 down; only a
+           FITHAW (or emergency thaw) on s1 recovers it.
+
+The window is wide here: from btrfs_open_devices() to btrfs_free_extra_devids() the mount
+reads the chunk tree.  The freeze must come after the registration's L1678 check (else
+the open is refused) and before the release.
+
+------------------------------------------------------------------------------
+TLC counterexample, printed by show-trace-life-devtable.py (a jens run with 24 workers, the
+local 4-worker run for dtdup_underflow; another run may report a different interleaving
+with the same outcome)
+
+** Invariant NoErr is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_set
+      E[1]={sb: s1, st: alloc, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      S[s1]={pass: 1, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  3 fs_set     s1: fs_set -> fs_setpass
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d1]=1
+  4 fs_setpass s1: fs_setpass -> fs_open
+      E[1]={sb: s1, st: linked, dev: d1, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 2, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+  5 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 dev=d1 ret=fs_bdevchk
+      bdOpen[d1]=1
+  6 R0         s1: R0 -> R1
+      L[s1] pos=1
+      rcu={s1}
+  7 R1         s1: R1 -> R2
+      L[s1] fnd=1
+  8 R2         s1: R2 -> fs_bdevchk
+      L[s1] res=ok pos=0 fnd=0
+      E[1]={sb: s1, st: linked, dev: d1, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+  9 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+ 10 fs_x       s1: fs_x -> R0
+      L[s1] dev=d2 ret=fs_xchk
+      bdOpen[d2]=1
+      xst[s1]=1
+ 11 R0         s1: R0 -> R1
+      rcu={s1}
+ 12 R1         s1: R1 -> R2
+ 13 R2         s1: R2 -> R3
+      rcu={}
+ 14 R3         s1: R3 -> R4
+      L[s1] ne=2
+      E[2]={sb: s1, st: alloc, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+ 15 R4         s1: R4 -> R5
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 0}
+      head[d2]=2
+ 16 R5         s1: R5 -> R6
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+      S[s1]={pass: 3, ph: nascent, act: 1, um: fs, sget: 1, own: 1}
+ 17 R6         s1: R6 -> fs_xchk
+      L[s1] ne=0
+ 18 fs_xchk    s1: fs_xchk -> fs_xdrop
+      use[s1]={d1: True, d2: True}
+ 19 fs_xdrop   s1: fs_xdrop -> U0
+      L[s1] ret=fs_xdfput
+      use[s1]={d1: True, d2: False}
+      xst[s1]=2
+ 20 F_bdf      F2: F_bdf -> F_hold
+      bdc[d2]=1
+ 21 U0         s1: U0 -> U1
+      L[s1] pos=2
+      rcu={s1}
+ 22 U1         s1: U1 -> U2
+      L[s1] fnd=2
+ 23 U2         s1: U2 -> P1
+      L[s1] pret=fs_xdfput pos=0 fnd=0 pe=2
+      rcu={}
+ 24 F_hold     F2: F_hold -> W0
+      L[F2] dev=d2 ret=F_fend ph=frz
+ 25 W0         F2: W0 -> W1
+      L[F2] pos=2 stab={2}
+      rcu={F2}
+ 26 W1         F2: W1 -> W2
+      L[F2] pos=0 nxt=2
+      E[2]={sb: s1, st: linked, dev: d2, ref: 2, next: 0, gp: {}, pass: 1}
+      rcu={}
+ 27 W2         F2: W2 -> W3
+ 28 P1         s1: P1 -> fs_xdfput
+      L[s1] pe=0
+      E[2]={sb: s1, st: linked, dev: d2, ref: 1, next: 0, gp: {}, pass: 1}
+ 29 fs_xdfput  s1: fs_xdfput -> fs_born
+      bdOpen[d2]=0
+ 30 fs_born    s1: fs_born -> fs_live
+      S[s1]={pass: 3, ph: born, act: 1, um: free, sget: 1, own: 1}
+ 31 W3         F2: W3 -> F_gas
+      L[F2] sb=s1 pin=2 nxt=0 vis={2}
+ 32 F_gas      F2: F_gas -> F_frz
+      S[s1]={pass: 3, ph: born, act: 2, um: free, sget: 1, own: 1}
+ 33 F_frz      F2: F_frz -> WN
+      L[F2] cnt=1
+      ucount[s1]=1
+      fvia[s1]={d1: 0, d2: 1}
+ 34 WN         F2: WN -> W1
+      L[F2] frm=True
+      rcu={F2}
+ 35 W1         F2: W1 -> W2
+      rcu={}
+ 36 W2         F2: W2 -> P1
+      L[F2] pret=W3 pin=0 frm=False pe=2
+ 37 P1         F2: P1 -> P2
+      E[2]={sb: s1, st: linked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+ 38 P2         F2: P2 -> P3
+      E[2]={sb: s1, st: unlinked, dev: d2, ref: 0, next: 0, gp: {}, pass: 1}
+      head[d2]=0
+ 39 P3         F2: P3 -> W3
+      L[F2] pe=0
+      E[2]={sb: s1, st: rcu, dev: d2, ref: 0, next: 0, gp: {}, pass: 2}
+      S[s1]={pass: 2, ph: born, act: 2, um: free, sget: 1, own: 1}
+ 40 W3         F2: W3 -> F_fend
+ 41 F_fend     F2: F_fend -> F_frozen
+ 42 F_frozen   F2: F_frozen -> F_bdt
+ 43 F_bdt      F2: F_bdt -> T_end
+ 44 T_end      F2: T_end -> Done
+      bdc[d2]=0
+      err={a freeze taken through the device outlives its thaw}

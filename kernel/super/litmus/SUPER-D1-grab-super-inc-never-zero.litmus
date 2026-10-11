@@ -1,0 +1,92 @@
+C SUPER-D1-grab-super-inc-never-zero
+
+(*
+ * Expected: Never
+ *
+ * Question: sget_fc() calls grab_super(), which takes a passive reference
+ * with a plain refcount_inc() under sb_lock, on any superblock on
+ * fs_supers that is not SB_DEAD.  put_super() drops the last passive
+ * reference outside sb_lock and only then unlinks under sb_lock.  Can
+ * that refcount_inc() ever see zero (i.e. a superblock whose final put
+ * already happened, about to be unlinked and freed after a grace period)?
+ * The argument: the superblock's own reference is dropped only after
+ * kill_super_notify() set SB_DEAD inside sb_lock, and every other passive
+ * reference holder (device table entries, walkers) is either gone before
+ * that or is a walker whose sb_lock section orders it.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   565         spin_lock(&sb_lock);                  (kill_super_notify())
+ *   566         super_wake(sb, SB_DEAD);
+ *   567         spin_unlock(&sb_lock);
+ *   594         put_super(s);                         (deactivate_locked_super())
+ *   421         if (refcount_dec_and_test(&s->s_passive)) {
+ *   424                 spin_lock(&sb_lock);
+ *   425                 list_del_init(&s->s_list);
+ *   426                 hlist_del_init(&s->s_instances);
+ *   427                 spin_unlock(&sb_lock);
+ *   432                 call_rcu(&s->rcu, destroy_super_rcu);
+ *   861         spin_lock(&sb_lock);                  (sget_fc())
+ *   863         hlist_for_each_entry(old, &fc->fs_type->fs_supers, s_instances) {
+ *   865                 if (super_flags(old, SB_DEAD))
+ *   866                         continue;
+ *   867                 if (test(old, fc))
+ *   868                         goto share_extant_sb;
+ *   636         refcount_inc(&sb->s_passive);         (grab_super())
+ *   637         spin_unlock(&sb_lock);
+ *
+ * Encoding: passive starts at 1 (the superblock's own reference, the
+ * device table's reference already dropped), flags at SB_BORN|SB_DYING
+ * (3; SB_DEAD=4), listed=1 while on fs_supers.  refcount_dec_and_test()
+ * is atomic_fetch_sub_release() plus smp_rmb() on success, refcount_inc()
+ * atomic_fetch_add_relaxed().  1:r5 starts at -1 so that 0 means the
+ * increment ran and saw zero.
+ *)
+
+{
+	passive=1;
+	listed=1;
+	flags=3;
+	1:r5=-1;
+}
+
+P0(int *flags, int *listed, atomic_t *passive, spinlock_t *sb_lock)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	spin_lock(sb_lock);
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 4;
+	smp_store_release(flags, r1);
+	smp_mb();
+	spin_unlock(sb_lock);
+	r2 = atomic_fetch_sub_release(1, passive);
+	if (r2 == 1) {
+		smp_rmb();
+		spin_lock(sb_lock);
+		WRITE_ONCE(*listed, 0);
+		spin_unlock(sb_lock);
+	}
+}
+
+P1(int *flags, int *listed, atomic_t *passive, spinlock_t *sb_lock)
+{
+	int r3;
+	int r4;
+	int r5;
+	int r6;
+
+	spin_lock(sb_lock);
+	r3 = READ_ONCE(*listed);
+	if (r3 == 1) {
+		r4 = smp_load_acquire(flags);
+		r6 = r4 & 4;
+		if (r6 == 0) {
+			r5 = atomic_fetch_add_relaxed(1, passive);
+		}
+	}
+	spin_unlock(sb_lock);
+}
+
+exists (1:r5=0)

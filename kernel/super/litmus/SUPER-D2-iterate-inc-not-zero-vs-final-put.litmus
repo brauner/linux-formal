@@ -1,0 +1,77 @@
+C SUPER-D2-iterate-inc-not-zero-vs-final-put
+
+(*
+ * Expected: Never
+ *
+ * Question: __iterate_supers() and iterate_supers_type() walk the lists
+ * under sb_lock and pin with refcount_inc_not_zero() (relaxed, control
+ * dependency only).  The final put_super() runs without sb_lock, then
+ * unlinks under sb_lock and frees after a grace period.  Can a walker
+ * pin a superblock whose final put already happened, or use one that was
+ * freed?  This is here for completeness: it reduces to the atomicity of
+ * the two read-modify-writes plus the unlink being under sb_lock.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   964         spin_lock(&sb_lock);                  (__iterate_supers())
+ *   969                 if (super_flags(sb, SB_DYING))
+ *   970                         continue;
+ *   972                 if (!refcount_inc_not_zero(&sb->s_passive))
+ *   973                         continue;
+ *   975                 spin_unlock(&sb_lock);
+ *   421         if (refcount_dec_and_test(&s->s_passive)) {   (put_super())
+ *   424                 spin_lock(&sb_lock);
+ *   425                 list_del_init(&s->s_list);
+ *   432                 call_rcu(&s->rcu, destroy_super_rcu);
+ *
+ * Encoding: passive=1 is the last reference, held by P0 (e.g. a device
+ * table entry being dropped); flags=0 lets the walker get past the
+ * SB_DYING test (the stronger case; with SB_DYING set it skips).
+ * call_rcu() is synchronize_rcu() followed by the callback.  1:r3 starts
+ * at -1.
+ *)
+
+{
+	passive=1;
+	listed=1;
+	flags=0;
+	freed=0;
+	1:r3=-1;
+}
+
+P0(int *listed, int *freed, atomic_t *passive, spinlock_t *sb_lock)
+{
+	int r0;
+
+	r0 = atomic_fetch_sub_release(1, passive);
+	if (r0 == 1) {
+		smp_rmb();
+		spin_lock(sb_lock);
+		WRITE_ONCE(*listed, 0);
+		spin_unlock(sb_lock);
+		synchronize_rcu();
+		WRITE_ONCE(*freed, 1);
+	}
+}
+
+P1(int *flags, int *listed, int *freed, atomic_t *passive, spinlock_t *sb_lock)
+{
+	int r1;
+	int r2;
+	int r3;
+	int r4;
+	int r5;
+
+	spin_lock(sb_lock);
+	r1 = READ_ONCE(*listed);
+	if (r1 == 1) {
+		r2 = smp_load_acquire(flags);
+		r5 = r2 & 2;
+		if (r5 == 0) {
+			r3 = atomic_cmpxchg_relaxed(passive, 1, 2);
+		}
+	}
+	spin_unlock(sb_lock);
+	r4 = READ_ONCE(*freed);
+}
+
+exists ((0:r0=1 /\ 1:r3=1) \/ (1:r3=1 /\ 1:r4=1))

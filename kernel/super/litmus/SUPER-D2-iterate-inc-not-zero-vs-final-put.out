@@ -1,0 +1,15 @@
+Test SUPER-D2-iterate-inc-not-zero-vs-final-put Allowed
+States 5
+0:r0=1; 1:r3=-1; 1:r4=0;
+0:r0=1; 1:r3=-1; 1:r4=1;
+0:r0=1; 1:r3=0; 1:r4=0;
+0:r0=1; 1:r3=0; 1:r4=1;
+0:r0=2; 1:r3=1; 1:r4=0;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (0:r0=1 /\ 1:r3=1 \/ 1:r3=1 /\ 1:r4=1)
+Observation SUPER-D2-iterate-inc-not-zero-vs-final-put Never 0 5
+Time SUPER-D2-iterate-inc-not-zero-vs-final-put 0.02
+Hash=3e750b959789beb6b85c7ef35a3da0c3
+

@@ -1,0 +1,74 @@
+C SUPER-A3-grab-super-waits-dead
+
+(*
+ * Expected: Never
+ *
+ * Question: can grab_super() sleep forever in its wait for SB_DEAD?
+ * kill_super_notify() sets SB_DEAD through super_wake() with sb_lock held;
+ * the waiter does not take sb_lock around its wait.  Same store buffering
+ * shape as SUPER-A1, with the waker inside an sb_lock critical section and
+ * the flag word already carrying SB_BORN|SB_DYING.
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   565         spin_lock(&sb_lock);
+ *   566         super_wake(sb, SB_DEAD);
+ *   567         spin_unlock(&sb_lock);
+ *   636         refcount_inc(&sb->s_passive);         (grab_super())
+ *   637         spin_unlock(&sb_lock);
+ *   638         locked = super_lock_excl(sb);
+ *   646         wait_var_event(&sb->s_flags, super_flags(sb, SB_DEAD));
+ *   164         smp_store_release(&sb->s_flags, sb->s_flags | flag);
+ *   170         smp_mb();
+ *   171         wake_up_var(&sb->s_flags);
+ *
+ * Encoding: as SUPER-A1 (SB_BORN=1, SB_DYING=2, SB_DEAD=4), plus sb_lock
+ * around P0's super_wake().  P1 is grab_super() after super_lock_excl()
+ * failed on SB_DYING.
+ *)
+
+{
+	flags=3;
+	wq=0;
+	state=0;
+}
+
+P0(int *flags, int *wq, int *woken, spinlock_t *wql, spinlock_t *sb_lock)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	spin_lock(sb_lock);
+	r0 = READ_ONCE(*flags);
+	r1 = r0 | 4;
+	smp_store_release(flags, r1);
+	smp_mb();
+	r2 = READ_ONCE(*wq);
+	if (r2 != 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*woken, 1);
+		spin_unlock(wql);
+	}
+	spin_unlock(sb_lock);
+}
+
+P1(int *flags, int *wq, int *state, spinlock_t *wql)
+{
+	int r3;
+	int r4;
+	int r5;
+	int r6;
+
+	r3 = smp_load_acquire(flags);
+	r4 = r3 & 4;
+	if (r4 == 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*wq, 1);
+		smp_store_mb(*state, 2);
+		spin_unlock(wql);
+		r5 = smp_load_acquire(flags);
+		r6 = r5 & 4;
+	}
+}
+
+exists (1:r4=0 /\ 1:r6=0 /\ 0:r2=0)

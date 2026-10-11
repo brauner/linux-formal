@@ -1,0 +1,12 @@
+Test SUPER-H1-dio-wq-publish Allowed
+States 2
+1:r1=wq; 1:r2=1;
+1:r1=z; 1:r2=0;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (1:r1=wq /\ 1:r2=0)
+Observation SUPER-H1-dio-wq-publish Never 0 2
+Time SUPER-H1-dio-wq-publish 0.00
+Hash=6534493b54c9b7bd8df5192ea4eb3de5
+

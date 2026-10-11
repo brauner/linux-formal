@@ -1,0 +1,14 @@
+Test C4-unregister-allow-vs-freeze Allowed
+States 3
+1:X13=0; 1:X15=0; 1:X17=0;
+1:X13=0; 1:X15=0; 1:X17=1;
+1:X13=-1; 1:X15=0; 1:X17=0;
+No
+Witnesses
+Positive: 0 Negative: 16
+Flag Assuming-common-inner-shareable-domain
+Condition exists (1:X13=0 /\ 1:X17=1 /\ 1:X15=1)
+Observation C4-unregister-allow-vs-freeze Never 0 16
+Time C4-unregister-allow-vs-freeze 0.65
+Hash=14a14c856ed23cff78eff891031d39ac
+

@@ -1,0 +1,13 @@
+Test C4m-no-branch Allowed
+States 3
+1:X13=0; 1:X15=0; 1:X17=1;
+1:X13=0; 1:X15=1; 1:X17=1;
+1:X13=-1; 1:X15=0; 1:X17=0;
+Ok
+Witnesses
+Positive: 6 Negative: 13
+Condition exists (1:X13=0 /\ 1:X17=1 /\ 1:X15=1)
+Observation C4m-no-branch Sometimes 6 13
+Time C4m-no-branch 0.38
+Hash=d4ebd0f980cbec39298b25f069815bd9
+

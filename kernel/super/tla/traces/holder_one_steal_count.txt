@@ -1,0 +1,64 @@
+holder_one_steal_count -- CountOK violated -- real (F2a): after a FITHAW took dm's freeze, dm resume leaves bd_fsfreeze_count at 1 for good
+
+Layout: as holder_one_steal.
+
+ 6-16  dm1 lock_fs() -> bdev_freeze(d1): count 1, s1 frozen through the walk.
+ 17-21 dm1 unlock_fs() (dm.c L3133, L2952) -> bdev_thaw() (block/bdev.c L341): count 1, so
+           the holder's ->thaw (L359-361) -> fs_bdev_thaw() L1594, the walk pins
+           (d1, s1), get_active_super().
+ 22    r1  FITHAW thaws s1 (as in holder_one_steal).
+ 23    dm1 fs_super_thaw() -> thaw_super(): not SB_FREEZE_COMPLETE -> -EINVAL (L2350-2351).
+ 26    dm1 one superblock: the error is returned (L1616-1618); bdev_thaw() decrements
+           only without an error (block/bdev.c L367-368): count stays 1; unlock_fs()
+           ignores the result and clears DMF_FROZEN (dm.c L2952-2953).
+
+bd_fsfreeze_count is 1 with nobody holding a freeze, and nothing ever calls
+bdev_thaw() for it again: after the umount the device can never be mounted
+(setup_bdev_super() "Can't mount, blockdev is frozen", L1811-1815), btrfs refuses
+to add/remove/replace it (bdev_deny_freeze() block/bdev.c L393-396), and every
+later bdev_freeze() nests (block/bdev.c L311-314) without freezing the filesystem,
+so the next dm snapshot is of a live filesystem.  Same end state as the bug
+fe967191e585 fixed; its message's "Thawing without holding a freeze still fails
+with -EINVAL" is not true while a block-device freeze holds freeze_ucount.
+Reproducer: dmsetup suspend dut; fsfreeze -u /mnt; dmsetup resume dut; umount
+/mnt; mount /dev/mapper/dut /mnt -> -EBUSY.  With fs_bdev_thaw() counting -EINVAL
+as thawed (holder_one_steal_fixed) the count goes.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/holder_one_steal_count.log)
+
+# Invariant CountOK is violated.
+  1 Initial predicate
+      tab = {}
+      pc = [m1=m_sget, u1=u_go, dm1=d_start, r1=r_thaw]
+      pv = [m1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], u1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], dm1=[ret=ok, dv=d1, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}], r1=[ret=ok, dv=none, k=done, todo={}, cur=none, e=ok, n=0, froze={}, it={}]]
+      dn = [d1=0]
+      dev = [d1=[cl={}, cnt=0, fm=none]]
+      gc = [d1=0]
+      sbs = [s1=[st=none, um=none, act=0, mnt=F, frz=F, kc=0, uc=0, mem={}]]
+      err = 
+  2 MSget: tab={<d1,s1>}; pc.m1=m_claim; sbs.s1.st=new; sbs.s1.um=m1; sbs.s1.act=1
+  3 DStart: pc.dm1=bf_lock; pv.dm1.k=d_frzret
+  4 MClaim: pc.m1=m_check; dev.d1.cl={s1}; sbs.s1.mem={d1}
+  5 MCheck: pc.m1=m_born
+  6 BfLock: pc.dm1=bf_hops; dev.d1.cnt=1; dev.d1.fm=dm1; gc.d1=1
+  7 BfHops: pc.dm1=bf_walk; pv.dm1.todo={s1}
+  8 Walk: pc.dm1=bf_gas; pv.dm1.todo={}; pv.dm1.cur=s1
+  9 MBorn: pc.m1=done; sbs.s1.st=born; sbs.s1.um=none; sbs.s1.mnt=T
+ 10 Gas: pc.dm1=bf_frz; sbs.s1.act=2
+ 11 BfFrz: pc.dm1=bf_put; pv.dm1.n=1; pv.dm1.froze={s1}; sbs.s1.act=3; sbs.s1.frz=T; sbs.s1.uc=1
+ 12 Put: pc.dm1=bf_walk; sbs.s1.act=2
+ 13 Walk: pc.dm1=bf_sync
+ 14 BfSync: pc.dm1=bf_end
+ 15 BfEnd: pc.dm1=d_frzret; dev.d1.fm=none
+ 16 DFrzRet: pc.dm1=d_hold
+ 17 DHold: pc.dm1=bt_lock; pv.dm1.k=done
+ 18 BtLock: pc.dm1=bt_hops; dev.d1.fm=dm1
+ 19 BtHops: pc.dm1=bt_walk; pv.dm1.todo={s1}; pv.dm1.n=0
+ 20 Walk: pc.dm1=bt_gas; pv.dm1.todo={}
+ 21 Gas: pc.dm1=bt_thw; sbs.s1.act=3
+ 22 Rogue: pc.r1=done; sbs.s1.act=2; sbs.s1.frz=F; sbs.s1.uc=0
+ 23 BtThw: pc.dm1=bt_put; pv.dm1.e=EINVAL; pv.dm1.n=1
+ 24 Put: pc.dm1=bt_walk; sbs.s1.act=1
+ 25 Walk: pc.dm1=bt_end
+ 26 BtEnd: pc.dm1=done; pv.dm1.ret=EINVAL; dev.d1.fm=none; gc.d1=0

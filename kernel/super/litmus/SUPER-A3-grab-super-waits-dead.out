@@ -1,0 +1,14 @@
+Test SUPER-A3-grab-super-waits-dead Allowed
+States 4
+0:r2=0; 1:r4=0; 1:r6=4;
+0:r2=0; 1:r4=4; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=0;
+0:r2=1; 1:r4=0; 1:r6=4;
+No
+Witnesses
+Positive: 0 Negative: 4
+Condition exists (1:r4=0 /\ 1:r6=0 /\ 0:r2=0)
+Observation SUPER-A3-grab-super-waits-dead Never 0 4
+Time SUPER-A3-grab-super-waits-dead 0.03
+Hash=5b09ad2f94386c4b29d65d76d9d83024
+

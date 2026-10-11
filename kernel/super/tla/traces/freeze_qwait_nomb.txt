@@ -1,0 +1,48 @@
+freeze_qwait_nomb -- NoLostWakeup violated -- review note for the worktree change (quotactl_block() waiting on s_writers.frozen needs sb_freeze_wake()'s smp_mb())
+
+Layout: u does FIFREEZE/FITHAW; Q is quotactl_block() as changed in the worktree after
+fc1c25014ff8: while the superblock is not SB_UNFROZEN it drops s_umount and does
+wait_var_event_killable(&frozen, frozen == SB_UNFROZEN).  Stores to frozen are
+buffered (WEAK_WAKE); wake_up_var() as at fc1c25014ff8 (no smp_mb()).
+
+ 2-14  u  FIFREEZE: frozen = SB_FREEZE_COMPLETE.
+ 15    Q  user_get_super(): frozen != SB_UNFROZEN, drop s_umount.
+ 16-17 u  FITHAW: thaw_super_locked() stores SB_UNFROZEN (L2385) -- buffered --
+ 18    u  and wake_up_var() (L2387) finds the wait queue empty: Q has not queued yet.
+ 19    Q  prepare_to_wait_event() queues Q, reads frozen: SB_FREEZE_COMPLETE (stale):
+          Q sleeps.
+ 20       the store drains: frozen == SB_UNFROZEN, Q asleep, no wakeup coming.
+
+Unlike wait_for_partially_frozen() this waiter samples the value the waking store
+replaces, so the store-buffering window is real.  With the smp_mb() of the
+worktree's sb_freeze_wake() (FIX_WAKE_MB, freeze_qwait_mb and freeze_qwait_ro_mb)
+the wakeup is not lost.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_qwait_nomb.log)
+
+# Invariant NoLostWakeup is violated.
+  1 Initial predicate
+      pc = [u=f_lock, b=f_gas, U=u_go, Q=q_lock]
+      pv = [u=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], Q=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FLock: pc.u=f_check; pv.u.tmp=1; sb.active=2; sb.um=u
+  3 FCheck: pc.u=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  4 FSw: pc.u=f_sw1w; sb.wpend.1=T
+  5 FSw1w: pc.u=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  6 FRelock: pc.u=f_sw2; sb.frozen=2; sb.um=u; sb.pend={u}
+  7 FSw: pc.u=f_sw2w; sb.fvis=2; sb.wpend.2=T; sb.pend={}
+  8 FSwWait: pc.u=f_sync; sb.wpend.2=F; sb.wheld.2=T
+  9 FSync: pc.u=f_sw3; sb.frozen=3; sb.pend={u}
+ 10 FSw: pc.u=f_sw3w; sb.fvis=3; sb.wpend.3=T; sb.pend={}
+ 11 FSwWait: pc.u=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 12 FFreezeFs: pc.u=wake; pv.u.cont=to_shared; pv.u.nxt=f_hold; pv.u.granted=T; sb.frozen=4; sb.ucount=1; sb.pend={u}; sb.wk={u}
+ 13 WakeStep: pc.u=rel; sb.wk={}
+ 14 RelStep: pc.u=f_hold; pv.u.tmp=0; sb.fvis=4; sb.sharedRef=1; sb.um=none; sb.pend={}
+ 15 QLock: pc.Q=q_wait
+ 16 FHold: pc.u=t_lock; pv.u.belief=T
+ 17 TLock: pc.u=wake; pv.u.cont=drop_shared; pv.u.nxt=t_done; pv.u.granted=F; sb.frozen=0; sb.ucount=0; sb.um=u; sb.wheld.1=F; sb.wheld.2=F; sb.wheld.3=F; sb.pend={u}; sb.wk={u}
+ 18 WakeStep: pc.u=rel; sb.wk={}
+ 19 QWait: pc.Q=q_sleep; sb.waitq={Q}
+ 20 Flush: sb.fvis=0; sb.pend={}

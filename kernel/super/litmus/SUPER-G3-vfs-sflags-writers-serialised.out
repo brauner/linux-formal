@@ -1,0 +1,11 @@
+Test SUPER-G3-vfs-sflags-writers-serialised Allowed
+States 1
+[flags]=18;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (not ([flags]=18))
+Observation SUPER-G3-vfs-sflags-writers-serialised Never 0 2
+Time SUPER-G3-vfs-sflags-writers-serialised 0.01
+Hash=f89648ca50694659c0b1e466bf602163
+

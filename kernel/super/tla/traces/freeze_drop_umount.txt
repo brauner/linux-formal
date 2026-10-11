@@ -1,0 +1,25 @@
+freeze_drop_umount -- Deadlock -- mutation FIX_DROP_UMOUNT off (why freeze_super() drops s_umount around sb_wait_write(SB_FREEZE_WRITE))
+
+Layout: w holds SB_FREEZE_WRITE (mnt_want_write_file()) and then takes s_umount, as
+f2fs_ioc_shutdown() does (fs/f2fs/file.c L2622, f2fs_do_shutdown() L2588); b freezes.
+
+ 2     w  sb_start_write(): reader of the WRITE rwsem.
+ 3-5   b  freeze_super(): SB_FREEZE_WRITE -- with the mutation s_umount stays held
+          (the kernel drops it at L2291 "to preserve sb_start_write -> s_umount ordering").
+ 6     b  percpu_down_write(WRITE): new readers block, b waits for w to leave.
+       w  waits for s_umount, which b holds: deadlock.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_drop_umount.log)
+
+# Deadlock reached.
+  1 Initial predicate
+      pc = [b=f_gas, w=w_start, U=u_go]
+      pv = [b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], w=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 WStart: pc.w=w_um; sb.readers.1={w}
+  3 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=2
+  4 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=3; sb.um=b
+  5 FCheck: pc.b=f_sw1; sb.frozen=1; sb.fvis=1
+  6 FSw: pc.b=f_sw1w; sb.wpend.1=T

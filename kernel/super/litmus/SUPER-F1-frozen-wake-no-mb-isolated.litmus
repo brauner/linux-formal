@@ -1,0 +1,72 @@
+C SUPER-F1-frozen-wake-no-mb-isolated
+
+(*
+ * Expected: Sometimes
+ *
+ * Question: every wake_up_var(&sb->s_writers.frozen) in fs/super.c
+ * follows a plain store of s_writers.frozen with no smp_mb() in between,
+ * although wake_up_var() requires one (kernel/sched/wait_bit.c: "there
+ * must be a full memory barrier after the variable is updated ... and
+ * before this function is called").  The waiter,
+ * wait_for_partially_frozen(), reads frozen without s_umount.  Taken in
+ * isolation, is the store/wake pair enough to rule out a lost wakeup?
+ *
+ * Code (fs/super.c, HEAD fc1c25014ff8):
+ *   2065                unsigned short old = sb->s_writers.frozen;
+ *   2067                up_write(&sb->s_umount);
+ *   2068                ret = wait_var_event_killable(&sb->s_writers.frozen,
+ *   2069                                              sb->s_writers.frozen != old);
+ *   2331        sb->s_writers.frozen = SB_FREEZE_COMPLETE;
+ *   2332        wake_up_var(&sb->s_writers.frozen);
+ *   (likewise 2283/2284, 2302/2304, 2318/2320, 2367/2369, 2385/2387)
+ *
+ * Encoding: frozen uses the kernel values (SB_UNFROZEN=0,
+ * SB_FREEZE_WRITE=1, SB_FREEZE_PAGEFAULT=2, SB_FREEZE_FS=3,
+ * SB_FREEZE_COMPLETE=4); the waiter saw SB_FREEZE_WRITE under s_umount
+ * (old=1) and waits for frozen != 1.  The waker stores COMPLETE straight
+ * away and checks the queue.  WRITE_ONCE()/READ_ONCE() stand in for the
+ * kernel's plain accesses (which herd7 would flag as a data race).
+ *
+ * Result: the store buffering outcome is allowed, so the pairs are not
+ * correct on their own.  SUPER-F2 shows why the code is nevertheless
+ * correct: the waiter can only be waiting for "frozen != SB_FREEZE_WRITE",
+ * and the store that first makes that true (SB_FREEZE_PAGEFAULT) is always
+ * followed by a full barrier in percpu_down_write() before any of these
+ * wake-ups.
+ *)
+
+{
+	frozen=1;
+	wq=0;
+	state=0;
+}
+
+P0(int *frozen, int *wq, int *woken, spinlock_t *wql)
+{
+	int r0;
+
+	WRITE_ONCE(*frozen, 4);
+	r0 = READ_ONCE(*wq);
+	if (r0 != 0) {
+		spin_lock(wql);
+		WRITE_ONCE(*woken, 1);
+		spin_unlock(wql);
+	}
+}
+
+P1(int *frozen, int *wq, int *state, spinlock_t *wql)
+{
+	int r1;
+	int r2;
+
+	r1 = READ_ONCE(*frozen);
+	if (r1 == 1) {
+		spin_lock(wql);
+		WRITE_ONCE(*wq, 1);
+		smp_store_mb(*state, 2);
+		spin_unlock(wql);
+		r2 = READ_ONCE(*frozen);
+	}
+}
+
+exists (1:r1=1 /\ 1:r2=1 /\ 0:r0=0)

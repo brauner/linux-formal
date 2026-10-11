@@ -1,0 +1,14 @@
+Test SUPER-G2-rdonly-lost-to-reconfigure-or-reuse Allowed
+States 4
+[flags]=2;
+[flags]=3;
+[flags]=18;
+[flags]=19;
+Ok
+Witnesses
+Positive: 14 Negative: 22
+Condition exists ([flags]=2 \/ [flags]=18)
+Observation SUPER-G2-rdonly-lost-to-reconfigure-or-reuse Sometimes 14 22
+Time SUPER-G2-rdonly-lost-to-reconfigure-or-reuse 0.03
+Hash=3072f8e7bd65be2c0faa0f113a3cb294
+

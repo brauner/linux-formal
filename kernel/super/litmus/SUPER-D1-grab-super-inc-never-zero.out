@@ -1,0 +1,12 @@
+Test SUPER-D1-grab-super-inc-never-zero Allowed
+States 2
+1:r5=-1;
+1:r5=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:r5=0)
+Observation SUPER-D1-grab-super-inc-never-zero Never 0 3
+Time SUPER-D1-grab-super-inc-never-zero 0.03
+Hash=20a43db91e52a374442e675c7a908b4e
+

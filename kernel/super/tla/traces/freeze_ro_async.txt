@@ -1,0 +1,55 @@
+freeze_ro_async -- RwsemOK violated -- real (F3): SB_RDONLY set by an error while frozen leaks the s_writers rwsems
+
+Layout: b freezes through a block device; A is an error handler that sets SB_RDONLY
+without s_umount (jfs_handle_error() fs/jfs/super.c L77, __nilfs_error()
+fs/nilfs2/super.c L145, ext2_error() fs/ext2/super.c L79, __fat_fs_error()
+fs/fat/misc.c L38, exfat fs/exfat/misc.c L44, hfs, hfsplus, affs, gfs2's withdraw).
+
+ 2-9   b  freeze_super() of a read-write superblock: SB_FREEZE_WRITE, s_umount dropped
+          and retaken, SB_FREEZE_PAGEFAULT; percpu_down_write() of the WRITE and
+          PAGEFAULT rwsems (L2289-2297).
+ 10    A  an error: sb->s_flags |= SB_RDONLY, no s_umount.
+ 11-14 b  sync_filesystem() (nothing to do on a read-only superblock), SB_FREEZE_FS and
+          its rwsem, ->freeze_fs(), SB_FREEZE_COMPLETE (L2300-2335): all three rwsems
+          are write-held, as for every full freeze.
+ 15-18 b  the thaw: thaw_super_locked() L2345, freeze_dec() to 0, then sb_rdonly() is
+          true (L2366-2371): SB_UNFROZEN and deactivate_locked_super() WITHOUT
+          sb_freeze_unlock() -- that branch is meant for the freeze_super() shortcut
+          that never took the rwsems (L2279-2287).
+
+The filesystem is SB_UNFROZEN with the three percpu rwsems write-held for good:
+every sb_start_write()/sb_start_pagefault()/sb_start_intwrite() sleeps
+uninterruptibly from now on (mnt_want_write() calls sb_start_write() before it
+checks for read-only, so even a write that should fail with -EROFS hangs), a
+later read-write remount hangs every writer, and the next freeze blocks forever
+in percpu_down_write().  The same happens when the error comes after
+SB_FREEZE_COMPLETE (the model finds both).  ext4 stopped setting SB_RDONLY on
+errors for exactly this (d3476f3dad4a).  Trigger: FIFREEZE on jfs or nilfs2
+(errors=remount-ro by default), a read that hits corruption, FITHAW.
+
+------------------------------------------------------------------------------
+TLC counterexample (show-trace-freeze-holder.py logs/freeze_ro_async.log)
+
+# Invariant RwsemOK is violated.
+  1 Initial predicate
+      pc = [b=f_gas, w=w_start, U=u_go, A=a_go]
+      pv = [b=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], w=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], U=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0], A=[ret=ok, cont=unlock, nxt=done, killed=F, granted=F, belief=F, tmp=0, old=0]]
+      sb = [frozen=0, fvis=0, kcount=0, ucount=0, owner=none, frozenRO=F, active=1, mounted=T, dying=F, sharedRef=0, rdonly=F, um=none, wpend=<F,F,F>, wheld=<F,F,F>, readers=<{},{},{}>, waitq={}, pend={}, wk={}]
+      err = 
+  2 FGas: pc.b=f_lock; pv.b.tmp=1; sb.active=2
+  3 FLock: pc.b=f_check; pv.b.tmp=2; sb.active=3; sb.um=b
+  4 FCheck: pc.b=f_sw1; sb.frozen=1; sb.fvis=1; sb.um=none
+  5 FSw: pc.b=f_sw1w; sb.wpend.1=T
+  6 FSw1w: pc.b=f_relock; sb.wpend.1=F; sb.wheld.1=T
+  7 FRelock: pc.b=f_sw2; sb.frozen=2; sb.fvis=2; sb.um=b
+  8 FSw: pc.b=f_sw2w; sb.wpend.2=T
+  9 FSwWait: pc.b=f_sync; sb.wpend.2=F; sb.wheld.2=T
+ 10 AsyncRo: pc.A=done; sb.rdonly=T
+ 11 FSync: pc.b=f_sw3; sb.frozen=3; sb.fvis=3
+ 12 FSw: pc.b=f_sw3w; sb.wpend.3=T
+ 13 FSwWait: pc.b=f_ffs; sb.wpend.3=F; sb.wheld.3=T
+ 14 FFreezeFs: pc.b=f_put; pv.b.granted=T; pv.b.tmp=1; sb.frozen=4; sb.fvis=4; sb.ucount=1; sb.sharedRef=1; sb.um=none
+ 15 FPut: pc.b=f_hold; pv.b.tmp=0; sb.active=2
+ 16 FHold: pc.b=t_gas; pv.b.belief=T
+ 17 TGas: pc.b=t_lock; pv.b.tmp=1; sb.active=3
+ 18 TLock: pc.b=t_put; pv.b.granted=F; sb.frozen=0; sb.fvis=0; sb.ucount=0; sb.active=2; sb.sharedRef=0
