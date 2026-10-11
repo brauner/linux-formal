@@ -1,7 +1,9 @@
 #!/bin/bash
+# gen.sh <kernel tree>: write the tests the kernel can carry, renamed and
+# with a comment, into Documentation/litmus-tests/fs/ of that tree.
 set -e
-SRC=/home/brauner/src/git/linux-formal/kernel/work.mount.gp_on_demand.proposal/litmus
-DST=/home/brauner/src/git/linux/vfs/work.mount.gp_on_demand.litmus/Documentation/litmus-tests/fs
+SRC=$(cd "$(dirname "$0")/.." && pwd)
+DST=${1:?usage: gen.sh <kernel tree>}/Documentation/litmus-tests/fs
 mkdir -p "$DST"
 mk() {
 	local src="$1" name="$2" out="$DST/$2.litmus"
