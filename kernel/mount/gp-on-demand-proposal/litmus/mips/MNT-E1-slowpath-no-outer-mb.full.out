@@ -1,0 +1,27 @@
+Test MNT-E1-slowpath-no-outer-mb Allowed
+States 13
+0:$21=0; 0:$22=0; [freed]=0;
+0:$21=0; 0:$22=1; [freed]=0;
+0:$21=0; 0:$22=1; [freed]=1;
+0:$21=0; 0:$22=2; [freed]=0;
+0:$21=0; 0:$22=2; [freed]=1;
+0:$21=0; 0:$22=3; [freed]=0;
+0:$21=0; 0:$22=3; [freed]=1;
+0:$21=0; 0:$22=4; [freed]=0;
+0:$21=0; 0:$22=4; [freed]=1;
+0:$21=1; 0:$22=0; [freed]=1;
+0:$21=2; 0:$22=0; [freed]=1;
+0:$21=3; 0:$22=0; [freed]=1;
+0:$21=4; 0:$22=0; [freed]=1;
+No
+Witnesses
+Positive: 0 Negative: 13
+Condition exists (0:$21=0 /\ 0:$22=0 /\ [freed]=1)
+Observation MNT-E1-slowpath-no-outer-mb Never 0 13
+Time MNT-E1-slowpath-no-outer-mb 5864.92
+Hash=714b18041b43c8030547e82af6b30584
+
+
+real	97m45.059s
+user	97m44.900s
+sys	0m0.030s
