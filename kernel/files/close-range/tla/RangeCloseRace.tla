@@ -87,7 +87,7 @@ Next == Start \/ Scan \/ FilpClose \/ Grow \/ Open \/ Install \/ Close \/ SetFd
 Spec == Init /\ [][Next]_vars /\ WF_vars(Start) /\ WF_vars(Scan) /\ WF_vars(FilpClose)
 
 TypeOK ==
-    /\ table \in UNION {Table(W * k) : k \in 1..NWords}
+    /\ \E k \in 1..NWords : table \in Table(W * k)  \* not UNION, TLC would build the tables
     /\ pc \in {"start", "scan", "closing", "done"}
     /\ n \in 0..(W * NWords)
 (* every descriptor the walk closes is one the range and the flags select at that moment *)
