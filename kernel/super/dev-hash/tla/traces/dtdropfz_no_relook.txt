@@ -1,0 +1,87 @@
+** Invariant NoErr is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_hash
+      S[s1]={ph: nascent, pass: 1, act: 1, um: fs, own: 1}
+  3 fs_hash    s1: fs_hash -> fs_open
+      E[1]={sb: s1, dev: d1, st: hashed, claims: 1, pass: 1}
+      S[s1]={ph: nascent, pass: 2, act: 1, um: fs, own: 1}
+      chain[d1]=<1>
+  4 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 ret=fs_bdevchk dev=d1
+      bdOpen[d1]=1
+  5 R0         s1: R0 -> R1
+      L[s1] ne=3
+      E[3]={sb: nosb, dev: nodev, st: alloc, claims: 0, pass: 0}
+  6 R1         s1: R1 -> fs_bdevchk
+      L[s1] res=ok ne=0
+      E[1]={sb: s1, dev: d1, st: hashed, claims: 2, pass: 1}
+      E[3]={sb: nosb, dev: nodev, st: free, claims: 0, pass: 0}
+  7 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+  8 fs_x       s1: fs_x -> R0
+      L[s1] ret=fs_xchk dev=d2
+      bdOpen[d2]=1
+      xst[s1]=1
+  9 R0         s1: R0 -> R1
+      L[s1] ne=3
+      E[3]={sb: nosb, dev: nodev, st: alloc, claims: 0, pass: 0}
+ 10 R1         s1: R1 -> fs_xchk
+      L[s1] ne=0
+      E[3]={sb: s1, dev: d2, st: hashed, claims: 1, pass: 1}
+      S[s1]={ph: nascent, pass: 3, act: 1, um: fs, own: 1}
+      chain[d2]=<3>
+ 11 fs_xchk    s1: fs_xchk -> fs_xdrop
+      use[s1]={d1: True, d2: True}
+ 12 fs_xdrop   s1: fs_xdrop -> U1
+      L[s1] ret=fs_xdfput
+      use[s1]={d1: True, d2: False}
+      xst[s1]=2
+ 13 U1         s1: U1 -> U2
+      L[s1] pret=fs_xdfput fnd=3 pe=3
+ 14 U2         s1: U2 -> P1
+      L[s1] fnd=0
+ 15 F_bdf      F2: F_bdf -> F_hold
+      bdc[d2]=1
+ 16 F_hold     F2: F_hold -> W0
+      L[F2] ret=F_fend dev=d2 ph=frz
+ 17 W0         F2: W0 -> W1
+      L[F2] stab={3}
+ 18 W1         F2: W1 -> WX
+      L[F2] sb=s1 at=3 ref=s1
+      S[s1]={ph: nascent, pass: 4, act: 1, um: fs, own: 1}
+      chain[d2]=<3,101>
+ 19 P1         s1: P1 -> P2
+      L[F2] stab={}
+      E[3]={sb: s1, dev: d2, st: unhashed, claims: 0, pass: 1}
+      crossed=True
+      chain[d2]=<101>
+ 20 P2         s1: P2 -> fs_xdfput
+      L[s1] pe=0
+      E[3]={sb: nosb, dev: nodev, st: free, claims: 0, pass: 0}
+      S[s1]={ph: nascent, pass: 3, act: 1, um: fs, own: 1}
+ 21 fs_xdfput  s1: fs_xdfput -> fs_born
+      bdOpen[d2]=0
+ 22 fs_born    s1: fs_born -> fs_live
+      S[s1]={ph: born, pass: 3, act: 1, um: free, own: 1}
+ 23 WX         F2: WX -> W3
+ 24 W3         F2: W3 -> F_gas
+      L[F2] vis={3} vsb={s1}
+ 25 F_gas      F2: F_gas -> F_frz
+      S[s1]={ph: born, pass: 3, act: 2, um: free, own: 1}
+ 26 F_frz      F2: F_frz -> WN
+      L[F2] cnt=1
+      ucount[s1]=1
+      fvia[s1]={d1: 0, d2: 1}
+ 27 WN         F2: WN -> W1
+      L[F2] sb=nosb ref=nosb
+      S[s1]={ph: born, pass: 2, act: 2, um: free, own: 1}
+ 28 W1         F2: W1 -> W3
+      L[F2] at=0
+      chain[d2]=<>
+ 29 W3         F2: W3 -> F_fend
+ 30 F_fend     F2: F_fend -> F_frozen
+ 31 F_frozen   F2: F_frozen -> F_bdt
+ 32 F_bdt      F2: F_bdt -> T_end
+ 33 T_end      F2: T_end -> Done
+      bdc[d2]=0
+      err={a freeze taken through the device outlives its thaw}

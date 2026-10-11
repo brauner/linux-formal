@@ -99,6 +99,7 @@ Superblocks, [`kernel/super/`](kernel/super/):
 |---|---|---|---|
 | [`core/`](kernel/super/core/) | fs/super.c: the superblock lifecycle, the device-to-superblock table and the block layer's holder operations, and freezing | TLA+, CBMC, LKMM litmus | mainline, at fc1c25014ff8 |
 | [`unborn-wait/`](kernel/super/unborn-wait/) | a version of a device table fix that wasn't taken, kept as the record of the alternative | TLA+, CBMC | not merged |
+| [`dev-hash/`](kernel/super/dev-hash/) | the device table as a plain hashtable under a spinlock, with walks that keep their place with a cursor on the stack | TLA+ | proposed |
 
 ## What the models found
 

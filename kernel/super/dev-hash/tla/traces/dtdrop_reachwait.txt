@@ -1,0 +1,42 @@
+** Invariant NoUnbornWait is violated
+  1 Initial
+  2 fs_alloc   s1: fs_alloc -> fs_hash
+      S[s1]={ph: nascent, pass: 1, act: 1, um: fs, own: 1}
+  3 fs_hash    s1: fs_hash -> fs_open
+      E[1]={sb: s1, dev: d1, st: hashed, claims: 1, pass: 1}
+      S[s1]={ph: nascent, pass: 2, act: 1, um: fs, own: 1}
+      chain[d1]=<1>
+  4 fs_open    s1: fs_open -> R0
+      L[s1] sb=s1 ret=fs_bdevchk dev=d1
+      bdOpen[d1]=1
+  5 R0         s1: R0 -> R1
+      L[s1] ne=2
+      E[2]={sb: nosb, dev: nodev, st: alloc, claims: 0, pass: 0}
+  6 R1         s1: R1 -> fs_bdevchk
+      L[s1] res=ok ne=0
+      E[1]={sb: s1, dev: d1, st: hashed, claims: 2, pass: 1}
+      E[2]={sb: nosb, dev: nodev, st: free, claims: 0, pass: 0}
+  7 fs_bdevchk s1: fs_bdevchk -> fs_x
+      use[s1]={d1: True, d2: False}
+  8 fs_x       s1: fs_x -> R0
+      L[s1] ret=fs_xchk dev=d2
+      bdOpen[d2]=1
+      xst[s1]=1
+  9 R0         s1: R0 -> R1
+      L[s1] ne=2
+      E[2]={sb: nosb, dev: nodev, st: alloc, claims: 0, pass: 0}
+ 10 R1         s1: R1 -> fs_xchk
+      L[s1] ne=0
+      E[2]={sb: s1, dev: d2, st: hashed, claims: 1, pass: 1}
+      S[s1]={ph: nascent, pass: 3, act: 1, um: fs, own: 1}
+      chain[d2]=<2>
+ 11 F_bdf      F2: F_bdf -> F_hold
+      bdc[d2]=1
+ 12 F_hold     F2: F_hold -> W0
+      L[F2] ret=F_fend dev=d2 ph=frz
+ 13 W0         F2: W0 -> W1
+      L[F2] stab={2}
+ 14 W1         F2: W1 -> WW
+      L[F2] ref=s1
+      S[s1]={ph: nascent, pass: 4, act: 1, um: fs, own: 1}
+      chain[d2]=<101,2>

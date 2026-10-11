@@ -7,3 +7,4 @@ act on superblocks.
 |---|---|---|
 | [`core/`](core/) | the superblock lifecycle, the device-to-superblock table and its walks, freezing and the holder operations | mainline, at fc1c25014ff8 |
 | [`unborn-wait/`](unborn-wait/) | the device table with a cursor that waits for an unborn superblock, a version of a fix that wasn't taken | not merged |
+| [`dev-hash/`](dev-hash/) | the device table as a plain hashtable under a spinlock, with walks that keep their place with a cursor on the stack | proposed |
