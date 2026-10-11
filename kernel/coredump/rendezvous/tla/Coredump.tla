@@ -59,8 +59,9 @@
 (*   - Memory is sequentially consistent.  The one ordering bug of the     *)
 (*     series (io-wq exit bit vs task work) is in IoWqExitBit.tla.         *)
 (*   - Freezing is a monotone, group wide event that only matters to the   *)
-(*     dumper, so it can only happen while a dump is being written.        *)
-(*     Frozen tasks are not stopped in the model.                          *)
+(*     dumper, so it can only happen between the dequeue of the coredump   *)
+(*     signal and the last write.  Frozen tasks are not stopped in the     *)
+(*     model.                                                              *)
 (*   - Task work is only create_worker_cb()/create_worker_cont().  It runs *)
 (*     at get_signal() entry, in the io_uring cancel loops and in exit.    *)
 (*   - task_struct memory is freed by an explicit "grace period" step that *)
@@ -129,7 +130,7 @@ vars == <<pc, flags, pending, shared, blocked, realblocked, sigpending, notify,
           budget>>
 
 PCs == {"none", "run", "sigwait",
-        "dump_wait", "dump_write", "dump_finish", "dump_release",
+        "dump_start", "dump_wait", "dump_write", "dump_finish", "dump_release",
         "exec_cancel_tw", "exec_wait_workers", "exec_dethread", "exec_wait",
         "exec_post", "exec_late_tw", "exec_late_wait",
         "sq_cancel", "sq_cancel_tw", "sq_wait_workers",
@@ -298,12 +299,11 @@ VfsCoredump(t, pend, sp) ==
                              IF u \in zapped THEN TRUE
                              ELSE IF u = t THEN FALSE       \* clear_tsk_thread_flag(TIF_SIGPENDING)
                              ELSE sp[u]]
-            /\ flags' = [flags EXCEPT ![t] = @ \cup {"SIGNALED", "DUMPCORE"}]
+            /\ flags' = [flags EXCEPT ![t] = @ \cup {"DUMPCORE"}]
             /\ pc' = [pc EXCEPT ![t] = IF nr > 0 THEN "dump_wait" ELSE "dump_write"]
             /\ dump' = [written |-> 0, result |-> "none"]
     ELSE \* -EAGAIN: no dump, the thread dies like on any fatal signal
-         /\ flags' = [flags EXCEPT ![t] = @ \cup {"SIGNALED"}]
-         /\ UNCHANGED <<core, dumper, counted, dump>>
+         /\ UNCHANGED <<flags, core, dumper, counted, dump>>
          /\ IF IsWorker(t)
             THEN /\ WorkerLeave(t)
                  /\ pending' = pend
@@ -321,7 +321,13 @@ Fatal(t, sig, pend, sp) ==
          /\ sigpending' = sp
          /\ UNCHANGED <<group, core, dumper, counted, dump>>
     ELSE IF sig = "CORE"
-    THEN VfsCoredump(t, pend, sp)
+    THEN \* PF_SIGNALED with the siglock dropped, vfs_coredump() takes it
+         \* again in zap_threads(), a step of its own (DumpStart)
+         /\ flags' = [flags EXCEPT ![t] = @ \cup {"SIGNALED"}]
+         /\ pc' = [pc EXCEPT ![t] = "dump_start"]
+         /\ pending' = pend
+         /\ sigpending' = sp
+         /\ UNCHANGED <<group, core, dumper, counted, dump>>
     ELSE /\ flags' = [flags EXCEPT ![t] = @ \cup {"SIGNALED"}]
          /\ UNCHANGED <<core, dumper, counted, dump>>
          /\ IF IsWorker(t)
@@ -369,6 +375,15 @@ GetSignal(t) ==
                     /\ sigpending' = [sigpending EXCEPT ![t] = Recalc(pending[t], shared, blocked[t])]
                     /\ UNCHANGED <<pc, flags, pending, shared, group, core, dumper, counted, dump>>
     /\ UNCHANGED <<notify, freed, decremented, released, release_list, rcu_reader>>
+    /\ UnchangedMask /\ UnchangedWq /\ UnchangedEnv
+
+\* vfs_coredump() reaches zap_threads(): the dump starts, or -EAGAIN when
+\* the group is already dying or exec'ing
+DumpStart(t) ==
+    /\ pc[t] = "dump_start"
+    /\ VfsCoredump(t, pending, sigpending)
+    /\ UNCHANGED <<shared, notify, freed, decremented, released, release_list,
+                   rcu_reader>>
     /\ UnchangedMask /\ UnchangedWq /\ UnchangedEnv
 
 \* clear_notify_signal() at get_signal() entry / exit_to_user_mode
@@ -469,16 +484,17 @@ TracerClearMask(w) ==
 (***************************************************************************)
 (* Freezers: freeze_task() -> fake_signal_wake_up(), cgroup_freeze_task()  *)
 (***************************************************************************)
-\* Only a freeze that lands on a running dump is visible to the model:
-\* before the dump the frozen thread would not start one, and the model
-\* has no thaw.
+\* Only a freeze that lands between the dequeue of the coredump signal and
+\* the last write is visible to the model: before the dequeue the frozen
+\* thread would not start a dump, and the model has no thaw.
 Freeze(kind) ==
     /\ kind \in {"pm", "cg2"}
     /\ freeze = "none"
-    /\ DumperPc \in {"dump_wait", "dump_write"}
+    /\ \/ DumperPc \in {"dump_wait", "dump_write"}
+       \/ \E t \in Threads : pc[t] = "dump_start"
     /\ freeze' = kind
     /\ sigpending' = [t \in Threads |-> IF Alive(t) THEN TRUE ELSE sigpending[t]]
-    /\ hist' = [hist EXCEPT !.freeze_mid_dump = DumperPc \in {"dump_wait", "dump_write"}]
+    /\ hist' = [hist EXCEPT !.freeze_mid_dump = TRUE]
     /\ UNCHANGED <<pc, flags, pending, shared, notify, group, freed, budget>>
     /\ UnchangedMask /\ UnchangedCore /\ UnchangedWq
 
@@ -971,7 +987,7 @@ Init ==
 \* Steps a thread takes on its own once it can; each of them is fair
 ThreadStep(t) ==
     \/ GetSignal(t) \/ HandleNotify(t) \/ SigWaitWake(t)
-    \/ DumpWaitDone(t) \/ DumpChunk(t) \/ DumpFinish(t)
+    \/ DumpStart(t) \/ DumpWaitDone(t) \/ DumpChunk(t) \/ DumpFinish(t)
     \/ (\E u \in Threads : ReleaseClear(t, u) \/ ReleaseWake(t, u))
     \/ ReleaseDone(t)
     \/ SyncGroupExit(t) \/ Unpark(t) \/ ExitCancel(t) \/ ExitCancelWait(t)
@@ -984,7 +1000,7 @@ ThreadStep(t) ==
 
 ThreadFairness(t) ==
     /\ WF_vars(GetSignal(t)) /\ WF_vars(HandleNotify(t)) /\ WF_vars(SigWaitWake(t))
-    /\ WF_vars(DumpWaitDone(t)) /\ WF_vars(DumpChunk(t)) /\ WF_vars(DumpFinish(t))
+    /\ WF_vars(DumpStart(t)) /\ WF_vars(DumpWaitDone(t)) /\ WF_vars(DumpChunk(t)) /\ WF_vars(DumpFinish(t))
     /\ \A u \in Threads : WF_vars(ReleaseClear(t, u)) /\ WF_vars(ReleaseWake(t, u))
     /\ WF_vars(ReleaseDone(t))
     /\ WF_vars(SyncGroupExit(t)) /\ WF_vars(Unpark(t)) /\ WF_vars(ExitCancel(t))
@@ -1094,8 +1110,9 @@ TruncationJustified ==
 TruncationJustifiedStrict ==
     dump.result = "truncated" => (hist.kill \/ Freezing)
 
-\* a freeze that arrives before the last write aborts the dump, for every
-\* freezer and whether the core goes to a file or a pipe
+\* a freeze that arrives between the dequeue of the coredump signal and
+\* the last write aborts the dump, for every freezer and whether the core
+\* goes to a file or a pipe
 FreezeAbortsDump == hist.freeze_mid_dump => dump.result # "complete"
 
 AllDead == \A t \in Threads : pc[t] \in {"none", "dead"}
