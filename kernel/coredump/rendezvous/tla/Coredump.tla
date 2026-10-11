@@ -3,20 +3,30 @@
 (* One thread group under the coredump rendezvous, the signal code around  *)
 (* it and the code that creates and tears down threads while it runs.      *)
 (*                                                                         *)
-(* Tree: work.coredump.close_files.fixes at 938c2dd45269 on top of         *)
-(* c7b1fa3db4a1 (vfs-7.4.coredump).  Every FIX_* constant switches one     *)
-(* patch of "coredump & signals: an impossible affair" on or off, so TLC   *)
-(* reproduces the bug that patch fixes when its constant is FALSE and       *)
-(* proves the property when it is TRUE.                                    *)
+(* Tree: vfs.all at 548491e998e1, which carries "coredump & signals: an    *)
+(* impossible affair" as queued for v7.4 (kernel-7.4.signal, merge         *)
+(* ed14a591175b, on top of vfs-7.4.signal).  The series was first modelled *)
+(* as v3 at 938c2dd45269, the switches marked "v3" restore what that       *)
+(* version did differently.  Every FIX_* constant switches one patch on or *)
+(* off, so TLC reproduces the bug that patch fixes when its constant is    *)
+(* FALSE and proves the property when it is TRUE.                          *)
 (*                                                                         *)
 (*   FIX_RCU_RELEASE          coredump: hold RCU while releasing parked    *)
 (*                            threads (coredump_finish)                    *)
 (*   FIX_SIGPENDING_DUMPCORE  signal: only SIGKILL and the freezers        *)
-(*                            interrupt a coredumping task                 *)
-(*                            (signal_pending, dump_interrupted)           *)
+(*                            interrupt a coredumping task: queued,        *)
+(*                            dump_interrupted() is task_sigpending();     *)
+(*                            with SIGPENDING_V3 the v3 shape, which       *)
+(*                            filtered signal_pending() for PF_DUMPCORE    *)
+(*   FIX_FREEZE_BEFORE_DUMP   the same patch as queued: zap_threads()      *)
+(*                            refuses to dump under a pending freeze       *)
+(*   FIX_NO_NOTIFY_SIGNAL     coredump: prevent TIF_NOTIFY_SIGNAL from     *)
+(*                            interrupting coredumps (vfs-7.4.signal, the  *)
+(*                            no_notify_signal guard of vfs_coredump())    *)
 (*   FIX_RETARGET_GROUP_EXIT  signal: don't retarget shared signals in a   *)
 (*                            dying thread group (retarget_shared_pending) *)
-(*   FIX_WORKER_NODUMP        signal: fix coredump deadlock with           *)
+(*   FIX_WORKER_NODUMP        v3 only, dropped from the queued series:     *)
+(*                            signal: fix coredump deadlock with           *)
 (*                            PF_USER_WORKER (get_signal)                  *)
 (*   FIX_PTRACE_MASK          ptrace: refuse to change the signal mask of  *)
 (*                            a user worker (PTRACE_SETSIGMASK)            *)
@@ -82,7 +92,8 @@ CONSTANTS
     Chunks,         \* writes that make a complete core
     BudgetKILL, BudgetCORE, BudgetTERM, BudgetUSR,   \* signals the environment may send
     ExecBudget, TracerBudget, RetryBudget,
-    FIX_RCU_RELEASE, FIX_SIGPENDING_DUMPCORE, FIX_RETARGET_GROUP_EXIT,
+    FIX_RCU_RELEASE, FIX_SIGPENDING_DUMPCORE, SIGPENDING_V3,
+    FIX_FREEZE_BEFORE_DUMP, FIX_NO_NOTIFY_SIGNAL, FIX_RETARGET_GROUP_EXIT,
     FIX_WORKER_NODUMP, FIX_PTRACE_MASK, FIX_EXEC_CANCEL_FIRST,
     FIX_GATE_SIGNALED, FIX_GATE_POSTCOREDUMP
 
@@ -170,20 +181,37 @@ Freezing == freeze # "none"
 \* fatal_signal_pending()
 FatalPending(t) == sigpending[t] /\ "KILL" \in pending[t]
 
-\* signal_pending() with the PF_DUMPCORE rule of the series
+\* The no_notify_signal guard vfs_coredump() takes once coredump_wait()
+\* returned: PF_NO_NOTIFY_SIGNAL for the writes and coredump_finish()
+NoNotify(t) ==
+    /\ FIX_NO_NOTIFY_SIGNAL
+    /\ t = dumper
+    /\ pc[t] \in {"dump_write", "dump_finish", "dump_release"}
+
+\* signal_pending(): TIF_NOTIFY_SIGNAL unless PF_NO_NOTIFY_SIGNAL, then
+\* TIF_SIGPENDING; v3 filtered the latter for a PF_DUMPCORE task
 SignalPending(t) ==
-    \/ notify[t]
+    \/ notify[t] /\ ~NoNotify(t)
     \/ /\ sigpending[t]
-       /\ \/ ~FIX_SIGPENDING_DUMPCORE
+       /\ \/ ~(FIX_SIGPENDING_DUMPCORE /\ SIGPENDING_V3)
           \/ "DUMPCORE" \notin flags[t]
           \/ "KILL" \in pending[t]
           \/ Freezing
 
-\* dump_interrupted(): fatal signal, freezing(), and with the fix the cgroup v2 trap
+\* dump_interrupted(): fatal_signal_pending() || freezing() before the
+\* series, the cgroup v2 trap as well in v3, task_sigpending() as queued
 DumpInterrupted(t) ==
-    \/ FatalPending(t)
-    \/ freeze = "pm"
-    \/ (FIX_SIGPENDING_DUMPCORE /\ freeze = "cg2")
+    IF ~FIX_SIGPENDING_DUMPCORE
+    THEN FatalPending(t) \/ freeze = "pm"
+    ELSE IF SIGPENDING_V3
+    THEN FatalPending(t) \/ freeze = "pm" \/ freeze = "cg2"
+    ELSE sigpending[t]
+
+\* zap_threads() as queued refuses to start the dump while freezing() or
+\* JOBCTL_TRAP_FREEZE: the freeze's TIF_SIGPENDING would be cleared
+FreezeRefusesDump ==
+    /\ FIX_SIGPENDING_DUMPCORE /\ ~SIGPENDING_V3 /\ FIX_FREEZE_BEFORE_DUMP
+    /\ Freezing
 
 \* recalc_sigpending(): keeps TIF_SIGPENDING while freezing() or a trap is set
 Recalc(pend, sh, bl) == Freezing \/ (pend \ bl) # {} \/ (sh \ bl) # {}
@@ -285,7 +313,7 @@ DoGroupExit(t, pend, sp) ==
 
 \* vfs_coredump() -> coredump_wait() -> zap_threads()/zap_process()
 VfsCoredump(t, pend, sp) ==
-    IF ~group.exit /\ group.exec = NoThread
+    IF ~group.exit /\ group.exec = NoThread /\ ~FreezeRefusesDump
     THEN LET zapped == {u \in Threads : u # t /\ Live(u)
                                         /\ "POSTCOREDUMP" \notin flags[u]}
              nr == Cardinality(zapped)
@@ -378,7 +406,7 @@ GetSignal(t) ==
     /\ UnchangedMask /\ UnchangedWq /\ UnchangedEnv
 
 \* vfs_coredump() reaches zap_threads(): the dump starts, or -EAGAIN when
-\* the group is already dying or exec'ing
+\* the group is already dying, exec'ing or (as queued) freezing
 DumpStart(t) ==
     /\ pc[t] = "dump_start"
     /\ VfsCoredump(t, pending, sigpending)
@@ -1088,8 +1116,8 @@ SingleThreadedExec ==
     \A e \in Threads : pc[e] \in ExecWindow =>
         \A t \in Threads : t # e => pc[t] \in {"none", "dead"}
 
-\* a user worker never dumps core (signal: fix coredump deadlock with
-\* PF_USER_WORKER)
+\* a user worker never dumps core: v3 had get_signal() say so, as queued
+\* the worker's mask is the only thing in the way
 WorkerNeverDumps == \A t \in Threads : IsWorker(t) => pc[t] \notin DumpStates
 
 \* a user worker keeps the mask copy_process() gave it (ptrace: refuse to
@@ -1104,15 +1132,15 @@ WorkerMaskIntact ==
 TruncationJustified ==
     dump.result = "truncated" => (hist.kill \/ Freezing \/ hist.notify_dumper)
 
-\* the stricter version without the task work escape; fails on this tree
-\* because TIF_NOTIFY_SIGNAL still counts as signal_pending() for a
-\* PF_DUMPCORE task
+\* the stricter version without the task work escape; fails without the
+\* no_notify_signal guard, where TIF_NOTIFY_SIGNAL still counts as
+\* signal_pending() for the dumper
 TruncationJustifiedStrict ==
     dump.result = "truncated" => (hist.kill \/ Freezing)
 
 \* a freeze that arrives between the dequeue of the coredump signal and
-\* the last write aborts the dump, for every freezer and whether the core
-\* goes to a file or a pipe
+\* the last write aborts the dump or keeps it from starting, for every
+\* freezer and whether the core goes to a file or a pipe
 FreezeAbortsDump == hist.freeze_mid_dump => dump.result # "complete"
 
 AllDead == \A t \in Threads : pc[t] \in {"none", "dead"}

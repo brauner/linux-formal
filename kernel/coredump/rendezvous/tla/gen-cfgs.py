@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 """Generate the TLC configurations: one green config per thread layout
-with every fix on, and one config per bug with its fix switched off."""
+with the queued tree, and one config per bug with its fix switched off.
+The v3 configurations switch back to what v3 of the series did."""
 import pathlib
 
-FIXES = ["FIX_RCU_RELEASE", "FIX_SIGPENDING_DUMPCORE", "FIX_RETARGET_GROUP_EXIT",
-         "FIX_WORKER_NODUMP", "FIX_PTRACE_MASK", "FIX_EXEC_CANCEL_FIRST",
-         "FIX_GATE_SIGNALED", "FIX_GATE_POSTCOREDUMP"]
+# the queued tree: vfs.all at 548491e998e1
+QUEUED = {
+    "FIX_RCU_RELEASE": True,
+    "FIX_SIGPENDING_DUMPCORE": True,
+    "SIGPENDING_V3": False,
+    "FIX_FREEZE_BEFORE_DUMP": True,
+    "FIX_NO_NOTIFY_SIGNAL": True,
+    "FIX_RETARGET_GROUP_EXIT": True,
+    "FIX_WORKER_NODUMP": False,
+    "FIX_PTRACE_MASK": True,
+    "FIX_EXEC_CANCEL_FIRST": True,
+    "FIX_GATE_SIGNALED": True,
+    "FIX_GATE_POSTCOREDUMP": True,
+}
+# what v3 at 938c2dd45269 did differently: the signal_pending() filter,
+# the PF_USER_WORKER test before the coredump, no no_notify_signal guard
+V3 = {"SIGPENDING_V3": True, "FIX_WORKER_NODUMP": True, "FIX_NO_NOTIFY_SIGNAL": False}
 
 SAFETY = ["TypeOK", "RemainingNonNegative", "CountConsistent",
           "OnlyCountedDecrement", "ReleasedAfterAllParked", "NoUseAfterFree",
@@ -21,29 +36,36 @@ LAYOUTS = {
     "cdhole":  ("MC_cdhole",  "m", 2, 1, 1, 0, 0, 0, 0, 0),
 }
 
-# name: (layout, fixes switched off, invariants, properties, expectation[, budget overrides])
+# name: (layout, switches that differ from QUEUED, invariants, properties,
+#        expectation[, budget overrides])
 CONFIGS = {
-    "signals_fixed":         ("signals", [], SAFETY, LIVENESS, "pass"),
-    "signals_no_rcu":        ("signals", ["FIX_RCU_RELEASE"], ["NoUseAfterFree"], [], "violation"),
-    "signals_no_retarget":   ("signals", ["FIX_RETARGET_GROUP_EXIT", "FIX_SIGPENDING_DUMPCORE"], ["TruncationJustified"], [], "violation"),
-    "signals_retarget_only": ("signals", ["FIX_RETARGET_GROUP_EXIT"], ["TruncationJustified"], [], "pass"),
-    "signals_sigpending_only": ("signals", ["FIX_SIGPENDING_DUMPCORE"], ["TruncationJustified"], [], "pass"),
-    "signals_no_freezer":    ("signals", ["FIX_SIGPENDING_DUMPCORE"], ["FreezeAbortsDump"], [], "violation"),
-    "sqpoll_fixed":          ("sqpoll", [], SAFETY, LIVENESS, "pass"),
-    "sqpoll_deadlock":       ("sqpoll", ["FIX_WORKER_NODUMP", "FIX_PTRACE_MASK"], ["TypeOK"], ["DumpEnds"], "violation"),
-    "sqpoll_mask_only":      ("sqpoll", ["FIX_WORKER_NODUMP"], ["TypeOK"], ["DumpEnds"], "pass"),
-    "sqpoll_no_gate_signaled": ("sqpoll", ["FIX_GATE_SIGNALED"], ["CountConsistent"], [], "violation"),
-    "plain_fixed":           ("plain", [], SAFETY, [], "pass"),
-    "plain_live":            ("plain", [], SAFETY, LIVENESS, "pass", {"usr": 0, "retry": 0}),
-    "plain_strict":          ("plain", [], ["TruncationJustifiedStrict"], [], "violation"),
-    "plain_no_exec_cancel":  ("plain", ["FIX_EXEC_CANCEL_FIRST"], ["SingleThreadedExec"], [], "violation"),
-    "cdhole_fixed":          ("cdhole", [], SAFETY, LIVENESS, "pass"),
-    "cdhole_no_gate":        ("cdhole", ["FIX_GATE_POSTCOREDUMP"], ["CountConsistent"], [], "violation"),
+    "signals_fixed":         ("signals", {}, SAFETY, LIVENESS, "pass"),
+    "signals_no_rcu":        ("signals", {"FIX_RCU_RELEASE": False}, ["NoUseAfterFree"], [], "violation"),
+    "signals_no_retarget":   ("signals", {"FIX_RETARGET_GROUP_EXIT": False, "FIX_SIGPENDING_DUMPCORE": False}, ["TruncationJustified"], [], "violation"),
+    "signals_retarget_only": ("signals", {"FIX_RETARGET_GROUP_EXIT": False}, ["TruncationJustified"], [], "violation"),
+    "signals_retarget_only_v3": ("signals", {**V3, "FIX_RETARGET_GROUP_EXIT": False}, ["TruncationJustified"], [], "pass"),
+    "signals_sigpending_only": ("signals", {"FIX_SIGPENDING_DUMPCORE": False}, ["TruncationJustified"], [], "pass"),
+    "signals_no_freezer":    ("signals", {"FIX_SIGPENDING_DUMPCORE": False}, ["FreezeAbortsDump"], [], "violation"),
+    "signals_no_freeze_check": ("signals", {"FIX_FREEZE_BEFORE_DUMP": False}, ["FreezeAbortsDump"], [], "violation"),
+    "sqpoll_fixed":          ("sqpoll", {}, SAFETY, LIVENESS, "pass"),
+    "sqpoll_deadlock":       ("sqpoll", {"FIX_PTRACE_MASK": False}, ["TypeOK"], ["DumpEnds"], "violation"),
+    "sqpoll_nodump_only":    ("sqpoll", {"FIX_WORKER_NODUMP": True, "FIX_PTRACE_MASK": False}, ["TypeOK"], ["DumpEnds"], "pass"),
+    "sqpoll_no_gate_signaled": ("sqpoll", {"FIX_GATE_SIGNALED": False}, ["CountConsistent"], [], "violation"),
+    "plain_fixed":           ("plain", {}, SAFETY, [], "pass"),
+    "plain_live":            ("plain", {}, SAFETY, LIVENESS, "pass", {"usr": 0, "retry": 0}),
+    "plain_strict":          ("plain", {}, ["TruncationJustifiedStrict"], [], "pass"),
+    "plain_strict_no_guard": ("plain", {"FIX_NO_NOTIFY_SIGNAL": False}, ["TruncationJustifiedStrict"], [], "violation"),
+    "plain_no_exec_cancel":  ("plain", {"FIX_EXEC_CANCEL_FIRST": False}, ["SingleThreadedExec"], [], "violation"),
+    "cdhole_fixed":          ("cdhole", {}, SAFETY, LIVENESS, "pass"),
+    "cdhole_no_gate":        ("cdhole", {"FIX_GATE_POSTCOREDUMP": False}, ["CountConsistent"], [], "violation"),
 }
 
 here = pathlib.Path(__file__).resolve().parent
+for old in here.glob("*.cfg"):
+    if old.name.split("_")[0] in LAYOUTS:
+        old.unlink()
 for name, entry in CONFIGS.items():
-    layout, off, invs, props, expect = entry[:5]
+    layout, switches, invs, props, expect = entry[:5]
     over = entry[5] if len(entry) > 5 else {}
     module, leader, chunks, kill, core, term, usr, execb, tracer, retry = LAYOUTS[layout]
     usr = over.get("usr", usr); retry = over.get("retry", retry)
@@ -57,8 +79,9 @@ for name, entry in CONFIGS.items():
              f"  BudgetTERM = {term}", f"  BudgetUSR = {usr}",
              f"  ExecBudget = {execb}", f"  TracerBudget = {tracer}",
              f"  RetryBudget = {retry}"]
-    for f in FIXES:
-        lines.append(f"  {f} = {'FALSE' if f in off else 'TRUE'}")
+    for f, on in QUEUED.items():
+        on = switches.get(f, on)
+        lines.append(f"  {f} = {'TRUE' if on else 'FALSE'}")
     if invs:
         lines.append("INVARIANTS")
         lines += [f"  {i}" for i in invs]
