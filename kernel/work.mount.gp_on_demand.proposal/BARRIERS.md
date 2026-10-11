@@ -79,7 +79,7 @@ sync, fence rw,rw, bcr 14,0, ...), unlike `smp_wmb()`/`smp_rmb()`, which is
 why the inner barrier can stand in for the outer one but not the other way
 round (MNT-A1m-nomb-in-sum: Sometimes). The hardware-model runs under Arm's
 official AArch64 model and the POWER model are the independent check for the
-weakest architectures (research-weak-memory-2.md).
+weakest architectures (`litmus/notes/hardware-models.md`).
 
 ## Results (herd7 7.58, tools/memory-model of the tree)
 

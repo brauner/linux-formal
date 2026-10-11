@@ -153,15 +153,10 @@ period).
 
 ## Results (jens, 16 workers x 8g per run, 2026-10-09)
 
-The full table with state counts and times is `RESULTS.txt`.  58 of the
-62 configurations had finished when this was written, every one as its
-header predicts.  Four were still running (RUNNING in `RESULTS.txt`, with
-the distinct states found so far): `full_lazy` (8.1M), `full_lazy_g0`
-(12.6M), `hh_lazy_weak` (7.2M), `hh_recheck_weak` (14.9M); their
-siblings `hh_kern_weak` (13.8M states, 15.5 min), `hh_kern_recheck_weak`
-(18.1M, 18.9 min) and `hh_lazy_migrate` (14.6M, 19.2 min) passed, and the
-four are expected to pass as well -- the rows below say so; `RESUME.md`
-says how to collect them and fix this table if they do not.
+The full table with state counts and times is `RESULTS.txt`.  60 of the
+62 configurations finished, every one as its header predicts.  The two
+five-task layouts, `full_lazy` and `full_lazy_g0`, were stopped by hand
+without a violation, see the end of this file.
 
 ### The series
 
@@ -170,7 +165,7 @@ says how to collect them and fix this table if they do not.
 | `hw_lazy`, `hw_lazy_ba`, `wh_lazy`, `wh_lazy_ba`, `hh_lazy`, `ww_lazy`, `h_lazy`, `h_lazy_ba`, `w_lazy`, `hwa_lazy`, `hwa_lazy_ba` | pass | a lazy umount of the two-mount batch: whatever each mount's situation (nothing else holds it, a holder mid-put on the fast path, a walker mid-__legitimize_mnt(), a holder keeping its reference past the batch, a walker finding it as a holder's pwd) and whichever order the list has, nothing is freed early, doomed early or leaked, and both mounts are freed |
 | `hw_sync`, `wh_sync`, `wh_sync_ba`, `ww_sync`, `h_sync`, `hwa_sync` | pass | the synchronous umount: refused while a holder has a reference or a walker's increment is visible; when it returns 0 the caller's puts are the last ones and the cleanups run from the caller |
 | `hh_lazy_migrate`, `hw_lazy_weak`, `wh_sync_weak`, `hh_lazy_weak` | pass | migrating holders, weakly ordered stores |
-| `full_lazy`, `full_lazy_g0` | pass | all four other tasks at once (`_g0`: without the holders' extra mntget()/mntput() pairs) |
+| `full_lazy`, `full_lazy_g0` | stopped, no violation | all four other tasks at once (`_g0`: without the holders' extra mntget()/mntput() pairs); stopped by hand after 49.7M and 51.3M distinct states |
 | `hw_nsdeath`, `hw_nsdeath_ba`, `hh_nsdeath` | pass | a namespace dying: the same protocol without a caller's reference |
 | `hh_kern`, `hh_kern_ba`, `h_kern`, `hh_kern_weak` | pass | kern_unmount_array(): the plain mnt_ns = NULL store without lock or seqcount bump is enough; a kern_mount() has no walkers, the lock_mount_hash() of the peek drains the store, and a holder's put either lands before the sum (count one, finished) or not (held, grace period) |
 | `h_witness_fast`, `h_kern_witness_fast` | `NoFastFinal` violated | the witness: an unheld mount is finished off without any grace period |

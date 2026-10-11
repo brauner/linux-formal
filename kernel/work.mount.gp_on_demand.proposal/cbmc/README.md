@@ -1,21 +1,54 @@
 # CBMC harness for the grace-period-on-demand mntput() protocol
 
-Tree: vfs/work.mount.gp_on_demand.proposal at 4379d47fd314, fs/namespace.c.
-Model it mirrors: ~/src/git/linux-tla/kernel/mount-gp-on-demand/MntPut.tla.
-Memo it follows: research-code-verification.md, section 1.3 (deviations below).
-Status on 2026-10-09 11:35: harness compiles and symexes; the first real run
-(sync, SC) was still in the SAT solver when the session had to stop.  See
-RESUME.md.  NO configuration has a result yet; results.md is empty.
+Tree: work.mount.gp_on_demand.proposal at 4379d47fd314, fs/namespace.c.
+
+The functions of the protocol are copied verbatim from fs/namespace.c
+into a C harness with the per-CPU counters, the seqlock, the grace
+period and task work modelled around them, and the invariants of the
+TLA+ model become assertions. The model is the one in
+`kernel/work.mount.gp_on_demand/tla/MntPut.tla`, which
+`../tla/MntPut.tla` extends to the batch of the series. CBMC then checks
+the assertions over every interleaving of the three threads up to the
+unwinding bound.
+
+## Status: no verdict yet
+
+The harness compiles and CBMC 6.6.0 runs it in minutes, but nothing it
+reported so far is evidence either way. Every configuration that
+finished, the series as written included, reported the same family of
+about thirty failures. The counterexamples show per-CPU counter slots
+holding values no increment can produce: a slot that only ever held 0, 1
+or 2 reads as 1275523073. That's CBMC's thread encoding, not the kernel.
+Those runs updated the counters with a store under a nondeterministic
+guard (`for (c) if (c == cpu) slot[c] += 1`), and a read in another
+thread can pick up such a guarded write with the value of the path that
+wasn't taken. The same traces also fail the pointer checks on
+`mnt->mnt_pcp`, which points at a second weakness: CBMC doesn't resolve
+the `mnt` that real_mount() derives from `&m->mnt` by pointer arithmetic
+in the threaded encoding.
+
+The current `mntput_harness.c` gives every thread one constant CPU, so
+there are no guarded writes any more. Its first run was still in the
+solver when the work stopped. If it reports nothing but the
+`NoFastFinal` witness, the guarded writes were the whole story. If the
+failures persist, the next step is to take the pointer arithmetic out of
+the threaded harness: pass struct mount * everywhere so that every
+shared access is `mounts[const].field`, then rerun `run.py` under
+sequential consistency and with `-m tso`.
+
+Never run: the TSO pass, the BATCH=2 and kern_unmount_array()
+configurations, and the full set of `--pointer-check --bounds-check
+--signed-overflow-check --unsigned-overflow-check` (one probe with all
+of them did not finish in 900 seconds).
 
 ## Files
 
 | file | what |
 |---|---|
 | `mntput_harness.c` | the harness: copied kernel functions + ghost state + threads U/H/W |
-| `run.py`, `run.sh` | the configuration matrix (SC, `-m tso` for goto-instrument --mm tso), result parsing, results.md |
-| `measure.py` | wall time + peak RSS (no /usr/bin/time on this machine) |
-| `results/` | one `<config>.<mm>.log` per run (full CBMC output incl. traces), `probe_sync_sc.log` = the first run |
-| `RESUME.md` | state, how to rerun |
+| `run.py`, `run.sh` | the configuration matrix (SC, `-m tso` for goto-instrument --mm tso), result parsing; writes `results/<name>.<mm>.log` and `results.md` |
+| `measure.py` | wall time + peak RSS (no /usr/bin/time on the machine it ran on) |
+| `trace2.py`, `trace_summary.py` | print the trace of one failed property from a log compactly, two variants |
 
 ## Function <-> copy mapping
 
@@ -51,10 +84,13 @@ RESUME.md.  NO configuration has a result yet; results.md is empty.
    reduced form.  The real pointer code needs a single-threaded CBMC run
    (not done).
 2. `mnt_ns` is an int id (0 = NULL), `mnt_parent` an index: same reason.
-3. Per-CPU: a fresh nondeterministic CPU per `this_cpu_inc()`; over-approximates
-   preemption/migration.  Under `--mm tso` CBMC's store buffers are per thread,
-   not per CPU; migration does not drain them (the kernel's does), which only
-   adds behaviours.
+3. Per-CPU: every thread runs on one constant CPU (U on 0, H on `HCPU`, W on
+   `WCPU`); with `MIGRATE=1` the holder moves to CPU 0 between its extra get
+   and its puts, like the TLA+ model's `MIGRATE`.  The first version picked a
+   nondeterministic CPU per `this_cpu_inc()`, which is what ran into the
+   artefact described under Status.  Under `--mm tso` CBMC's store buffers are
+   per thread, not per CPU; migration does not drain them (the kernel's does),
+   which only adds behaviours.
 4. RCU: `rcu_read_lock()` sets `in_rcu[tid]`; a grace period = for each other
    thread, an atomic `__CPROVER_assume(!in_rcu[t])` (sound for safety, says
    nothing about liveness); `call_rcu()` frees as early as legal, in the
@@ -92,5 +128,4 @@ unmounted mount cleaned and freed exactly once; a refused umount leaves count
     export PATH=~/opt/fv/usr/bin:$PATH LD_LIBRARY_PATH=~/opt/fv/usr/lib/x86_64-linux-gnu:~/opt/fv/usr/lib
     cbmc --version   # 6.6.0
 
-ESBMC was not installed (the GitHub release download delivered 0 bytes in
-10 s on this link; the zip is 238 MB).
+ESBMC was not tried.

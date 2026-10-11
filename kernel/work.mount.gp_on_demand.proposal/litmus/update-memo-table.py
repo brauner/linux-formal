@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Rewrite the results table in research-weak-memory-2.md from collect-results.sh output."""
+"""Rewrite the results table in notes/hardware-models.md from collect-results.sh output."""
 import subprocess, re, os, datetime
 here = os.path.dirname(os.path.abspath(__file__))
-memo = os.path.join(here, '..', 'research-weak-memory-2.md')
+memo = os.path.join(here, 'notes', 'hardware-models.md')
 out = subprocess.run(['bash', os.path.join(here, 'collect-results.sh')], capture_output=True, text=True).stdout.splitlines()[1:]
 rows = []
 for line in out:

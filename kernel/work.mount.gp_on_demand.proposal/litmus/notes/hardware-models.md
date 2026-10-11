@@ -1,6 +1,6 @@
 # Follow-up: the ordering argument under the Arm and POWER architectural models, and on x86 hardware
 
-Companion to research-weak-memory.md (same scratchpad).  Tree: work.mount.gp_on_demand.proposal at
+Companion to lkmm-tooling.md.  Tree: work.mount.gp_on_demand.proposal at
 4379d47fd314, untouched.  Everything here lives in scratchpad/litmus/ (`aarch64/`, `ppc/`, `gen-asm.py`,
 `collect-results.sh`, `x86-klitmus.txt`, `RESUME.md`) and on jens in `~/tmp/klitmus/`.
 
