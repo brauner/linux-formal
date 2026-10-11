@@ -8,6 +8,7 @@ State 1: <Initial predicate>
 /\ i = 0
 /\ refs = {}
 /\ pc = "size"
+/\ dropped = {}
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = <<>>
 /\ cap = 3
@@ -15,7 +16,7 @@ State 1: <Initial predicate>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 0
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 2: <Size>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -27,6 +28,7 @@ State 2: <Size>
 /\ i = 0
 /\ refs = {}
 /\ pc = "copy"
+/\ dropped = {}
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -34,7 +36,7 @@ State 2: <Size>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 3: <Copy>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -46,6 +48,7 @@ State 3: <Copy>
 /\ i = 1
 /\ refs = {}
 /\ pc = "copy"
+/\ dropped = 0..2
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -53,7 +56,7 @@ State 3: <Copy>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 4: <Copy>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -65,6 +68,7 @@ State 4: <Copy>
 /\ i = 2
 /\ refs = {}
 /\ pc = "copy"
+/\ dropped = 0..2
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -72,7 +76,7 @@ State 4: <Copy>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 5: <Copy>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -84,6 +88,7 @@ State 5: <Copy>
 /\ i = 3
 /\ refs = {2}
 /\ pc = "copy"
+/\ dropped = 0..2
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -91,7 +96,7 @@ State 5: <Copy>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 6: <Copy>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -103,6 +108,7 @@ State 6: <Copy>
 /\ i = 3
 /\ refs = {2}
 /\ pc = "finish"
+/\ dropped = 0..2
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -110,7 +116,7 @@ State 6: <Copy>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 
 State 7: <Finish>
 /\ clone = ( 0 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
@@ -122,6 +128,7 @@ State 7: <Finish>
 /\ i = 3
 /\ refs = {2}
 /\ pc = "done"
+/\ dropped = 0..2
 /\ flags = [unshare |-> TRUE, cloexec |-> FALSE, except |-> FALSE, cloexec_only |-> FALSE]
 /\ full = (0 :> FALSE)
 /\ cap = 3
@@ -129,5 +136,5 @@ State 7: <Finish>
   1 :> [cloexec |-> FALSE, open |-> FALSE, file |-> FALSE] @@
   2 :> [cloexec |-> FALSE, open |-> TRUE, file |-> TRUE] )
 /\ open_files = 3
-/\ range = [null |-> FALSE, from |-> 1, to |-> 3]
+/\ range = [null |-> FALSE, from |-> 0, to |-> 3]
 

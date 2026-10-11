@@ -47,7 +47,8 @@ The mutations finish in seconds, `refine_new`, `refine_new_3w`,
 `race_fixed_w2` and the `dupfd_*` runs in a few minutes.
 `refine_new_w4` (1.7M initial tables, `TLC_OPTS="-maxSetSize 2000000"`)
 and `race_fixed`, the walk with liveness over three-bit words, want a big
-machine (`run-parallel.sh`, `TLC_WORKERS`, `TLC_HEAP`).
+machine (`run-parallel.sh`, `TLC_WORKERS`, `TLC_HEAP`): about an hour
+each with around fifty workers.
 
 ## What is in the model
 
@@ -144,26 +145,56 @@ models start from every one-word table and let the table grow.
 
 | Configuration | What it checks | Expected | Result | States | Time |
 |---|---|---|---|---|---|
-| `dupfd_new` | dup_fd() against the lockless fd_install() and the unlocked resize: CloneOK, NoRefOnDropped, KeptCopied, DroppedNotInClone, CopiedAreFiles, Finishes | pass | pass | 1071085 | 17s |
-| `dupfd_old` | the code before the series: the same without NoRefOnDropped | pass | pass | 393408 | 09s |
-| `dupfd_old_refs` | the code before the series: NoRefOnDropped | violation | violation | 238925 | 01s |
-| `race_fixed_w2` | the same walk with two-bit words, the size that finishes in minutes | pass | pass | 1495584 | 27s |
-| `race_no_hop` | the hop of next_fd_to_close() taken out: ClosedOnlySelected (the walk closes the kept window) | violation | violation | 95555 | 01s |
-| `refine_new` | the series, all twelve flag combinations, every table of one or two words of three bits: Refines, CloneOK, NoRefOnDropped, Sized | pass | pass | 1734264 | 34s |
-| `refine_new_3w` | the same over three words of two bits | pass | pass | 1775556 | 45s |
-| `refine_new_w4` | the same over two words of four bits (1.7M tables, needs -maxSetSize) | pass | pass | 94131072 | 29min53s |
-| `refine_old` | the code before the series with its two flags: Refines, CloneOK | pass | pass | 1734264 | 07s |
-| `refine_old_refs` | the code before the series: NoRefOnDropped (the clone references what it then closes again) | violation | violation | 47796 | 01s |
+| `dupfd_new` | dup_fd() against the lockless fd_install() and the unlocked resize: CloneOK, NoRefOnDropped, KeptCopied, DroppedNotInClone, CopiedAreFiles, Finishes | pass | pass | 1071085 | 19s |
+| `dupfd_old` | the code before the series: the same without NoRefOnDropped | pass | pass | 393408 | 20s |
+| `dupfd_old_refs` | the code before the series: NoRefOnDropped | violation | violation | 237624 | 01s |
+| `race_fixed` | __range_close() against open, fd_install, close, F_SETFD and table growth: ClosedOnlySelected, Bounded, Terminates | pass | pass | 86453568 | 50min16s |
+| `race_fixed_w2` | the same walk with two-bit words | pass | pass | 1091232 | 42s |
+| `race_no_range_mask` | last_fd_to_close() without dup_fd_dropped_word(): ClosedOnlySelected (the walk closes a descriptor the flags keep) | violation | violation | 94227 | 01s |
+| `refine_hop_off_by_one` | the hop resumes a word too low: Refines (the word below the window is skipped) | violation | violation | 85956 | 03s |
+| `refine_hop_partial` | the hop also takes a word that sticks out above the window: Refines (what sits above the window in that word stays open) | violation | violation | 47090 | 01s |
+| `refine_new` | the series, all twelve flag combinations, every table of one or two words of three bits: Refines, CloneOK, NoRefOnDropped, Sized | pass | pass | 1734264 | 03min55s |
+| `refine_new_3w` | the same over three words of two bits | pass | pass | 1775556 | 07min07s |
+| `refine_new_w4` | the same over two words of four bits (1.7M tables, needs -maxSetSize) | pass | pass | 94131072 | 56min19s |
+| `refine_no_last_word_mask` | last_fd_to_close() without BITMAP_LAST_WORD_MASK(n): Refines (a claimed slot at the bound ends the walk) | violation | violation | 47882 | 01s |
+| `refine_no_range_mask` | last_fd_to_close() without dup_fd_dropped_word(): Refines (the walk closes what the range and the flags keep) | violation | violation | 47099 | 01s |
+| `refine_old` | the code before the series with its two flags: Refines, CloneOK | pass | pass | 1734264 | 01min11s |
+| `refine_old_refs` | the code before the series: NoRefOnDropped (the clone references what it then closes again) | violation | violation | 47094 | 00s |
+| `refine_size_no_except_clamp` | sane_fdtable_size() keeps the last descriptor above a FD_RANGE_EXCEPT range: Sized | violation | violation | 54796 | 02s |
+| `refine_skip_off_by_one` | the skip of an empty stretch resumes a word too low: Refines (the word holding the last open descriptor is skipped) | violation | violation | 85754 | 03s |
+
+The times are wall clock on a shared 512-CPU machine, with 8 workers for
+the short runs, 16 for `refine_new`, 56 for `refine_new_w4` and 48 for
+`race_fixed`.
 
 ## What the model says beyond the series
 
+- The queued code refines the meaning of the flags for every table,
+  range and flag combination the refinement enumerates, over three-bit,
+  two-bit and four-bit words, and the clone is sized exactly
+  (`refine_new`, `refine_new_3w`, `refine_new_w4`).  Every mutation of
+  the new walk and the new sizing is caught: the walk stops early on a
+  claimed slot at its bound without `BITMAP_LAST_WORD_MASK()`, misses
+  the descriptors in the word the skip or the hop should have resumed
+  at, misses the descriptors above the window in a word the hop should
+  not have taken, closes what the range and the flags keep without
+  `dup_fd_dropped_word()`, and sizes the clone past the range without
+  the clamp.
+- The walk is safe against everything else the process does to the
+  table while the walk has the lock dropped: it only ever closes what
+  the range and the flags select at that moment, its bound only comes
+  down, and it ends (`race_fixed_w2`, `race_fixed`).  Without
+  `dup_fd_dropped_word()` it closes what the range and the flags keep,
+  in the counterexample a descriptor without close-on-exec under
+  CLOSE_RANGE_EXCEPT | CLOSE_RANGE_CLOEXEC_ONLY (`race_no_range_mask`).
 - The two "old" configurations show that the code before the series was
   correct for its flags (`refine_old`, `dupfd_old`) and that it took
   references it then dropped again (`refine_old_refs`,
-  `dupfd_old_refs`): with descriptors 1 and 2 open and
-  `close_range(0, 1, CLOSE_RANGE_UNSHARE)` the clone was sized to the
-  word, descriptor 1 got a reference and was closed from the clone.
-  That is what "file: let dup_fd() leave the punched hole behind" removes.
+  `dupfd_old_refs`): with only descriptor 2 open,
+  `close_range(0, 2, CLOSE_RANGE_UNSHARE)` still gave the clone its
+  first word, so descriptor 2 got a reference and was closed from the
+  clone.  That is what "file: let dup_fd() leave the punched hole
+  behind" removes.
 - Every table the refinement enumerates has stale close_on_exec bits on
   closed slots somewhere; no property depends on them, so the bits
   `close()` and the copy loop leave behind never matter.
@@ -171,6 +202,7 @@ models start from every one-word table and let the table grow.
   cleared in the clone together with the full bit of its word.  The
   sizing counts it as carried over, so a clone can be a word larger than
   its files need.  `Sized` pins that down: the size is the last open
-  descriptor that is not dropped, claimed or not.
-- Without the hop (`race_no_hop`) the walk of CLOSE_RANGE_EXCEPT closes
-  the first descriptor of the window it is supposed to keep.
+  descriptor that is not dropped, claimed or not.  The walk leaves a
+  claimed slot open as well, and `BITMAP_LAST_WORD_MASK()` is what keeps
+  it from ending the walk: without it the walk finds the claimed slot
+  again at its bound and stops.
