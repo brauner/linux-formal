@@ -1,4 +1,4 @@
-# Formal models of Linux kernel and systemd code
+# Formal models of Linux kernel code
 
 Models and proofs that cannot live in the trees themselves: TLA+ models
 checked with TLC, Linux-kernel-memory-model litmus tests for herd7 and
@@ -19,8 +19,7 @@ it models: `kernel/mount/core/` for the mount code itself,
 model of a series may carry its own copy of an upstream module with
 the series' change applied, and says so. Inside a model every method
 has a directory of its own: `tla/`, `litmus/`, `dat3m/`, `cbmc/`,
-`trace/`. `systemd/` holds one directory per component. `tools/` is
-where the jars go (untracked).
+`trace/`. `tools/` is where the jars go (untracked).
 
 ## Kernel
 
@@ -39,14 +38,6 @@ where the jars go (untracked).
 | `kernel/super/core/` | the superblock code of fs/super.c: the lifecycle (SB_BORN, SB_DYING, SB_DEAD, s_active, s_passive, s_umount, sget_fc(), the iterators, user_get_super(), the shrinker), the device-to-superblock table and the fs_holder_ops walks against bdev_freeze(), bdev_thaw() and bdev_deny_freeze(), and freezing (freeze_super(), thaw_super(), the freeze holders, the emergency thaw, suspend); TLA+, CBMC and LKMM litmus tests, the fixes they found are switches and sit on work.super.fixes.core, .7.3 and .fs and on work.fs.sb_rdonly | fc1c25014ff8 (v7.3-rc6-301) |
 | `kernel/super/unborn-wait/` | the device-to-superblock table of fs/super.c with the cursor of work.super.fixes.core.claims, a version of "super: don't act on superblocks that dropped their device claim" that was not taken: super_dev_get() waits for an unborn superblock with a passive reference instead of a pin, against claims dropped during the mount (btrfs' extra devices, the rollback of fs_bdev_register()), freezes, thaws and user_get_super(); the fc1c25014ff8 cursor behind the switch (TLA+, CBMC) | 587d78169911 on fc1c25014ff8 (work.super.fixes.core.claims) |
 
-## systemd
-
-| Directory | Protocol | systemd base |
-|-----------|----------|--------------|
-| `systemd/executor/` | systemd-executor and the service manager: the exec_fd protocol of Type=exec, the (sd-pam) helper, the PrivatePIDs= pidref handoff, the priorities of the manager's event loop against SIGCHLD, and the kill logic | v262-rc2-60-ge96ff3b5b9 |
-| `systemd/nsresourced/` | the user namespace registry of systemd-nsresourced: clients (nspawn, the executor), the worker, the BPF-LSM map and death ring buffer, PID 1's fd store, the kernel's inode reuse, the manager's release and startup sweep | v262-rc2-60-ge96ff3b5b9 |
-| `systemd/mountfsd/` | dm-verity device sharing between systemd-mountfsd workers: the verity_partition() retry loop against the device-mapper's deferred removal and udev's symlinks | v262-rc2-60-ge96ff3b5b9 |
-| `systemd/fiber/` | the fiber runtime of sd-future: fibers driven by their defer and exit event sources, futures resolving and resuming fibers, cancellation and cleanup unwinding, SD_FIBER_TIMEOUT() deadlines, against sd-event's dispatch order; six findings, every fix a switch | v262-rc3 (e96ff3b5b9) |
 
 ## Running
 
@@ -63,8 +54,7 @@ own run notes next to them.
 
 The configurations that switch a fix off stop at their counterexample in
 seconds to minutes; the green kernel proofs explore tens of millions of
-states and want a large machine (`run-parallel.sh`).  The systemd models
-are small and finish in seconds.
+states and want a large machine (`run-parallel.sh`).
 
 ## License
 
