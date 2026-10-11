@@ -35,7 +35,6 @@ pending in, ties arbitrary).  Each candidate fix is a switch.
 | `check.sh`, `start.sh`, `run-parallel.sh`, `status.sh`, `resume.sh`, `summarize.sh` | run one configuration in the foreground, detached, all of them; watch; resume a dead run from its checkpoint; the summary |
 | `extract-trace.sh`, `traces/` | the counterexamples of the configurations that are expected to fail |
 | `fill-results.py`, `RESULTS.txt` | the results table below, from `logs/summary.txt` |
-| `STATUS.md` | progress log and the resume protocol |
 
 ## Running it
 
@@ -96,7 +95,7 @@ safe to build on. As of e96ff3b5b9 it is not, for three structural reasons
 and one refcounting bug; each is proven twice, by a TLC counterexample and by
 a C test that fails on a pristine build of that commit (the tests are the
 ones on `work.systemd.fiber`, run with `TESTFUNCS=<name> build/test-fiber`
-against `jens:src/git/systemd-fiber-orig`). What the failures mean depends on
+against a build of e96ff3b5b9). What the failures mean depends on
 the build: developer builds abort on an assertion; release builds
 (`-Db_ndebug=true`, as `.github/workflows/build-test.sh` uses, where
 systemd's `assert()` becomes `__builtin_unreachable()`) corrupt memory. A
@@ -202,9 +201,11 @@ alive, as for any callback.
 Every finding below reproduces against the code as it is (the `asis_*`
 configurations), and every fix is a switch in the model; the `abl_*`
 configurations show which fix each property needs. The C fixes are on branch
-`work.systemd.fiber` (worktree `~/src/git/systemd-worktrees/work.systemd.fiber`),
-one commit per fix followed by its tests; every new test was also run against
-a pristine build of e96ff3b5b9 and fails there the way the finding says.
+`work.systemd.fiber`, one commit per fix followed by its tests; every new test
+was also run against a pristine build of e96ff3b5b9 and fails there the way the
+finding says. The full `meson test` of the fixed tree passes, but for five
+`dist` checks of the help output and the ukify version that fail the same way
+on the pristine tree.
 
 1. **Dropping the last reference to a pending future aborts.**
    `sd_future_free()` runs with `n_ref == 0` and resolves a pending future
