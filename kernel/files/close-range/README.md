@@ -1,11 +1,7 @@
 # close_range() and the clone dup_fd() makes for it
 
-Status: queued for v7.4 in vfs-7.4.close_range, revised since. The
-queued sane_fdtable_size() sizes the clone differently, and "fs: close
-files from the highest descriptor down" on vfs-7.4.sync_close replaces
-the ascending walk of __range_close() and its hop over the kept window
-with a descending one. The models describe e0bfe9dbba49, not the queued
-code.
+Status: queued for v7.4 in vfs-7.4.close_range and vfs-7.4.sync_close,
+as modelled.
 
 "files,close_range: add CLOSE_RANGE_{CLOEXEC_ONLY,EXCEPT}" does two
 things. It makes dup_fd() leave the descriptors close_range() is about
@@ -14,8 +10,11 @@ again from there. And it adds CLOSE_RANGE_EXCEPT, which acts on
 everything outside the range, and CLOSE_RANGE_CLOEXEC_ONLY, which acts
 only on close-on-exec descriptors. What the series adds is bitmap
 arithmetic: which bits of a word a range covers, the inversion and the
-close_on_exec mask on top of that, the size of the clone, and a walk
-over the table that hops over the window it keeps.
+close_on_exec mask on top of that, and the size of the clone. "fs:
+close files from the highest descriptor down", which sits on top of it
+in vfs-7.4.sync_close, turned the walk of __range_close() around. It
+starts at the top now, skips empty stretches with find_last_bit() and
+hops below the window it keeps.
 
 `FdTable.tla` writes that code down operator by operator, next to what
 the flags are supposed to mean. Three models use it. `CloseRange`
@@ -24,37 +23,49 @@ two small words, every range and all twelve flag combinations, shared
 and private. `RangeCloseRace` runs __range_close() over a shared table
 while other threads open, install, close and re-flag descriptors and
 grow the table. `DupFdRace` runs dup_fd() against the lockless
-fd_install().
+fd_install(). Next to the models, `exhaustive/` runs the queued C
+functions themselves against the same meaning of the flags.
 
-Tree: work.file.close_range_except at e0bfe9dbba49 on 5dd1818b15d9.
+Tree: vfs-7.4.sync_close at 02de8d0c3512, which holds
+vfs-7.4.close_range (c73c0e243836). The models were first written
+against e0bfe9dbba49, the series before it was applied, and brought up
+to the queued code since.
 
 | Method | Directory | What it covers |
 |---|---|---|
 | TLA+ (TLC) | [`tla/`](tla/README.md) | `FdTable` and the three models above |
+| C, exhaustive | [`exhaustive/`](exhaustive/README.md) | the queued functions on emulated small words, every table, range and flag combination, nothing concurrent |
 
 ## Results
 
-No defect in the series. The refinement holds over every table with
-three-bit, four-bit and two-bit words (`refine_new`, `refine_new_w4`,
-`refine_new_3w`), the walk keeps its bounds and closes only what the
-range selects while the table changes under it (`race_fixed_w2`), and
-the clone carries over exactly what it should against concurrent
-installs (`dupfd_new`).
+No defect in the queued code. The refinement holds over every table
+with three-bit, four-bit and two-bit words (`refine_new`,
+`refine_new_w4`, `refine_new_3w`). The walk keeps its bound, closes
+only what the range and the flags select while the table changes under
+it, and ends (`race_fixed`, `race_fixed_w2`). The clone carries over
+exactly what it should against concurrent installs (`dupfd_new`). The C
+functions agree with the meaning of the flags in about 1.7 billion
+cases.
+
+Each piece of the new walk and of the new sizing is needed. Taking any
+one of them out makes a configuration fail: `BITMAP_LAST_WORD_MASK()`,
+the resume points of the skip and of the hop, the hop taking only words
+that lie entirely inside the window, `dup_fd_dropped_word()` in the
+walk, and the clamp of the size to a CLOSE_RANGE_EXCEPT range.
 
 The models say a few things beyond the series:
 
 - The code before it was correct for its flags but took references it
-  dropped again right away: with descriptors 1 and 2 open,
-  `close_range(0, 1, CLOSE_RANGE_UNSHARE)` copied descriptor 1 into the
-  clone and closed it from there (`refine_old_refs`, `dupfd_old_refs`).
-  That's what "file: let dup_fd() leave the punched hole behind"
-  removes.
-- The hop over the kept window in next_fd_to_close() is load-bearing:
-  without it CLOSE_RANGE_EXCEPT closes the first descriptor of the
-  window it is supposed to keep (`race_no_hop`).
+  dropped again right away: with only descriptor 2 open,
+  `close_range(0, 2, CLOSE_RANGE_UNSHARE)` still gave the clone its
+  first word, copied descriptor 2 into it and closed it from there
+  (`refine_old_refs`, `dupfd_old_refs`). That's what "file: let dup_fd()
+  leave the punched hole behind" removes.
 - A claimed slot, open bit set and no file installed yet, counts for the
   size of the clone, so a clone can be one word larger than its files
-  need. `Sized` pins that down.
+  need. `Sized` pins that down. The walk leaves a claimed slot open too,
+  and `BITMAP_LAST_WORD_MASK()` is what keeps it from ending the walk
+  when the bound comes down to it.
 
 Everything but `race_fixed` and `refine_new_w4` finishes in minutes on a
 laptop.
