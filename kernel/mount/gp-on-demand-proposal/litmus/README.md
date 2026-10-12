@@ -19,6 +19,7 @@ back.
 | C | `MNT-C1-kern-unmount-get-before-put`, `MNT-C2-kern-unmount-gp-fallback` | kern_unmount_array(): plain store of mnt_ns, no lock, no seqcount bump | Never |
 | D | `MNT-D1-dekker-fastpath-recheck`, `MNT-D1m-holder-wmb-only` | the Dekker alternative (fast path re-reads mnt_ns after its put, no grace period); exploratory, not the tree | Never / Sometimes |
 | E | `MNT-E1-slowpath-no-outer-mb`, `MNT-E1u-slowpath-after-umount-tree`, `MNT-E2-busycheck-no-outer-mb`, `MNT-E{1,1u,2}m-{nomb-in-sum,walker-nomb}` | mntput_no_expire_slowpath() and do_umount()'s busy check without their outer smp_mb() (the shape of the tree after "fs: drop the smp_mb()s that mnt_get_count() made redundant"); E1u is E1 started after umount_tree(); the mutations take out the smp_mb() inside mnt_get_count() or the walker's | Never, Never, Never / Sometimes for the six mutations |
+| F | `MNT-F1-late-walker-sees-new-pwd`, `MNT-F1m-{nowmb,nomb-in-sum}` | three processes: a walker that starts after the peek finished a mount off can't reach it through the old cwd of a holder whose put the peek counted; the smp_wmb() of set_fs_pwd()'s write_sequnlock() or of the fast path orders the new fs->pwd before the put, the smp_mb() inside mnt_get_count() orders the load of the put before the seqcount store of the unlock; the mutations take out both smp_wmb()s or the smp_mb() | Never / Sometimes for both mutations |
 
 Modelling: LKMM has no seqlock, the tests spell write_seqlock() out as the
 kernel does (lock, seqcount store, smp_wmb(), ..., smp_wmb(), seqcount store,
@@ -146,6 +147,14 @@ POWER, the architectural models above are.
 `MNT-E1u-slowpath-after-umount-tree` went through the same pipeline
 later, `klitmus/run-E1u.sh` drives one test through it: Never over
 2097130 iterations.
+
+F1 is the last part of the argument for the peek: once the sum came
+out at one nobody can find the mount anymore. A walker whose seqcount
+sample postdates the peek would get through __legitimize_mnt(), so it
+must not be able to read a pointer to the mount at all. The kernel tree
+carries F1 and its two mutations as
+`Documentation/litmus-tests/fs/mnt-walker-late-sees-new-pwd{,-nowmb,-nomb}.litmus`,
+they were written there and copied here. They only ran under LKMM.
 
 ## For the kernel tree
 

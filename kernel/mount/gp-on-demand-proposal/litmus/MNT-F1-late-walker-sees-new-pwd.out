@@ -1,0 +1,29 @@
+Test MNT-F1-late-walker-sees-new-pwd Allowed
+States 19
+1:r1=0; 2:r5=0; 2:r6=0;
+1:r1=0; 2:r5=0; 2:r6=1;
+1:r1=0; 2:r5=1; 2:r6=0;
+1:r1=0; 2:r5=1; 2:r6=1;
+1:r1=0; 2:r5=2; 2:r6=0;
+1:r1=0; 2:r5=2; 2:r6=1;
+1:r1=0; 2:r5=3; 2:r6=0;
+1:r1=0; 2:r5=3; 2:r6=1;
+1:r1=0; 2:r5=4; 2:r6=0;
+1:r1=0; 2:r5=4; 2:r6=1;
+1:r1=1; 2:r5=0; 2:r6=0;
+1:r1=1; 2:r5=0; 2:r6=1;
+1:r1=1; 2:r5=1; 2:r6=0;
+1:r1=1; 2:r5=1; 2:r6=1;
+1:r1=1; 2:r5=2; 2:r6=0;
+1:r1=1; 2:r5=2; 2:r6=1;
+1:r1=1; 2:r5=3; 2:r6=0;
+1:r1=1; 2:r5=3; 2:r6=1;
+1:r1=1; 2:r5=4; 2:r6=1;
+No
+Witnesses
+Positive: 0 Negative: 29
+Condition exists (1:r1=1 /\ 2:r5=4 /\ 2:r6=0)
+Observation MNT-F1-late-walker-sees-new-pwd Never 0 29
+Time MNT-F1-late-walker-sees-new-pwd 0.40
+Hash=ebbbce9f264fbc4d462d77dbf6787f67
+
