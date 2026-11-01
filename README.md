@@ -80,6 +80,12 @@ Coredumps, [`kernel/coredump/`](kernel/coredump/):
 |---|---|---|---|
 | [`rendezvous/`](kernel/coredump/rendezvous/) | the coredump rendezvous and the signal, exit, fork, exec and io-wq code around it | TLA+ | queued for v7.4 |
 
+libfs, [`kernel/libfs/`](kernel/libfs/):
+
+| Model | What it models | Methods | Status |
+|---|---|---|---|
+| [`offset-readdir/`](kernel/libfs/offset-readdir/) | readdir on tmpfs directories with stable offsets: the d_children walk and the descending walk of the offset tree that replaces it, against creates, unlinks, renames, exchanges and whiteouts | TLA+ | proposed |
+
 Mounts, [`kernel/mount/`](kernel/mount/):
 
 | Model | What it models | Methods | Status |
@@ -152,6 +158,16 @@ finding. In short:
   deadlock against sched_ext, and the foreground job of an exiting
   session leader can miss its SIGHUP.
   [`kernel/files/sync-close/`](kernel/files/sync-close/)
+- **Offset directories**: since v6.14 readdir on tmpfs walks d_children,
+  which stops agreeing with the stable offsets after a rename over a
+  name, an exchange or a wrap of the offset allocator. An unlink between
+  two getdents64() calls then makes it return untouched entries twice
+  or skip them. The descending walk of the offset tree that replaces it
+  returns every untouched entry exactly once, and it can take no
+  references only because all writers hold i_rwsem exclusive. An
+  lseek() past the end of the directory has returned the whole
+  directory again since v6.14 as well, and still does with the fix.
+  [`kernel/libfs/offset-readdir/`](kernel/libfs/offset-readdir/)
 - **The vacant-mount series**: an RCU path walk that climbs out of a
   vacated bind mount, a double free and a lost release in drafts of the
   handoff, a lost release when a vacant mount rides the wrong list, and

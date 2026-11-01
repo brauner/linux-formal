@@ -1,0 +1,16 @@
+** Invariant NoSeekBack is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Create      b@4 a@3                            
+  4 Open        b@4 a@3                            closed -> idle; opendir: entries a,b
+  5 CallStart   b@4 a@3                            idle -> find
+  6 FindOffset  b@4 a@3                            find -> emit; pos=4; found b
+  7 Emit        b@4 a@3                            emit -> find; RETURNED b (x1)
+  8 FindOffset  b@4 a@3                            find -> emit; pos=3; found a
+  9 Stop        b@4 a@3                            emit -> idle
+ 10 Unlink      b@4                                touched a
+ 11 Tell        b@4                                telldir() = 3, returned so far b
+ 12 SeekBack    b@4                                seekdir(3)
+ 13 CallStart   b@4                                idle -> find; cookiegone=True
+ 14 FindOffset  b@4                                find -> done; pos=EOD
+untouched since opendir(): b; returned since opendir() or the last seek: -

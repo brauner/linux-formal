@@ -1,0 +1,10 @@
+** Invariant NoCookieGone is violated
+  1 Initial     (empty)                            
+  2 Create      d@3                                
+  3 Open        d@3                                closed -> idle; opendir: entries d
+  4 CallStart   d@3                                idle -> find
+  5 FindOffset  d@3                                find -> emit; pos=3; found d
+  6 Stop        d@3                                emit -> idle
+  7 Unlink      (empty)                            touched d
+  8 CallStart   (empty)                            idle -> find; cookiegone=True
+untouched since opendir(): -; returned since opendir() or the last seek: -

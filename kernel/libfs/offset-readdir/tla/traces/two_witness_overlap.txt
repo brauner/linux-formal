@@ -1,0 +1,11 @@
+** Invariant NoOverlap is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Create      b@4 a@3                            
+  4 Unlink      b@4                                
+  5 Open        b@4                                L1 closed -> idle; L1 opendir: entries b
+  6 CallStart   b@4                                L1 idle -> find
+  7 Open        b@4                                L2 closed -> idle; L2 opendir: entries b
+  8 CallStart   b@4                                L2 idle -> find
+L1 untouched since opendir(): b; returned since opendir() or the last seek: -
+L2 untouched since opendir(): b; returned since opendir() or the last seek: -

@@ -1,0 +1,17 @@
+** Invariant ReReturnNeedsWrap is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Create      d@4 a@3                            
+  4 Open        d@4 a@3                            closed -> idle; opendir: entries a,d
+  5 CallStart   d@4 a@3                            idle -> find
+  6 FindOffset  d@4 a@3                            find -> emit; pos=3; found a
+  7 Emit        d@4 a@3                            emit -> find; RETURNED a (x1)
+  8 FindOffset  d@4 a@3                            find -> emit; pos=4; found d
+  9 Stop        d@4 a@3                            emit -> idle
+ 10 RenameRead  b@5 d@4                            touched a,b
+ 11 CallStart   b@5 d@4                            idle -> find
+ 12 FindOffset  b@5 d@4                            find -> emit; found d
+ 13 Emit        b@5 d@4                            emit -> find; RETURNED d (x1)
+ 14 FindOffset  b@5 d@4                            find -> emit; pos=5; found b
+ 15 Emit        b@5 d@4                            emit -> find; RETURNED b (x1); rereturn=True
+untouched since opendir(): d; returned since opendir() or the last seek: a=1 b=1 d=1

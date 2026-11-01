@@ -1,0 +1,9 @@
+** Invariant PastEODEmpty is violated
+  1 Initial     (empty)                            
+  2 Open        (empty)                            closed -> idle; opendir: entries 
+  3 Create      a@3                                touched a
+  4 SeekFar     a@3                                pos=PAST_EOD; lseek() past DIR_OFFSET_EOD
+  5 CallStart   a@3                                idle -> find
+  6 FindOffset  a@3                                find -> emit; pos=3; found a
+  7 Emit        a@3                                emit -> find; RETURNED a (x1)
+untouched since opendir(): -; returned since opendir() or the last seek: a=1

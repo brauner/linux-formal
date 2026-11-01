@@ -1,0 +1,8 @@
+** Invariant NoWrap is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Unlink      (empty)                            
+  4 Create      a@4                                
+  5 Create      b@5 a@4                            
+  6 Create      c@3 b@5 a@4                        wrapped=True
+untouched since opendir(): -; returned since opendir() or the last seek: -

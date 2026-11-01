@@ -1,0 +1,17 @@
+** Invariant NoDup is violated
+  1 Initial     (empty)                            
+  2 Create      d@3                                
+  3 Create      a@4 d@3                            
+  4 Unlink      a@4                                
+  5 Create      d@5 a@4                            
+  6 Open        d@5 a@4                            closed -> idle; opendir: entries a,d
+  7 CallStart   d@5 a@4                            idle -> find
+  8 FindList    d@5 a@4                            find -> emit; pos=5; found d
+  9 Emit        d@5 a@4                            emit -> find; RETURNED d (x1)
+ 10 FindList    d@5 a@4                            find -> emit; pos=4; found a
+ 11 Stop        d@5 a@4                            emit -> idle
+ 12 Unlink      d@5                                touched a
+ 13 CallStart   d@5                                idle -> find; cookiegone=True
+ 14 FindList    d@5                                find -> emit; pos=5; found d
+ 15 Emit        d@5                                emit -> find; RETURNED d (x2)
+untouched since opendir(): d; returned since opendir() or the last seek: d=2

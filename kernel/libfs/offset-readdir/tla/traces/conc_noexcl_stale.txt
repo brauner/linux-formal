@@ -1,0 +1,12 @@
+** Invariant NoStale is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Unlink      (empty)                            
+  4 Create      a@4                                
+  5 Open        a@4                                closed -> idle; opendir: entries a
+  6 CallStart   a@4                                idle -> find
+  7 FindOffset  a@4                                find -> emit; pos=4; found a
+  8 Create      b@5 a@4                            touched b
+  9 Emit        b@5 a@4                            emit -> find; RETURNED a (x1)
+ 10 FindOffset  b@5 a@4                            find -> done; pos=EOD; err=stale
+untouched since opendir(): a; returned since opendir() or the last seek: a=1

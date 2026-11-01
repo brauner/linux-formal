@@ -1,0 +1,7 @@
+** Invariant OrdersAgree is violated
+  1 Initial     (empty)                            
+  2 Create      d@3                                
+  3 Create      a@4 d@3                            
+  4 Exchange    d@3 a@4                            
+  5 Open        d@3 a@4                            closed -> idle; opendir: entries a,d; mismatch=True
+untouched since opendir(): a,d; returned since opendir() or the last seek: -

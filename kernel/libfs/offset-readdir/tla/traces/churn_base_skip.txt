@@ -1,0 +1,16 @@
+** Invariant Complete is violated
+  1 Initial     (empty)                            
+  2 Create      a@3                                
+  3 Create      d@4 a@3                            
+  4 Create      b@5 d@4 a@3                        
+  5 Exchange    d@4 b@5 a@3                        
+  6 Open        d@4 b@5 a@3                        closed -> idle; opendir: entries a,b,d; mismatch=True
+  7 CallStart   d@4 b@5 a@3                        idle -> find
+  8 FindList    d@4 b@5 a@3                        find -> emit; pos=4; found d
+  9 Stop        d@4 b@5 a@3                        emit -> idle
+ 10 Unlink      b@5 a@3                            touched d
+ 11 CallStart   b@5 a@3                            idle -> find; cookiegone=True
+ 12 FindList    b@5 a@3                            find -> emit; pos=3; found a
+ 13 Emit        b@5 a@3                            emit -> find; RETURNED a (x1)
+ 14 FindList    b@5 a@3                            find -> done; pos=EOD
+untouched since opendir(): a,b; returned since opendir() or the last seek: a=1
