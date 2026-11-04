@@ -1,0 +1,26 @@
+Test FREF-G2fm-same-slot-reload-dep-relaxed Allowed
+States 16
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=1;
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-9; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=fop; 1:r3=1;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=1;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=0; 1:r0=fop; 1:r1=-1; 1:r2=fop; 1:r3=1;
+0:r1=0; 1:r0=fop; 1:r1=-1; 1:r2=q; 1:r3=-9;
+0:r1=0; 1:r0=q; 1:r1=-1; 1:r2=q; 1:r3=0;
+Ok
+Witnesses
+Positive: 1 Negative: 19
+Condition exists (0:r1=-1 /\ 1:r0=fop /\ 1:r1=0 /\ 1:r2=fop /\ 1:r3=1)
+Observation FREF-G2fm-same-slot-reload-dep-relaxed Sometimes 1 19
+Time FREF-G2fm-same-slot-reload-dep-relaxed 0.29
+Hash=ff9b7aff406c111144613cde1886d3f7
+

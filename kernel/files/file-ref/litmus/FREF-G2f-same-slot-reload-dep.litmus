@@ -1,0 +1,96 @@
+C FREF-G2f-same-slot-reload-dep
+
+(*
+ * Expected: Never
+ *
+ * FREF-G2 with the field read through the pointer of the *second* load,
+ * the shape of __get_file_rcu() (file_reloaded, OPTIMIZER_HIDE_VAR) and
+ * the fix for __fget_files_rcu(): the address dependency on the reload
+ * pairs with the release store of fd_install(), so the field read sees
+ * what open() wrote before publishing the file.
+ *
+ * __fget_files_rcu() when the file is recycled into the same descriptor:
+ * thread A closes fd and opens again, getting the same struct file and
+ * the same fd back; thread B looks fd up meanwhile.  B's increment lands
+ * on the recycled file, the recheck passes (the slot holds that file
+ * again), B returns it.  Can B's caller then read a field of the old
+ * incarnation, say f_op, which open() wrote after init_file() set f_ref?
+ *
+ * P0 is thread A: close(fd) clears the slot, fput() marks the file DEAD
+ * and frees it, open() recycles it: init_file() stores ONEREF (plain),
+ * do_dentry_open() stores f_op (plain), fd_install() publishes the slot
+ * (release).  P1 is thread B, __fget_files_rcu() plus the first field
+ * read of its caller: file = *fdentry, file_ref_get(), reload, compare,
+ * then file->f_op through the pointer of the *first* load, as the code
+ * returns `file`.
+ *
+ * Encoding: slot holds a pointer, to fop (the file) or to q (NULL); fop
+ * is the f_op field, 1 the old incarnation's, 2 the new one's.  0:r1 = -1
+ * says the file was freed and recycled, so 1:r1 = 0 is the recycled
+ * ONEREF.  Bad outcome: the recheck saw the slot hold the file again and
+ * the field read returned the old incarnation's value.
+ *
+ * The increment is ordered after the first load by the address
+ * dependency and the field read after the increment by the full
+ * barrier, but the field read is not ordered after the reload: nothing
+ * ties it to the release store that published the new f_op.  The
+ * SLAB_TYPESAFE_BY_RCU conversion (0ede61d8589c) made every later load
+ * depend on the second load, as Jann Horn asked; the code-generation
+ * rewrite 253ca8678d30 inlined the lookup without that dependency.
+ * __get_file_rcu() still has it: FREF-G2f.
+ *
+ * Code (fs/file.c at v7.4-rc1-132-g05441d697f7f):
+ *   1188   file = rcu_dereference_raw( *fdentry);
+ *   1202   if (unlikely(!file_ref_get(&file->f_ref)))
+ *   1218   if (unlikely(file != rcu_dereference_raw( *fdentry)) ||
+ *   1228   if (unlikely(file->f_mode & mask)) {
+ *   1237   return file;
+ * fs/file_table.c init_file():    file_ref_init(&f->f_ref, 1);   (last)
+ * fs/open.c do_dentry_open():     f->f_op = fops_get(inode->i_fop);
+ * fs/file.c fd_install():         rcu_assign_pointer(fdt->fd[fd], file);
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	slot=fop;
+	fop=1;
+	q=0;
+	0:r1=-9;
+	1:r3=-9;
+}
+
+P0(int **slot, int *fop, int *q, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+
+	WRITE_ONCE(*slot, q);
+	r0 = atomic_fetch_sub(1, cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, -1, -4);
+		if (r1 == -1) {
+			atomic_set(cnt, 0);
+			WRITE_ONCE(*fop, 2);
+			smp_store_release(slot, fop);
+		}
+	}
+}
+
+P1(int **slot, atomic_t *cnt)
+{
+	int *r0;
+	int r1;
+	int *r2;
+	int r3;
+
+	rcu_read_lock();
+	r0 = rcu_dereference(*slot);
+	r1 = atomic_fetch_add(1, cnt);
+	r2 = rcu_dereference(*slot);
+	if (r2 == r0) {
+		r3 = READ_ONCE(*r2);
+	}
+	rcu_read_unlock();
+}
+
+exists (0:r1=-1 /\ 1:r0=fop /\ 1:r1=0 /\ 1:r2=fop /\ 1:r3=1)

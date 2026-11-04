@@ -1,0 +1,19 @@
+Test FREF-G1-recheck-get-full Allowed
+States 9
+0:r1=-9; 1:r0=0; 1:r1=0; 1:r2=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=1;
+0:r1=-1; 1:r0=0; 1:r1=-4; 1:r2=0;
+0:r1=-1; 1:r0=0; 1:r1=0; 1:r2=0;
+0:r1=-1; 1:r0=1; 1:r1=-4; 1:r2=0;
+0:r1=-1; 1:r0=1; 1:r1=0; 1:r2=0;
+0:r1=0; 1:r0=0; 1:r1=-1; 1:r2=0;
+0:r1=0; 1:r0=1; 1:r1=-1; 1:r2=0;
+No
+Witnesses
+Positive: 0 Negative: 9
+Condition exists (0:r1=-1 /\ 1:r0=1 /\ 1:r1=0 /\ 1:r2=1)
+Observation FREF-G1-recheck-get-full Never 0 9
+Time FREF-G1-recheck-get-full 0.06
+Hash=ae94ff5de7a81ec27fb7323b9d1fc61c
+

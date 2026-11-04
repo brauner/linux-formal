@@ -1,0 +1,12 @@
+Test FREF-P3-last-put-release Allowed
+States 2
+1:r0=0; 1:r1=-1; 1:r2=1;
+1:r0=1; 1:r1=-9; 1:r2=-9;
+No
+Witnesses
+Positive: 0 Negative: 2
+Condition exists (1:r0=0 /\ 1:r1=-1 /\ 1:r2=0)
+Observation FREF-P3-last-put-release Never 0 2
+Time FREF-P3-last-put-release 0.01
+Hash=bc5dc6fd89fa8a16742eb388043bd6e8
+

@@ -1,0 +1,13 @@
+Test FREF-P3m-last-put-no-fence Allowed
+States 3
+1:r0=0; 1:r1=-1; 1:r2=0;
+1:r0=0; 1:r1=-1; 1:r2=1;
+1:r0=1; 1:r1=-9; 1:r2=-9;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (1:r0=0 /\ 1:r1=-1 /\ 1:r2=0)
+Observation FREF-P3m-last-put-no-fence Sometimes 1 2
+Time FREF-P3m-last-put-no-fence 0.01
+Hash=85b7c7ee7456e14d3854851cd3afbb0f
+

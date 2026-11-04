@@ -1,0 +1,56 @@
+C FREF-P1mm-cleared-slot-relaxed-get
+
+(*
+ * Expected: Sometimes
+ *
+ * Mutation of FREF-P1: a release put but a relaxed get.  The reload may
+ * be satisfied before the increment.  Acquire is the minimum for the get.
+ *
+ * The pattern kvm's guest_memfd relies on by name ("file_ref_put()
+ * provides a full barrier, and __get_file_rcu() the matching acquire"):
+ * the owner clears the pointer, then drops its reference; a lookup that
+ * takes its reference after the drop must see the cleared pointer, so
+ * that it fails the "file reloaded" check and puts the file back.
+ * close(fd) is the same shape.
+ *
+ * P0 is the owner with the candidate relaxation: WRITE_ONCE(ptr, NULL),
+ * then atomic_long_dec_return_release().  P1 is __get_file_rcu() with an
+ * acquire get.  1:r1 = -1 is the get that read the decrement's NOREF and
+ * resurrected the file (P0's cmpxchg then loses; both are legal).  Bad
+ * outcome: that get still saw the pointer.
+ *
+ * Code (virt/kvm/guest_memfd.c at v7.4-rc1-132-g05441d697f7f):
+ *    365   file_ref_put() provides a full barrier, and __get_file_rcu() the
+ *    366   matching acquire barrier, to ensure that kvm_gmem_get_file() (via
+ *    367   __get_file_rcu()) sees refcount==0 or fails the "file reloaded"
+ *    368   check (file != NULL due to nullifying the file pointer here).
+ *    402   WRITE_ONCE(slot->gmem.file, NULL);
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	slot=1;
+}
+
+P0(int *slot, atomic_t *cnt)
+{
+	int r0;
+
+	WRITE_ONCE(*slot, 0);
+	r0 = atomic_fetch_sub_release(1, cnt);
+}
+
+P1(int *slot, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	rcu_read_lock();
+	r0 = READ_ONCE(*slot);
+	r1 = atomic_fetch_add_relaxed(1, cnt);
+	r2 = READ_ONCE(*slot);
+	rcu_read_unlock();
+}
+
+exists (1:r0=1 /\ 1:r1=-1 /\ 1:r2=1)

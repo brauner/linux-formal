@@ -1,0 +1,82 @@
+C FREF-G1hm-handoff-release-put-mb
+
+(*
+ * Expected: Never
+ *
+ * FREF-G1h with an smp_mb() between the release decrement and the free:
+ * what a release put would need on the synchronous free paths.
+ *
+ * Why file_ref_put() keeps its full ordering.  The decrement with
+ * release ordering (atomic_long_dec_return_release()) orders the cleared
+ * slot before the decrement itself, and nothing more: not before the
+ * free that follows when the put was the last one and __fput() runs
+ * synchronously (__fput_sync(), fput_close_sync() on its fallback path).
+ * The freed object goes to another CPU through the slab freelist, which
+ * recycles it, sets ONEREF and publishes it; a lookup that increments
+ * the recycled counter can then still read the old slot and pass its
+ * recheck for a descriptor that never named the new file.
+ *
+ * P0 is the owner on one CPU: close(fd) clears the slot, the release
+ * decrement reaches NOREF, the cmpxchg marks the file DEAD, __fput()
+ * frees it: the object lands on the freelist (a relaxed RMW in SLUB,
+ * here a plain store).  P2 is open() on another CPU: it takes the object
+ * from the freelist (a relaxed RMW, here a load that the init store
+ * depends on by control), init_file() sets ONEREF, fd_install() publishes
+ * it in another slot.  P1 is __fget_files_rcu() with an acquire get.
+ *
+ * With the fully ordered decrement the kernel has today (FREF-G1hf) the
+ * cleared slot is ordered before the freelist store by the barrier and
+ * the outcome is forbidden.  In the deferred path of fput() the
+ * try_cmpxchg() of task_work_add() is such a barrier too; the
+ * synchronous paths have none.
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	slot=1;
+	slot2=0;
+	fl=0;
+	0:r1=-9;
+}
+
+P0(int *slot, int *fl, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+
+	WRITE_ONCE(*slot, 0);
+	r0 = atomic_fetch_sub_release(1, cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, -1, -4);
+		if (r1 == -1) {
+			smp_mb();
+			WRITE_ONCE(*fl, 1);
+		}
+	}
+}
+
+P1(int *slot, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	rcu_read_lock();
+	r0 = READ_ONCE(*slot);
+	r1 = atomic_fetch_add_acquire(1, cnt);
+	r2 = READ_ONCE(*slot);
+	rcu_read_unlock();
+}
+
+P2(int *slot2, int *fl, atomic_t *cnt)
+{
+	int r0;
+
+	r0 = READ_ONCE(*fl);
+	if (r0 == 1) {
+		atomic_set(cnt, 0);
+		smp_store_release(slot2, 1);
+	}
+}
+
+exists (0:r1=-1 /\ 2:r0=1 /\ 1:r0=1 /\ 1:r1=0 /\ 1:r2=1)

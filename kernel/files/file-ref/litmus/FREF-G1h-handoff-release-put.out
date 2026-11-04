@@ -1,0 +1,22 @@
+Test FREF-G1h-handoff-release-put Allowed
+States 12
+0:r1=-9; 1:r0=0; 1:r1=0; 1:r2=0; 2:r0=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=0; 2:r0=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=1; 2:r0=0;
+0:r1=-1; 1:r0=0; 1:r1=-4; 1:r2=0; 2:r0=0;
+0:r1=-1; 1:r0=0; 1:r1=-4; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=0; 1:r1=0; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=1; 1:r1=-4; 1:r2=0; 2:r0=0;
+0:r1=-1; 1:r0=1; 1:r1=-4; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=1; 1:r1=0; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=1; 1:r1=0; 1:r2=1; 2:r0=1;
+0:r1=0; 1:r0=0; 1:r1=-1; 1:r2=0; 2:r0=0;
+0:r1=0; 1:r0=1; 1:r1=-1; 1:r2=0; 2:r0=0;
+Ok
+Witnesses
+Positive: 1 Negative: 11
+Condition exists (0:r1=-1 /\ 2:r0=1 /\ 1:r0=1 /\ 1:r1=0 /\ 1:r2=1)
+Observation FREF-G1h-handoff-release-put Sometimes 1 11
+Time FREF-G1h-handoff-release-put 0.12
+Hash=7b57a86e45db6c048fc8656e5a8f1ef1
+

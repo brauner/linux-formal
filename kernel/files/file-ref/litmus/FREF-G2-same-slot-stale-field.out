@@ -1,0 +1,25 @@
+Test FREF-G2-same-slot-stale-field Allowed
+States 15
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=1;
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-9; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=fop; 1:r3=1;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=1;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=0; 1:r0=fop; 1:r1=-1; 1:r2=q; 1:r3=-9;
+0:r1=0; 1:r0=q; 1:r1=-1; 1:r2=q; 1:r3=0;
+Ok
+Witnesses
+Positive: 1 Negative: 15
+Condition exists (0:r1=-1 /\ 1:r0=fop /\ 1:r1=0 /\ 1:r2=fop /\ 1:r3=1)
+Observation FREF-G2-same-slot-stale-field Sometimes 1 15
+Time FREF-G2-same-slot-stale-field 0.27
+Hash=4023c4994c32af12c6b0742e2f8f4e4f
+

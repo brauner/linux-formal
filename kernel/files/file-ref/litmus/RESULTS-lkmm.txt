@@ -1,0 +1,24 @@
+test                                         expected   observation                flags
+FREF-C1f-put-close-release-cas-fence         Never      Never (0 of 6)             -
+FREF-C1m-put-close-release-cas               Sometimes  Sometimes (2 of 8)         -
+FREF-C1-put-close-full-cas                   Never      Never (0 of 6)             -
+FREF-G1a-recheck-get-acquire                 Never      Never (0 of 9)             -
+FREF-G1hf-handoff-full-put                   Never      Never (0 of 11)            -
+FREF-G1h-handoff-release-put                 Sometimes  Sometimes (1 of 12)        -
+FREF-G1hm-handoff-release-put-mb             Never      Never (0 of 11)            -
+FREF-G1m-recheck-get-relaxed                 Sometimes  Sometimes (1 of 12)        -
+FREF-G1-recheck-get-full                     Never      Never (0 of 9)             -
+FREF-G1rm-recheck-release-put                Sometimes  Sometimes (1 of 10)        -
+FREF-G2fa-same-slot-reload-dep-acquire       Never      Never (0 of 15)            -
+FREF-G2fm-same-slot-reload-dep-relaxed       Sometimes  Sometimes (1 of 20)        -
+FREF-G2f-same-slot-reload-dep                Never      Never (0 of 14)            -
+FREF-G2h-same-slot-acquire-reload            Never      Never (0 of 14)            -
+FREF-G2-same-slot-stale-field                Sometimes  Sometimes (1 of 16)        -
+FREF-P1-cleared-slot-release-put             Never      Never (0 of 5)             -
+FREF-P1m-cleared-slot-relaxed-put            Sometimes  Sometimes (1 of 6)         -
+FREF-P1mm-cleared-slot-relaxed-get           Sometimes  Sometimes (1 of 6)         -
+FREF-P2m-resurrect-free-no-fence             Sometimes  Sometimes (1 of 9)         -
+FREF-P2-resurrect-free-acquire               Never      Never (0 of 7)             -
+FREF-P3c-last-put-full-no-fence              Never      Never (0 of 2)             -
+FREF-P3-last-put-release                     Never      Never (0 of 2)             -
+FREF-P3m-last-put-no-fence                   Sometimes  Sometimes (1 of 3)         -

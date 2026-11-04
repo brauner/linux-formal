@@ -1,0 +1,17 @@
+Test FREF-P2-resurrect-free-acquire Allowed
+States 7
+0:r1=-9; 0:r2=-9; 1:r0=0;
+0:r1=-4; 0:r2=-9; 1:r0=-1;
+0:r1=-1; 0:r2=0; 1:r0=-4;
+0:r1=-1; 0:r2=1; 1:r0=-4;
+0:r1=-1; 0:r2=1; 1:r0=-1;
+0:r1=-1; 0:r2=1; 1:r0=0;
+0:r1=0; 0:r2=-9; 1:r0=-1;
+No
+Witnesses
+Positive: 0 Negative: 7
+Condition exists (1:r0=-1 /\ 0:r1=-1 /\ 0:r2=0)
+Observation FREF-P2-resurrect-free-acquire Never 0 7
+Time FREF-P2-resurrect-free-acquire 0.35
+Hash=f68ddbd0b0fbd410a5331ca8b5718cfc
+

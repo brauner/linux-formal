@@ -73,6 +73,7 @@ File descriptor tables, [`kernel/files/`](kernel/files/):
 |---|---|---|---|
 | [`sync-close/`](kernel/files/sync-close/) | the order in which a dying descriptor table closes its files, against exit, exec and fork | TLA+ | queued for v7.4 |
 | [`close-range/`](kernel/files/close-range/) | close_range() with CLOSE_RANGE_EXCEPT and CLOSE_RANGE_CLOEXEC_ONLY, and the clone dup_fd() makes for it | TLA+, exhaustive C | queued for v7.4 |
+| [`file-ref/`](kernel/files/file-ref/) | file_ref_t, the reference count of struct file: the rcuref scheme on an atomic_long_t with SLAB_TYPESAFE_BY_RCU recycling, against the fget-rcu lookup, close(), open(), epoll; and the ordering its lockless users need | TLA+, LKMM litmus | mainline, at v7.4-rc1 |
 
 Coredumps, [`kernel/coredump/`](kernel/coredump/):
 
@@ -160,6 +161,16 @@ finding. In short:
   [`kernel/files/sync-close/`](kernel/files/sync-close/)
 - **Offset directories**: since v6.14 readdir on tmpfs walks d_children,
   which stops agreeing with the stable offsets after a rename over a
+- **file_ref**: the counter protocol holds and every protection in it is
+  load-bearing. `__fget_files_rcu()` lost the dependency on its second
+  load in the code-generation rewrite that followed the
+  SLAB_TYPESAFE_BY_RCU conversion, so on arm64 and POWER a caller can
+  read the fields of the previous incarnation of a file that another
+  thread closed and reopened on the same descriptor. `file_ref_get()`
+  needs acquire ordering and provides full ordering; `file_ref_put()`
+  cannot be relaxed, its full barrier orders the cleared slot before the
+  slab handoff on the synchronous free paths.
+  [`kernel/files/file-ref/`](kernel/files/file-ref/)
   name, an exchange or a wrap of the offset allocator. An unlink between
   two getdents64() calls then makes it return untouched entries twice
   or skip them. The descending walk of the offset tree that replaces it

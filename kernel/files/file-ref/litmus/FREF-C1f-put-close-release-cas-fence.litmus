@@ -1,0 +1,58 @@
+C FREF-C1f-put-close-release-cas-fence
+
+(*
+ * Expected: Never
+ *
+ * FREF-C1 with try_cmpxchg_release() plus smp_acquire__after_ctrl_dep()
+ * on success, the shape __file_ref_put() uses: enough, if one wanted the
+ * release form here too.
+ *
+ * file_ref_put_close(): atomic_long_read() finds ONEREF, the fully
+ * ordered try_cmpxchg(ONEREF, DEAD) succeeds, the caller frees the file.
+ * Meanwhile a lookup took a reference, used the file and put it back
+ * (acquire get, release put).  The free must see that use.
+ *
+ * 1:r0 = 0: the lookup's get succeeded, on the initial ONEREF.  0:r1 = 0:
+ * the cmpxchg succeeded; as the get came first it read the ONEREF the
+ * lookup's put wrote.  Bad outcome: the free misses the lookup's store.
+ *
+ * Code (include/linux/file_ref.h at v7.4-rc1-132-g05441d697f7f):
+ *    182   old = atomic_long_read(&ref->refcnt);
+ *    183   if (likely(old == FILE_REF_ONEREF)) {
+ *    184           if (likely(atomic_long_try_cmpxchg(&ref->refcnt, &old, FILE_REF_DEAD)))
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	data=0;
+	0:r1=-9;
+	0:r2=-9;
+}
+
+P0(atomic_t *cnt, int *data)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_read(cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, 0, -4);
+		if (r1 == 0) {
+			smp_rmb();
+			r2 = READ_ONCE(*data);
+		}
+	}
+}
+
+P1(atomic_t *cnt, int *data)
+{
+	int r0;
+	int r1;
+
+	r0 = atomic_fetch_add_acquire(1, cnt);
+	WRITE_ONCE(*data, 1);
+	r1 = atomic_fetch_sub_release(1, cnt);
+}
+
+exists (1:r0=0 /\ 0:r1=0 /\ 0:r2=0)

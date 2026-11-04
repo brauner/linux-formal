@@ -1,0 +1,15 @@
+Test FREF-P1-cleared-slot-release-put Allowed
+States 5
+1:r0=0; 1:r1=-1; 1:r2=0;
+1:r0=0; 1:r1=0; 1:r2=0;
+1:r0=1; 1:r1=-1; 1:r2=0;
+1:r0=1; 1:r1=0; 1:r2=0;
+1:r0=1; 1:r1=0; 1:r2=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (1:r0=1 /\ 1:r1=-1 /\ 1:r2=1)
+Observation FREF-P1-cleared-slot-release-put Never 0 5
+Time FREF-P1-cleared-slot-release-put 0.02
+Hash=afae30c794046463ce7b9da4dd02e1fb
+

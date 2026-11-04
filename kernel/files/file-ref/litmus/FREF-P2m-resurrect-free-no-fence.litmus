@@ -1,0 +1,65 @@
+C FREF-P2m-resurrect-free-no-fence
+
+(*
+ * Expected: Sometimes
+ *
+ * Mutation of FREF-P2 without smp_acquire__after_ctrl_dep(): with release
+ * decrements the free can run ahead of what the resurrecting pair did.
+ * The fence is load-bearing once the decrement is not fully ordered.
+ *
+ * The free must come after everything a resurrecting get/put pair did
+ * to the file.  P0 drops the last reference (release decrement to
+ * NOREF); P1 brings it back (file_ref_get() on NOREF succeeds), uses the
+ * file, drops it again; P0's cmpxchg NOREF -> DEAD wins over P1's and
+ * P0 frees the file.  P0's smp_acquire__after_ctrl_dep() after the
+ * successful cmpxchg (an smp_rmb() on every architecture that has no
+ * stronger one) is what orders the free after P1's use.
+ *
+ * Both decrements are the candidate atomic_long_dec_return_release().
+ * 1:r0 = -1: P1 read P0's NOREF.  0:r1 = -1: P0's cmpxchg succeeded, so
+ * it read the NOREF P1's decrement wrote.  Bad outcome: the free (the
+ * last look at the object) misses P1's store.
+ *
+ * Code (fs/file.c at v7.4-rc1-132-g05441d697f7f):
+ *     81   if (!atomic_long_try_cmpxchg_release(&ref->refcnt, &cnt, FILE_REF_DEAD))
+ *     88   smp_acquire__after_ctrl_dep();
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	data=0;
+	0:r1=-9;
+	0:r2=-9;
+	1:r2=-9;
+}
+
+P0(atomic_t *cnt, int *data)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_fetch_sub_release(1, cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, -1, -4);
+		if (r1 == -1) {
+			r2 = READ_ONCE(*data);
+		}
+	}
+}
+
+P1(atomic_t *cnt, int *data)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_fetch_add_acquire(1, cnt);
+	WRITE_ONCE(*data, 1);
+	r1 = atomic_fetch_sub_release(1, cnt);
+	if (r1 == 0) {
+		r2 = atomic_cmpxchg_release(cnt, -1, -4);
+	}
+}
+
+exists (1:r0=-1 /\ 0:r1=-1 /\ 0:r2=0)

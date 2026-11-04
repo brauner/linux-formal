@@ -1,0 +1,15 @@
+Test FREF-C1f-put-close-release-cas-fence Allowed
+States 5
+0:r1=-9; 0:r2=-9; 1:r0=0;
+0:r1=0; 0:r2=0; 1:r0=-4;
+0:r1=0; 0:r2=1; 1:r0=-4;
+0:r1=0; 0:r2=1; 1:r0=0;
+0:r1=1; 0:r2=-9; 1:r0=0;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (1:r0=0 /\ 0:r1=0 /\ 0:r2=0)
+Observation FREF-C1f-put-close-release-cas-fence Never 0 6
+Time FREF-C1f-put-close-release-cas-fence 0.05
+Hash=484aeb21a70f99fe129abe9fe21b8651
+

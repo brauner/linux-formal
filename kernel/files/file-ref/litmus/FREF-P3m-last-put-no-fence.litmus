@@ -1,0 +1,52 @@
+C FREF-P3m-last-put-no-fence
+
+(*
+ * Expected: Sometimes
+ *
+ * Mutation of FREF-P3 without smp_acquire__after_ctrl_dep(): the free can
+ * run ahead of the other holder's use.
+ *
+ * Two holders drop their references with the candidate
+ * atomic_long_dec_return_release(); the one that reaches NOREF marks the
+ * file DEAD and frees it.  The free must see what the other holder did
+ * before its put: the release of P0's decrement orders its use before
+ * the decrement, P1's cmpxchg reads the NOREF its own decrement wrote
+ * after P0's, and smp_acquire__after_ctrl_dep() orders the free after
+ * the cmpxchg.  The fast path (a decrement that stays non-negative)
+ * needs no acquire: the task never touches the file again.
+ *
+ * 1:r0 = 0: P1's decrement read P0's result.  Bad outcome: the free
+ * misses P0's store.
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(1);
+	data=0;
+	1:r1=-9;
+	1:r2=-9;
+}
+
+P0(atomic_t *cnt, int *data)
+{
+	int r0;
+
+	WRITE_ONCE(*data, 1);
+	r0 = atomic_fetch_sub_release(1, cnt);
+}
+
+P1(atomic_t *cnt, int *data)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	r0 = atomic_fetch_sub_release(1, cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, -1, -4);
+		if (r1 == -1) {
+			r2 = READ_ONCE(*data);
+		}
+	}
+}
+
+exists (1:r0=0 /\ 1:r1=-1 /\ 1:r2=0)

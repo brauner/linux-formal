@@ -1,0 +1,57 @@
+C FREF-G1rm-recheck-release-put
+
+(*
+ * Expected: Sometimes
+ *
+ * Mutation of FREF-G1a: an acquire get against a release put
+ * (atomic_long_dec_return_release()), the relaxation of the put side that
+ * would pair with it.  LKMM allows the bad outcome: the release orders
+ * the cleared slot before the decrement and before the cmpxchg's store,
+ * but not before the plain store that re-initialises the counter after
+ * the free, even though that store is coherence-after the cmpxchg on the
+ * same CPU (LKMM has no release-sequence rule for a later plain store).
+ * In the kernel the re-initialisation happens on whichever CPU takes the
+ * object from the slab freelist; FREF-G1h is that shape and is allowed
+ * by every model, FREF-G1hf shows the full decrement forbidding it.
+ *
+ * Encoding as FREF-G1: 0:r1 = -1 says the file was freed and recycled,
+ * 1:r1 = 0 is then the recycled ONEREF, 1:r2 = 1 the old slot.
+ *)
+
+{
+	atomic_t cnt = ATOMIC_INIT(0);
+	slot=1;
+	slot2=0;
+	0:r1=-9;
+}
+
+P0(int *slot, int *slot2, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+
+	WRITE_ONCE(*slot, 0);
+	r0 = atomic_fetch_sub_release(1, cnt);
+	if (r0 == 0) {
+		r1 = atomic_cmpxchg_release(cnt, -1, -4);
+		if (r1 == -1) {
+			atomic_set(cnt, 0);
+			smp_store_release(slot2, 1);
+		}
+	}
+}
+
+P1(int *slot, atomic_t *cnt)
+{
+	int r0;
+	int r1;
+	int r2;
+
+	rcu_read_lock();
+	r0 = READ_ONCE(*slot);
+	r1 = atomic_fetch_add_acquire(1, cnt);
+	r2 = READ_ONCE(*slot);
+	rcu_read_unlock();
+}
+
+exists (0:r1=-1 /\ 1:r0=1 /\ 1:r1=0 /\ 1:r2=1)

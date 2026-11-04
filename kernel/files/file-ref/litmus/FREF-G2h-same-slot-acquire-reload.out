@@ -1,0 +1,23 @@
+Test FREF-G2h-same-slot-acquire-reload Allowed
+States 13
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=1;
+0:r1=-9; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-9; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=-4; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=fop; 1:r3=2;
+0:r1=-1; 1:r0=fop; 1:r1=0; 1:r2=q; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=-4; 1:r2=q; 1:r3=0;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=fop; 1:r3=-9;
+0:r1=-1; 1:r0=q; 1:r1=0; 1:r2=q; 1:r3=0;
+0:r1=0; 1:r0=fop; 1:r1=-1; 1:r2=q; 1:r3=-9;
+0:r1=0; 1:r0=q; 1:r1=-1; 1:r2=q; 1:r3=0;
+No
+Witnesses
+Positive: 0 Negative: 14
+Condition exists (0:r1=-1 /\ 1:r0=fop /\ 1:r1=0 /\ 1:r2=fop /\ 1:r3=1)
+Observation FREF-G2h-same-slot-acquire-reload Never 0 14
+Time FREF-G2h-same-slot-acquire-reload 0.27
+Hash=6747fe4a196200dea9b42f3dd570a1b3
+

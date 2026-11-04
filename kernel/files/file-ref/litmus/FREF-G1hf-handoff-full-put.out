@@ -1,0 +1,21 @@
+Test FREF-G1hf-handoff-full-put Allowed
+States 11
+0:r1=-9; 1:r0=0; 1:r1=0; 1:r2=0; 2:r0=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=0; 2:r0=0;
+0:r1=-9; 1:r0=1; 1:r1=0; 1:r2=1; 2:r0=0;
+0:r1=-1; 1:r0=0; 1:r1=-4; 1:r2=0; 2:r0=0;
+0:r1=-1; 1:r0=0; 1:r1=-4; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=0; 1:r1=0; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=1; 1:r1=-4; 1:r2=0; 2:r0=0;
+0:r1=-1; 1:r0=1; 1:r1=-4; 1:r2=0; 2:r0=1;
+0:r1=-1; 1:r0=1; 1:r1=0; 1:r2=0; 2:r0=1;
+0:r1=0; 1:r0=0; 1:r1=-1; 1:r2=0; 2:r0=0;
+0:r1=0; 1:r0=1; 1:r1=-1; 1:r2=0; 2:r0=0;
+No
+Witnesses
+Positive: 0 Negative: 11
+Condition exists (0:r1=-1 /\ 2:r0=1 /\ 1:r0=1 /\ 1:r1=0 /\ 1:r2=1)
+Observation FREF-G1hf-handoff-full-put Never 0 11
+Time FREF-G1hf-handoff-full-put 0.11
+Hash=1e982a024af475b133b146c836037d3a
+
