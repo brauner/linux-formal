@@ -1,0 +1,25 @@
+AArch64 file-ref-reload-nodep-field-lse
+"fget() before the dependency fix, LSE: f_mode read through the first pointer"
+{
+0:X0=slot; 0:X1=fop; 0:X2=cnt; 0:X3=q;
+1:X0=slot; 1:X2=cnt;
+slot=fop; fop=1; q=0; cnt=0;
+}
+ P0                       | P1                       ;
+ STR X3,[X0]              | LDR X4,[X0]              ;
+ MOV W5,#-1               | EOR X10,X4,X4            ;
+ LDADDAL W5,W6,[X2]       | ADD X11,X2,X10           ;
+ CBNZ W6,Lout0            | MOV W5,#1                ;
+ MOV W7,#-1               | LDADDAL W5,W6,[X11] ;
+ MOV W8,#-4               | ADD W7,W6,W5             ;
+ CASL W7,W8,[X2]          | CMP W7,#0                ;
+ MOV W9,#-1               | B.LT Lout1               ;
+ CMP W7,W9                | LDR X8,[X0]              ;
+ B.NE Lout0               | CMP X8,X4                ;
+ DMB ISHLD                | B.NE Lout1               ;
+ STR WZR,[X2]             | LDR W9,[X4]               ;
+ MOV W10,#2               | Lout1:                   ;
+ STR W10,[X1]             |                          ;
+ STLR X1,[X0]             |                          ;
+ Lout0:                   |                          ;
+exists (0:X6=0 /\ 0:X7=-1 /\ 1:X4=fop /\ 1:X6=0 /\ 1:X8=fop /\ 1:X9=1)

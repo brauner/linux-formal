@@ -117,3 +117,12 @@ different shape of the same question.
   and POWER a caller of `fget()` can read `f_mode` or `f_op` of the
   previous incarnation of a file that was closed and reopened on the
   same descriptor by another thread.
+
+## AArch64
+
+[`aarch64/`](aarch64/) has the stale field read (G2) as AArch64 litmus
+tests of the code GCC emits for the lookup, run against herd7's model
+of the Arm architecture: allowed with the field read through the
+register of the first load, with LSE and on the LL/SC path, forbidden
+with the read through the reloaded register.  See
+[`aarch64/README.md`](aarch64/README.md).

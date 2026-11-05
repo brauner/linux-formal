@@ -1,0 +1,66 @@
+0000000000001104 <fget>:
+    1104:	paciasp
+    1108:	stp	x29, x30, [sp, #-48]!
+    110c:	mrs	x1, sp_el0
+    1110:	mov	x29, sp
+    1114:	str	x19, [sp, #16]
+    1118:	str	w0, [sp, #40]
+    111c:	ldr	x19, [x1, #1880]
+    1120:	bl	0 <__rcu_read_lock>
+    1124:	ldr	w2, [sp, #40]
+    1128:	ldr	x3, [x19, #32]
+    112c:	ldr	w1, [x3]
+    1130:	cmp	x2, x1
+    1134:	ngc	x1, xzr
+    1138:	csdb
+    113c:	ldr	x0, [x3, #8]
+    1140:	and	x4, x1, x2
+    1144:	add	x5, x0, x4, lsl #3
+    1148:	ldr	x0, [x0, x4, lsl #3]
+    114c:	ands	x0, x0, x1
+    1150:	b.eq	11d4 <fget+0xd0>  // b.none
+    1154:	b	11a8 <fget+0xa4>
+    1158:	add	x4, x0, #0xa8
+    115c:	mov	x1, #0x1                   	// #1
+    1160:	ldaddal	x1, x1, [x4]
+    1164:	add	x1, x1, #0x1
+    1168:	tbnz	x1, #63, 11c8 <fget+0xc4>
+    116c:	ldr	x1, [x5]
+    1170:	cmp	x0, x1
+    1174:	b.ne	11f4 <fget+0xf0>  // b.any
+    1178:	ldr	x1, [x19, #32]
+    117c:	cmp	x1, x3
+    1180:	b.ne	11f4 <fget+0xf0>  // b.any
+    1184:	ldr	w1, [x0, #4]
+    1188:	tbnz	w1, #14, 11d0 <fget+0xcc>
+    118c:	str	x0, [sp, #40]
+    1190:	bl	0 <__rcu_read_unlock>
+    1194:	ldr	x19, [sp, #16]
+    1198:	ldr	x0, [sp, #40]
+    119c:	ldp	x29, x30, [sp], #48
+    11a0:	autiasp
+    11a4:	ret
+    11a8:	add	x6, x0, #0xa8
+    11ac:	prfm	pstl1strm, [x6]
+    11b0:	ldxr	x1, [x6]
+    11b4:	add	x1, x1, #0x1
+    11b8:	stlxr	w4, x1, [x6]
+    11bc:	cbnz	w4, 11b0 <fget+0xac>
+    11c0:	dmb	ish
+    11c4:	tbz	x1, #63, 116c <fget+0x68>
+    11c8:	ldr	x3, [x19, #32]
+    11cc:	b	112c <fget+0x28>
+    11d0:	bl	0 <fput>
+    11d4:	mov	x0, #0x0                   	// #0
+    11d8:	str	x0, [sp, #40]
+    11dc:	bl	0 <__rcu_read_unlock>
+    11e0:	ldr	x19, [sp, #16]
+    11e4:	ldr	x0, [sp, #40]
+    11e8:	ldp	x29, x30, [sp], #48
+    11ec:	autiasp
+    11f0:	ret
+    11f4:	str	x2, [sp, #40]
+    11f8:	bl	0 <fput>
+    11fc:	ldr	x3, [x19, #32]
+    1200:	ldr	x2, [sp, #40]
+    1204:	b	112c <fget+0x28>
